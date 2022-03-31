@@ -56,6 +56,7 @@ class HeaderFragment : Fragment() {
         }
     }
 
+//    TODO: Find alternative way.
     private fun getCurrentActivity():String? {
         val activityManager = context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         return activityManager.getRunningTasks(1)[0].topActivity?.className
