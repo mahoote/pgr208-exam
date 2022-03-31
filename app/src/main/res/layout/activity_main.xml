@@ -30,9 +30,10 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="123dp"
-            android:layout_height="133dp"
+            android:layout_width="158dp"
+            android:layout_height="170dp"
             android:text="Select Image"
+            android:textSize="18sp"
             android:background="@drawable/large_blue_btn"
             android:drawableBottom="@drawable/ic_file_image_solid"
             android:paddingBottom="20dp"
@@ -41,9 +42,10 @@
             />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="123dp"
-            android:layout_height="133dp"
+            android:layout_width="158dp"
+            android:layout_height="170dp"
             android:text="Take Photo"
+            android:textSize="18sp"
             android:background="@drawable/large_blue_btn"
             android:drawableBottom="@drawable/ic_camera_solid"
             android:paddingBottom="20dp"
