@@ -1,5 +1,6 @@
 package no.kristiania.prg208_1_exam.fragments
 
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import no.kristiania.prg208_1_exam.MainActivity
 import no.kristiania.prg208_1_exam.R
+import no.kristiania.prg208_1_exam.SearchActivity
 
 class HeaderFragment : Fragment() {
 
@@ -25,6 +27,10 @@ class HeaderFragment : Fragment() {
 
         highlightCurrentActivity(view)
         newImageOnClick(view)
+
+        view.findViewById<AppCompatButton>(R.id.hf_search_btn).setOnClickListener {
+            startEmptyActivity(SearchActivity())
+        }
 
         return view
     }
@@ -38,8 +44,7 @@ class HeaderFragment : Fragment() {
             if (contentFragment != null) {
                 fragmentManager.beginTransaction().remove(contentFragment).commit()
             } else {
-                val intent = Intent(this.requireContext(), MainActivity::class.java)
-                startActivity(intent)
+                startEmptyActivity(MainActivity())
             }
         }
     }
@@ -54,6 +59,11 @@ class HeaderFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun startEmptyActivity(activity: Activity){
+        val intent = Intent(this.requireContext(), activity::class.java)
+        startActivity(intent)
     }
 
 //    TODO: Find alternative way.

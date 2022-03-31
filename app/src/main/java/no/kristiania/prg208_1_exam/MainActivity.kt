@@ -16,11 +16,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val fragmentManager = supportFragmentManager
-        val headerFragment = HeaderFragment()
-
-        // Add header fragment to activity
-        fragmentManager.beginTransaction().add(R.id.m_header_fragment_container, headerFragment).commit()
+        Globals.setHeaderFragment(supportFragmentManager)
 
         val selectImage = findViewById<AppCompatButton>(R.id.m_select_image_btn)
         val uploadImageFragment = UploadImageFragment()
