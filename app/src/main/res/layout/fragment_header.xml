@@ -33,27 +33,36 @@
             android:orientation="horizontal"
             android:layout_marginTop="20dp">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/new_image_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:height="55dp"
                 android:layout_weight="1"
-                android:text="New Image"/>
-            <Button
+                android:text="New Image"
+                android:background="@drawable/nav_gray_btn"
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/search_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:height="55dp"
-                android:text="Search"/>
-            <Button
+                android:text="Search"
+                android:background="@drawable/nav_gray_btn"
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/saved_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:height="55dp"
-                android:text="Saved"/>
+                android:text="Saved"
+                android:background="@drawable/nav_gray_btn"
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+
 
         </LinearLayout>
 
