@@ -49,6 +49,11 @@ class HeaderFragment : Fragment() {
         }
     }
 
+    private fun startEmptyActivity(activity: Activity){
+        val intent = Intent(this.requireContext(), activity::class.java)
+        startActivity(intent)
+    }
+
     private fun highlightCurrentActivity(v: View) {
         val currentActivity = getCurrentActivity()
         if(currentActivity != null) {
@@ -57,13 +62,11 @@ class HeaderFragment : Fragment() {
                 currentActivity.contains("MainActivity") -> {
                     v.findViewById<AppCompatButton>(R.id.hf_new_image_btn).background = blueBtn
                 }
+                currentActivity.contains("SearchActivity") -> {
+                    v.findViewById<AppCompatButton>(R.id.hf_search_btn).background = blueBtn
+                }
             }
         }
-    }
-
-    private fun startEmptyActivity(activity: Activity){
-        val intent = Intent(this.requireContext(), activity::class.java)
-        startActivity(intent)
     }
 
 //    TODO: Find alternative way.

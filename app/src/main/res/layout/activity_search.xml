@@ -7,7 +7,7 @@
     tools:context=".SearchActivity">
 
     <FrameLayout
-        android:id="@+id/s_header_fragment_container"
+        android:id="@+id/header_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"

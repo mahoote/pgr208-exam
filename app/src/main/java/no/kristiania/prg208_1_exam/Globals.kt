@@ -11,6 +11,6 @@ object Globals : AppCompatActivity() {
         val headerFragment = HeaderFragment()
 
         // Add header fragment to activity
-        fragmentManager.beginTransaction().add(R.id.m_header_fragment_container, headerFragment).commit()
+        fragmentManager.beginTransaction().add(R.id.header_fragment_container, headerFragment).commit()
     }
 }
