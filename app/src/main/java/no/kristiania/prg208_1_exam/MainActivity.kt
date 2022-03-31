@@ -1,8 +1,11 @@
 package no.kristiania.prg208_1_exam
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.widget.AppCompatButton
 import no.kristiania.prg208_1_exam.fragments.HeaderFragment
+import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,6 +16,13 @@ class MainActivity : AppCompatActivity() {
         val headerFragment = HeaderFragment()
 
         // Add header fragment to activity
-        fragmentManager.beginTransaction().add(R.id.header_fragment_container, headerFragment).commit()
+        fragmentManager.beginTransaction().add(R.id.m_header_fragment_container, headerFragment).commit()
+
+        val selectImage = findViewById<AppCompatButton>(R.id.m_select_image_btn)
+        val uploadImageFragment = UploadImageFragment()
+
+        selectImage.setOnClickListener {
+            fragmentManager.beginTransaction().replace(R.id.m_content_fragment_container, uploadImageFragment).commit()
+        }
     }
 }
