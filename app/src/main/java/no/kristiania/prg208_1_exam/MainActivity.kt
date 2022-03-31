@@ -3,7 +3,9 @@ package no.kristiania.prg208_1_exam
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.os.HandlerCompat.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import no.kristiania.prg208_1_exam.fragments.HeaderFragment
@@ -32,6 +34,6 @@ class MainActivity : AppCompatActivity() {
         val fragmentManager = supportFragmentManager
 
         fragmentManager.beginTransaction()
-            .replace(R.id.m_content_fragment_container, fragment).commit()
+            .replace(R.id.m_content_fragment_container, fragment, "content_fragment").commit()
     }
 }
