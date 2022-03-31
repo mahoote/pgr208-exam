@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.widget.AppCompatButton
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import no.kristiania.prg208_1_exam.fragments.HeaderFragment
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
 
@@ -22,7 +24,14 @@ class MainActivity : AppCompatActivity() {
         val uploadImageFragment = UploadImageFragment()
 
         selectImage.setOnClickListener {
-            fragmentManager.beginTransaction().replace(R.id.m_content_fragment_container, uploadImageFragment).commit()
+            switchFragment(uploadImageFragment)
         }
+    }
+
+    private fun switchFragment(fragment: Fragment) {
+        val fragmentManager = supportFragmentManager
+
+        fragmentManager.beginTransaction()
+            .replace(R.id.m_content_fragment_container, fragment).commit()
     }
 }
