@@ -22,7 +22,7 @@ class SearchActivity : AppCompatActivity() {
         Globals.setHeaderFragment(supportFragmentManager)
         overridePendingTransition(0, 0)
 
-        addImages(500)
+        addImages(10)
 
         val adapter = ImageAdapter(results)
         recyclerView = findViewById(R.id.s_results_view)
@@ -41,7 +41,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun addImages(amount: Int) {
         for (i in 0..amount) {
-            results.add(ResultImage(R.mipmap.ic_launcher, "Test"))
+            results.add(ResultImage(R.drawable.ic_launcher_background, "Test"))
         }
     }
 }
