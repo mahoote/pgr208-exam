@@ -3,6 +3,7 @@ package no.kristiania.prg208_1_exam
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import no.kristiania.prg208_1_exam.adapters.ImageAdapter
@@ -12,16 +13,7 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
 
-    private val results: ArrayList<ResultImage> = arrayListOf(
-        ResultImage(R.mipmap.ic_launcher, "Test"),
-        ResultImage(R.mipmap.ic_launcher, "Test"),
-        ResultImage(R.mipmap.ic_launcher, "Test"),
-        ResultImage(R.mipmap.ic_launcher, "Test"),
-        ResultImage(R.mipmap.ic_launcher, "Test"),
-        ResultImage(R.mipmap.ic_launcher, "Test"),
-        ResultImage(R.mipmap.ic_launcher, "Test"),
-        ResultImage(R.mipmap.ic_launcher, "Test")
-    )
+    private var results: ArrayList<ResultImage> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,10 +22,12 @@ class SearchActivity : AppCompatActivity() {
         Globals.setHeaderFragment(supportFragmentManager)
         overridePendingTransition(0, 0)
 
+        addImages(500)
+
         val adapter = ImageAdapter(results)
         recyclerView = findViewById(R.id.s_results_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = GridLayoutManager(this, 3)
         recyclerView.adapter = adapter
 
         adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
@@ -43,5 +37,11 @@ class SearchActivity : AppCompatActivity() {
 
         })
 
+    }
+
+    private fun addImages(amount: Int) {
+        for (i in 0..amount) {
+            results.add(ResultImage(R.mipmap.ic_launcher, "Test"))
+        }
     }
 }

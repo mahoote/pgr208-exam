@@ -63,7 +63,9 @@ class HeaderFragment : Fragment() {
 
         if(!currentActivity.equals(activityClassName)) {
             val intent = Intent(this.requireContext(), activity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             startActivity(intent)
+            activity.finish()
         }
     }
 
