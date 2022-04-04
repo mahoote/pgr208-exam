@@ -1,12 +1,9 @@
 package no.kristiania.prg208_1_exam.fragments
 
 import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
+import no.kristiania.prg208_1_exam.Globals
 import no.kristiania.prg208_1_exam.MainActivity
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.SearchActivity
@@ -56,7 +54,7 @@ class HeaderFragment : Fragment() {
 
     private fun startEmptyActivity(activity: Activity){
         val activityClassName = activity::class.java.name
-        val currentActivity = getCurrentActivity()
+        val currentActivity = Globals.getCurrentActivity(context)
 
         if(!currentActivity.equals(activityClassName)) {
             val intent = Intent(this.requireContext(), activity::class.java)
@@ -66,7 +64,7 @@ class HeaderFragment : Fragment() {
     }
 
     private fun highlightCurrentActivity() {
-        val currentActivity = getCurrentActivity()
+        val currentActivity = Globals.getCurrentActivity(context)
         if(currentActivity != null) {
             val blueBtn: Drawable? = context?.let { ContextCompat.getDrawable(it, R.drawable.nav_blue_btn) }
             when {
@@ -78,12 +76,6 @@ class HeaderFragment : Fragment() {
                 }
             }
         }
-    }
-
-//    TODO: Find alternative way.
-    private fun getCurrentActivity():String? {
-        val activityManager = context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        return activityManager.getRunningTasks(1)[0].topActivity?.className
     }
 
 }
