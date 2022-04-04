@@ -35,6 +35,9 @@ class MainActivity : AppCompatActivity() {
     private fun switchFragment(fragment: Fragment) {
         fragmentManager.beginTransaction()
             .replace(R.id.m_content_fragment_container, fragment, "content_fragment").commit()
+
+
+
     }
 
     override fun onBackPressed() {
@@ -46,4 +49,6 @@ class MainActivity : AppCompatActivity() {
             finishAffinity()
         }
     }
+
+
 }

@@ -19,24 +19,26 @@ import no.kristiania.prg208_1_exam.SearchActivity
 
 class HeaderFragment : Fragment() {
 
+    private lateinit var v: View
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_header, container, false)
+        v = inflater.inflate(R.layout.fragment_header, container, false)
 
-        highlightCurrentActivity(view)
-        newImageOnClick(view)
+        highlightCurrentActivity()
+        newImageOnClick()
 
-        view.findViewById<AppCompatButton>(R.id.hf_search_btn).setOnClickListener {
+        v.findViewById<AppCompatButton>(R.id.hf_search_btn).setOnClickListener {
             startEmptyActivity(SearchActivity())
         }
 
-        return view
+        return v
     }
 
-    private fun newImageOnClick(view: View) {
-        view.findViewById<AppCompatButton>(R.id.hf_new_image_btn).setOnClickListener {
+    private fun newImageOnClick() {
+        v.findViewById<AppCompatButton>(R.id.hf_new_image_btn).setOnClickListener {
             Toast.makeText(context, "Click new image", Toast.LENGTH_SHORT).show()
             val fragmentManager = parentFragmentManager
 
@@ -53,10 +55,11 @@ class HeaderFragment : Fragment() {
 
     private fun startEmptyActivity(activity: Activity){
         val intent = Intent(this.requireContext(), activity::class.java)
+        v.clearAnimation()
         startActivity(intent)
     }
 
-    private fun highlightCurrentActivity(v: View) {
+    private fun highlightCurrentActivity() {
         val currentActivity = getCurrentActivity()
         if(currentActivity != null) {
             val blueBtn: Drawable? = context?.let { ContextCompat.getDrawable(it, R.drawable.nav_blue_btn) }
