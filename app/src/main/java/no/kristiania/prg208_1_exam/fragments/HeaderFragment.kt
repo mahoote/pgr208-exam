@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -54,9 +55,14 @@ class HeaderFragment : Fragment() {
     }
 
     private fun startEmptyActivity(activity: Activity){
-        val intent = Intent(this.requireContext(), activity::class.java)
-        v.clearAnimation()
-        startActivity(intent)
+        val activityClassName = activity::class.java.name
+        val currentActivity = getCurrentActivity()
+
+        if(!currentActivity.equals(activityClassName)) {
+            val intent = Intent(this.requireContext(), activity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     private fun highlightCurrentActivity() {
