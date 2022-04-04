@@ -46,14 +46,14 @@
                     android:layout_height="wrap_content"
                     android:text="Original Image"
                     android:textColor="@color/black"
-                    android:textSize="28sp"
+                    android:textSize="30sp"
                     android:textStyle="bold"/>
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/s_orig_img_shapeable"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:background="@color/app_gray"
+                <ImageView
+                    android:id="@+id/s_orig_img"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:background="@drawable/ic_launcher_background"
                     android:layout_marginVertical="20dp"/>
 
             </LinearLayout>
