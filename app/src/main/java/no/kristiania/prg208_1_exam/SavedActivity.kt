@@ -11,6 +11,7 @@ import no.kristiania.prg208_1_exam.models.CategoryItem
 class SavedActivity : AppCompatActivity() {
     private var mainCategoryRecycler: RecyclerView? = null
     private var mainRecyclerAdapter: MainRecyclerAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_saved)
@@ -71,10 +72,10 @@ class SavedActivity : AppCompatActivity() {
         allCategoryList.add(AllCategory("Movies Dubbed in Hindi", categoryItemList3))
         allCategoryList.add(AllCategory("Category 4th", categoryItemList4))
         allCategoryList.add(AllCategory("Category 5th", categoryItemList5))
-        setMainCategoryRecycler(allCategoryList)
+        setMainRecycler(allCategoryList)
     }
 
-    private fun setMainCategoryRecycler(allCategoryList: List<AllCategory>) {
+    private fun setMainRecycler(allCategoryList: List<AllCategory>) {
         mainCategoryRecycler = findViewById(R.id.main_recycler)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         mainCategoryRecycler?.layoutManager = layoutManager

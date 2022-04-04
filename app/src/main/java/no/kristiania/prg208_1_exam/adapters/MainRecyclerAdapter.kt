@@ -11,9 +11,11 @@ import no.kristiania.prg208_1_exam.models.AllCategory
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.models.CategoryItem
 
-class MainRecyclerAdapter(private val context: Context, allCategoryList: List<AllCategory>) :
+class MainRecyclerAdapter(
+    private val context: Context,
+    private val allCategoryList: List<AllCategory>
+) :
     RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>() {
-    private val allCategoryList: List<AllCategory> = allCategoryList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
         return MainViewHolder(
@@ -25,7 +27,7 @@ class MainRecyclerAdapter(private val context: Context, allCategoryList: List<Al
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         holder.categoryTitle.text = allCategoryList[position].categoryTitle
-        setCatItemRecycler(holder.itemRecycler, allCategoryList[position].categoryItemList)
+        setSearchItemRecycler(holder.itemRecycler, allCategoryList[position].categoryItemList)
     }
 
     override fun getItemCount(): Int {
@@ -38,7 +40,7 @@ class MainRecyclerAdapter(private val context: Context, allCategoryList: List<Al
 
     }
 
-    private fun setCatItemRecycler(
+    private fun setSearchItemRecycler(
         recyclerView: RecyclerView,
         categoryItemList: List<CategoryItem>
     ) {
