@@ -4,24 +4,19 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.rajendra.nestedrecyclerview.adapter.MainRecyclerAdapter
-import com.rajendra.nestedrecyclerview.model.AllCategory
-import com.rajendra.nestedrecyclerview.model.CategoryItem
+import no.kristiania.prg208_1_exam.adapters.MainRecyclerAdapter
+import no.kristiania.prg208_1_exam.models.AllCategory
+import no.kristiania.prg208_1_exam.models.CategoryItem
 
 class SavedActivity : AppCompatActivity() {
-    var mainCategoryRecycler: RecyclerView? = null
-    var mainRecyclerAdapter: MainRecyclerAdapter? = null
+    private var mainCategoryRecycler: RecyclerView? = null
+    private var mainRecyclerAdapter: MainRecyclerAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_saved)
 
         Globals.setHeaderFragment(supportFragmentManager)
 
-        // here we will add some dummy data to our model class
-
-        // here we will add data to category item model class
-
-        // added in first category
         val categoryItemList: MutableList<CategoryItem> = ArrayList()
         categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
         categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
@@ -85,13 +80,5 @@ class SavedActivity : AppCompatActivity() {
         mainCategoryRecycler?.layoutManager = layoutManager
         mainRecyclerAdapter = MainRecyclerAdapter(this, allCategoryList)
         mainCategoryRecycler?.adapter = mainRecyclerAdapter
-    } // Hi today we are gonna make a nested recyclerview
-    // one is horizontal and 2nd is vertical and we will place then together.
-    // before getting started make sure to subscribe and hit the bell icon to get update when i post video.
-    // so 1st we will setup verticle recyclerview.
-    // so now we will setup a horizontal recyclerview. which having category elements
-    // now lets goto the all category Model
-    // similarly u can add many types
-    // so this tutorial has been completed if u have any question and doubt plz comment
-    // see you in the next tutorial
+    }
 }

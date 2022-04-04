@@ -1,4 +1,4 @@
-package com.rajendra.nestedrecyclerview.adapter
+package no.kristiania.prg208_1_exam.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,15 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.rajendra.nestedrecyclerview.model.CategoryItem
+import no.kristiania.prg208_1_exam.models.CategoryItem
 import no.kristiania.prg208_1_exam.R
 
 class CategoryItemRecyclerAdapter(
     private val context: Context,
-    categoryItemList: List<CategoryItem>
+    private val categoryItemList: List<CategoryItem>
 ) :
     RecyclerView.Adapter<CategoryItemRecyclerAdapter.CategoryItemViewHolder>() {
-    private val categoryItemList: List<CategoryItem>
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryItemViewHolder {
         return CategoryItemViewHolder(
             LayoutInflater.from(
@@ -32,14 +31,8 @@ class CategoryItemRecyclerAdapter(
     }
 
     class CategoryItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var itemImage: ImageView
+        var itemImage: ImageView = itemView.findViewById(R.id.item_image)
 
-        init {
-            itemImage = itemView.findViewById(R.id.item_image)
-        }
     }
 
-    init {
-        this.categoryItemList = categoryItemList
-    }
 }

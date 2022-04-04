@@ -1,10 +1,7 @@
-package com.rajendra.nestedrecyclerview.model
+package no.kristiania.prg208_1_exam.models
 
-class AllCategory(var categoryTitle: String, categoryItemList: List<CategoryItem>) {
 
+data class AllCategory(
+    var categoryTitle: String,
     var categoryItemList: List<CategoryItem>
-
-    init {
-        this.categoryItemList = categoryItemList
-    }
-}
+    )

@@ -1,4 +1,4 @@
-package com.rajendra.nestedrecyclerview.adapter
+package no.kristiania.prg208_1_exam.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.rajendra.nestedrecyclerview.model.AllCategory
-import com.rajendra.nestedrecyclerview.model.CategoryItem
+import no.kristiania.prg208_1_exam.models.AllCategory
 import no.kristiania.prg208_1_exam.R
+import no.kristiania.prg208_1_exam.models.CategoryItem
 
 class MainRecyclerAdapter(private val context: Context, allCategoryList: List<AllCategory>) :
     RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>() {
-    private val allCategoryList: List<AllCategory>
+    private val allCategoryList: List<AllCategory> = allCategoryList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
         return MainViewHolder(
@@ -24,7 +24,7 @@ class MainRecyclerAdapter(private val context: Context, allCategoryList: List<Al
     }
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
-        holder.categoryTitle.setText(allCategoryList[position].categoryTitle)
+        holder.categoryTitle.text = allCategoryList[position].categoryTitle
         setCatItemRecycler(holder.itemRecycler, allCategoryList[position].categoryItemList)
     }
 
@@ -33,13 +33,9 @@ class MainRecyclerAdapter(private val context: Context, allCategoryList: List<Al
     }
 
     class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var categoryTitle: TextView
-        var itemRecycler: RecyclerView
+        var categoryTitle: TextView = itemView.findViewById(R.id.row_title)
+        var itemRecycler: RecyclerView = itemView.findViewById(R.id.item_recycler)
 
-        init {
-            categoryTitle = itemView.findViewById(R.id.row_title)
-            itemRecycler = itemView.findViewById(R.id.item_recycler)
-        }
     }
 
     private fun setCatItemRecycler(
@@ -51,7 +47,4 @@ class MainRecyclerAdapter(private val context: Context, allCategoryList: List<Al
         recyclerView.adapter = itemRecyclerAdapter
     }
 
-    init {
-        this.allCategoryList = allCategoryList
-    }
 }
