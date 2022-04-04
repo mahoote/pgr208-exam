@@ -17,6 +17,8 @@ class SavedActivity : AppCompatActivity() {
         setContentView(R.layout.activity_saved)
 
         Globals.setHeaderFragment(supportFragmentManager)
+        overridePendingTransition(0, 0)
+
 
         val categoryItemList: MutableList<CategoryItem> = ArrayList()
         categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
