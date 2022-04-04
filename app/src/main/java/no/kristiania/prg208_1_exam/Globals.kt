@@ -1,6 +1,7 @@
 package no.kristiania.prg208_1_exam
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import no.kristiania.prg208_1_exam.fragments.HeaderFragment
 

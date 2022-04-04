@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val contentFragment = fragmentManager.findFragmentByTag("content_fragment")
-        Toast.makeText(applicationContext, "Back pressed", Toast.LENGTH_SHORT).show()
 
         if (contentFragment != null) {
             fragmentManager.beginTransaction().remove(contentFragment).commit()

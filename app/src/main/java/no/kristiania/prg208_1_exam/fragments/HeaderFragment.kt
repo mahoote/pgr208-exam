@@ -39,6 +39,8 @@ class HeaderFragment : Fragment() {
         view.findViewById<AppCompatButton>(R.id.hf_new_image_btn).setOnClickListener {
             Toast.makeText(context, "Click new image", Toast.LENGTH_SHORT).show()
             val fragmentManager = parentFragmentManager
+
+            // TODO: Refactor code. Similar with MainActivity onBackPressed().
             val contentFragment = fragmentManager.findFragmentByTag("content_fragment")
 
             if (contentFragment != null) {
