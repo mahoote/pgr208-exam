@@ -11,10 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
-import no.kristiania.prg208_1_exam.Globals
-import no.kristiania.prg208_1_exam.MainActivity
-import no.kristiania.prg208_1_exam.R
-import no.kristiania.prg208_1_exam.SearchActivity
+import no.kristiania.prg208_1_exam.*
 
 class HeaderFragment : Fragment() {
 
@@ -40,7 +37,7 @@ class HeaderFragment : Fragment() {
         }
 
         v.findViewById<AppCompatButton>(R.id.hf_saved_btn).setOnClickListener {
-            // TODO: startEmptyActivity(SavedActivity())
+           startEmptyActivity(SavedActivity())
         }
     }
 
