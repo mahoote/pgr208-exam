@@ -27,28 +27,33 @@ class HeaderFragment : Fragment() {
         v = inflater.inflate(R.layout.fragment_header, container, false)
 
         highlightCurrentActivity()
-        newImageOnClick()
+        headerButtonsOnClick()
+
+        return v
+    }
+
+    private fun headerButtonsOnClick() {
+        v.findViewById<AppCompatButton>(R.id.hf_new_image_btn).setOnClickListener { newImageOnClick() }
 
         v.findViewById<AppCompatButton>(R.id.hf_search_btn).setOnClickListener {
             startEmptyActivity(SearchActivity())
         }
 
-        return v
+        v.findViewById<AppCompatButton>(R.id.hf_saved_btn).setOnClickListener {
+            // TODO: startEmptyActivity(SavedActivity())
+        }
     }
 
     private fun newImageOnClick() {
-        v.findViewById<AppCompatButton>(R.id.hf_new_image_btn).setOnClickListener {
-            Toast.makeText(context, "Click new image", Toast.LENGTH_SHORT).show()
-            val fragmentManager = parentFragmentManager
+        val fragmentManager = parentFragmentManager
 
-            // TODO: Refactor code. Similar with MainActivity onBackPressed().
-            val contentFragment = fragmentManager.findFragmentByTag("content_fragment")
+        // TODO: Refactor code. Similar with MainActivity onBackPressed().
+        val contentFragment = fragmentManager.findFragmentByTag("content_fragment")
 
-            if (contentFragment != null) {
-                fragmentManager.beginTransaction().remove(contentFragment).commit()
-            } else {
-                startEmptyActivity(MainActivity())
-            }
+        if (contentFragment != null) {
+            fragmentManager.beginTransaction().remove(contentFragment).commit()
+        } else {
+            startEmptyActivity(MainActivity())
         }
     }
 
@@ -60,7 +65,6 @@ class HeaderFragment : Fragment() {
             val intent = Intent(this.requireContext(), activity::class.java)
             startActivity(intent)
         }
-
     }
 
     private fun highlightCurrentActivity() {
@@ -73,6 +77,9 @@ class HeaderFragment : Fragment() {
                 }
                 currentActivity.contains("SearchActivity") -> {
                     v.findViewById<AppCompatButton>(R.id.hf_search_btn).background = blueBtn
+                }
+                currentActivity.contains("SavedActivity") -> {
+                    v.findViewById<AppCompatButton>(R.id.hf_saved_btn).background = blueBtn
                 }
             }
         }
