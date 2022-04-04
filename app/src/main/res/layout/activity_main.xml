@@ -53,6 +53,7 @@
                 android:text="Take Photo"
                 android:textSize="18sp"
                 android:background="@drawable/large_blue_btn"
+                android:alpha="0.4"
                 android:drawableBottom="@drawable/ic_camera_solid"
                 android:paddingBottom="20dp"
                 android:layout_marginHorizontal="10dp"
