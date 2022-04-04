@@ -42,7 +42,8 @@
                 android:text="New Image"
                 android:background="@drawable/nav_gray_btn"
                 android:textColor="@color/white"
-                android:textSize="18sp"/>
+                android:textSize="18sp"
+                android:tag="1"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/hf_search_btn"
@@ -52,7 +53,8 @@
                 android:text="Search"
                 android:background="@drawable/nav_gray_btn"
                 android:textColor="@color/white"
-                android:textSize="18sp"/>
+                android:textSize="18sp"
+                android:tag="2"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/hf_saved_btn"
@@ -62,7 +64,8 @@
                 android:text="Saved"
                 android:background="@drawable/nav_gray_btn"
                 android:textColor="@color/white"
-                android:textSize="18sp"/>
+                android:textSize="18sp"
+                android:tag="3"/>
 
 
         </LinearLayout>

@@ -17,4 +17,69 @@
         />
 
 
+    <LinearLayout
+        android:id="@+id/s_content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/header_fragment_container"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:gravity="center_horizontal">
+
+        <LinearLayout
+            android:id="@+id/s_orig_img_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginVertical="20dp">
+
+            <TextView
+                android:id="@+id/s_orig_img_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Original Image"
+                android:textColor="@color/black"
+                android:textSize="30sp"
+                android:textStyle="bold"/>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/s_orig_img_shapeable"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:background="@color/app_gray"
+                android:layout_marginVertical="20dp"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/s_results_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/s_results_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Results"
+                android:textColor="@color/black"
+                android:textSize="30sp"
+                android:textStyle="bold"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/s_results_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="20dp"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
