@@ -4,24 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/app_gray"
     tools:context=".fragments.ChosenImageFragment">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
+    <com.revosleap.blurrylayout.BlurryLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/blurLayout">
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_x_solid"
-            android:background="@color/app_transparent"
-            android:layout_gravity="end"
-            android:layout_margin="20dp"/>
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            android:alpha="0.8" />
 
+    </com.revosleap.blurrylayout.BlurryLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -31,8 +27,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="vertical"
-            android:layout_marginTop="90dp">
+            android:orientation="vertical">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="80dp"/>
 
             <ImageView
                 android:layout_width="250dp"
@@ -57,38 +56,45 @@
                 android:text="This cat is really cool. He (or she) wears glasses that are really cool!"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                android:gravity="center" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal"
-                android:layout_marginBottom="20dp">
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_bookmark_stroke"
-                    android:background="@color/app_transparent"
-                    android:layout_marginHorizontal="20dp"/>
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_globe_stroke"
-                    android:background="@color/app_transparent"
-                    android:layout_marginHorizontal="20dp"/>
-
-            </LinearLayout>
+                android:gravity="center"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginBottom="120dp"/>
 
         </LinearLayout>
 
     </ScrollView>
+
+    <ImageButton
+        android:id="@+id/cif_close_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_x_solid"
+        android:background="@color/app_transparent"
+        android:layout_gravity="end"
+        android:layout_margin="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <ImageButton
+        android:id="@+id/cif_bookmark_btn"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_bookmark_stroke"
+        android:background="@drawable/round_black_btn"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <ImageButton
+        android:id="@+id/cif_web_btn"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_globe_stroke"
+        android:background="@drawable/round_black_btn"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

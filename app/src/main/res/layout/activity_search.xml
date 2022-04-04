@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".SearchActivity">
+    tools:context=".SearchActivity"
+    android:id="@+id/se_content_layout">
 
     <FrameLayout
         android:id="@+id/header_fragment_container"
