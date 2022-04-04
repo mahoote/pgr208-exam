@@ -61,6 +61,7 @@
     </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/uf_upload_search_btn"
         android:layout_width="wrap_content"
         android:layout_height="120dp"
         android:layout_gravity="center"
