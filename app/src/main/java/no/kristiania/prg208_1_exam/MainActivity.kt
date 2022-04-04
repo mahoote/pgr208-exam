@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         fragmentManager = supportFragmentManager
 
         Globals.setHeaderFragment(fragmentManager)
+        overridePendingTransition(0, 0)
 
         val selectImage = findViewById<AppCompatButton>(R.id.m_select_image_btn)
         val uploadImageFragment = UploadImageFragment()

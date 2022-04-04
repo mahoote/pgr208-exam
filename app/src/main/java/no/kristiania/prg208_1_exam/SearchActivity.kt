@@ -11,7 +11,7 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
 
         Globals.setHeaderFragment(supportFragmentManager)
-
+        overridePendingTransition(0, 0)
 
     }
 }
