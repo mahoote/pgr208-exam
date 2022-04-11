@@ -34,6 +34,7 @@
                 android:layout_height="80dp"/>
 
             <ImageView
+                android:id="@+id/cif_chosen_image"
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:layout_gravity="center"

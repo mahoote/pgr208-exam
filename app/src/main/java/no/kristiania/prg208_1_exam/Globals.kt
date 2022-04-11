@@ -11,6 +11,8 @@ import no.kristiania.prg208_1_exam.fragments.HeaderFragment
 
 object Globals : AppCompatActivity() {
 
+    const val LOG_TAG = "debugger"
+
     fun setHeaderFragment(fragmentManager: FragmentManager){
 
         val headerFragment = HeaderFragment()
