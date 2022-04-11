@@ -2,20 +2,25 @@ package no.kristiania.prg208_1_exam
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import no.kristiania.prg208_1_exam.adapters.ImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
 import no.kristiania.prg208_1_exam.models.ResultImage
+import no.kristiania.prg208_1_exam.repository.Repository
 
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var fragmentManager: FragmentManager
+    private lateinit var viewModel: SearchViewModel
 
     private var results: ArrayList<ResultImage> = arrayListOf()
 
@@ -44,6 +49,23 @@ class SearchActivity : AppCompatActivity() {
                 switchFragment(chosenImageFragment)
             }
 
+        })
+
+        val repository = Repository()
+        val viewModelFactory = SearchViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, viewModelFactory)[SearchViewModel::class.java]
+        viewModel.getAllPosts()
+        viewModel.allPosts.observe(this, Observer { response ->
+            if(response.isSuccessful) {
+                response.body()?.forEach {
+                    Log.d("Response", it.userId.toString())
+                    Log.d("Response", it.id.toString())
+                    Log.d("Response", it.title)
+                    Log.d("Response", it.body)
+                }
+            } else {
+                Log.d("Response", response.errorBody().toString())
+            }
         })
 
     }
