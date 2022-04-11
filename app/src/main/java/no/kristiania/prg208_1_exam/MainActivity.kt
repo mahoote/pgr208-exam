@@ -48,6 +48,9 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE){
             Log.i("debug", "${data?.data}")
+            val uriPathHelper = URIPathHelper()
+            val filePath = data?.data?.let { uriPathHelper.getPath(this, it) }
+            Log.i("debug", filePath.toString())
         }
     }
 
