@@ -10,6 +10,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -19,7 +20,7 @@ import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
 
 class MainActivity : AppCompatActivity() {
 
-    private val REQUEST_CODE = 200
+    private val REQUEST_CODE = 100
     private lateinit var fragmentManager: FragmentManager
 
 
@@ -37,13 +38,22 @@ class MainActivity : AppCompatActivity() {
 
         selectImage.setOnClickListener {
             if (askForPermissions()) {
-                // Permissions are already granted, do your stuff
+                openGalleryForImage()
             }
 //            switchFragment(uploadImageFragment)
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE){
+            Log.i("debug", "${data?.data}")
+        }
+    }
+
     private fun switchFragment(fragment: Fragment) {
+        val bundle = Bundle()
+//        bundle.putInt("chosenImage", )
         fragmentManager.beginTransaction()
             .replace(R.id.m_content_fragment_container, fragment, "content_fragment").commit()
     }
@@ -56,6 +66,12 @@ class MainActivity : AppCompatActivity() {
         } else {
             finishAffinity()
         }
+    }
+
+    private fun openGalleryForImage() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, REQUEST_CODE)
     }
 
     private fun isPermissionsAllowed(): Boolean {
