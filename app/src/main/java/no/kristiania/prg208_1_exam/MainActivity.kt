@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentManager
 import no.kristiania.prg208_1_exam.Globals.UriToBitmap
 import no.kristiania.prg208_1_exam.Globals.getBitmap
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
+import java.net.URI
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,17 +48,17 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == this.requestCode){
-            val imageUri = data?.data.toString()
-            val bitmapImage = getBitmap(this, null, imageUri, ::UriToBitmap)
+            val imageUri = data?.data
+
 
             val uploadImageFragment = UploadImageFragment()
-            addFragment(uploadImageFragment, bitmapImage)
+            addFragment(uploadImageFragment, imageUri)
         }
     }
 
-    private fun addFragment(fragment: Fragment, bitmapImage: Bitmap) {
+    private fun addFragment(fragment: Fragment, uri: Uri?) {
         val bundle = Bundle()
-        bundle.putParcelable("bitmapImage", bitmapImage)
+        bundle.putParcelable("imageUri", uri)
         fragment.arguments = bundle
 
         fragmentManager.beginTransaction()

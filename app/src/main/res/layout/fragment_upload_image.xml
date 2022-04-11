@@ -14,8 +14,8 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        tools:layout_editor_absoluteX="-162dp"
-        tools:layout_editor_absoluteY="0dp">
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="128dp">
 
         <LinearLayout
             android:id="@+id/uf_button_container"
@@ -56,7 +56,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginVertical="20dp"
-            android:maxWidth="300dp"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
             android:src="@mipmap/ic_launcher_round" />
 
     </LinearLayout>

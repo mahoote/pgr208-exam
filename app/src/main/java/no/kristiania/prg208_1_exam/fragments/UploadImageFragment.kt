@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -27,22 +28,10 @@ class UploadImageFragment : Fragment() {
         val v =  inflater.inflate(R.layout.fragment_upload_image, container, false)
 
         val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
-        val bitmapImage: Bitmap? = arguments?.getParcelable("bitmapImage")
-
-        Log.i(LOG_TAG, "$bitmapImage")
-
-        uploadImage.layoutParams = uploadImage.layoutParams.apply {
-
-            if (bitmapImage != null) {
-                width = 300
-            }
-            else {
-                Log.w(LOG_TAG, "Chosen image is null")
-            }
-        }
-
-        uploadImage.setImageBitmap(bitmapImage)
-
+        val imageUri: Uri? = arguments?.getParcelable("imageUri")
+        uploadImage.setImageURI(imageUri)
+        uploadImage.maxWidth = 300
+        uploadImage.maxHeight = 350
         v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
             startEmptyActivity(SearchActivity())
         }
