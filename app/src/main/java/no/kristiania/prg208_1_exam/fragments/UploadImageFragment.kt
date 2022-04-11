@@ -30,8 +30,8 @@ class UploadImageFragment : Fragment() {
         val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
         val imageUri: Uri? = arguments?.getParcelable("imageUri")
         uploadImage.setImageURI(imageUri)
-        uploadImage.maxWidth = 300
-        uploadImage.maxHeight = 350
+        uploadImage.maxWidth = 800
+        uploadImage.maxHeight = 800
         v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
             startEmptyActivity(SearchActivity())
         }
