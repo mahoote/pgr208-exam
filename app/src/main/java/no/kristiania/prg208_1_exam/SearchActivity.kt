@@ -1,5 +1,6 @@
 package no.kristiania.prg208_1_exam
 
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import no.kristiania.prg208_1_exam.adapters.ImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
+import no.kristiania.prg208_1_exam.models.Post
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.repository.Repository
 
@@ -54,19 +56,39 @@ class SearchActivity : AppCompatActivity() {
         val repository = Repository()
         val viewModelFactory = SearchViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory)[SearchViewModel::class.java]
-        viewModel.getAllPosts()
-        viewModel.allPosts.observe(this, Observer { response ->
-            if(response.isSuccessful) {
-                response.body()?.forEach {
-                    Log.d("Response", it.userId.toString())
-                    Log.d("Response", it.id.toString())
-                    Log.d("Response", it.title)
-                    Log.d("Response", it.body)
-                }
+
+        // TODO: POST request:
+
+        val bundle: Bundle? = intent.extras
+
+        val imageUri: Uri? = bundle?.getParcelable("chosenImageUri")
+        if (imageUri != null) {
+            viewModel.postImage(imageUri)
+        }
+        viewModel.postResponse.observe(this, Observer { response ->
+            if (response.isSuccessful) {
+                Log.d("Response", response.body().toString())
+                Log.d("Response", response.code().toString())
+                Log.d("Response", response.message())
             } else {
-                Log.d("Response", response.errorBody().toString())
+              Toast.makeText(this, response.code(), Toast.LENGTH_SHORT).show()
             }
         })
+
+        // TODO: GET request:
+//        viewModel.getAllPosts()
+//        viewModel.allPosts.observe(this, Observer { response ->
+//            if(response.isSuccessful) {
+//                response.body()?.forEach {
+//                    Log.d("Response", it.userId.toString())
+//                    Log.d("Response", it.id.toString())
+//                    Log.d("Response", it.title)
+//                    Log.d("Response", it.body)
+//                }
+//            } else {
+//                Log.d("Response", response.errorBody().toString())
+//            }
+//        })
 
     }
 

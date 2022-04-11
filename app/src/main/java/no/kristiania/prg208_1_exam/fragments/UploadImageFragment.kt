@@ -20,6 +20,8 @@ import no.kristiania.prg208_1_exam.SearchActivity
 
 class UploadImageFragment : Fragment() {
 
+    private lateinit var imageUri: Uri
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -28,10 +30,11 @@ class UploadImageFragment : Fragment() {
         val v =  inflater.inflate(R.layout.fragment_upload_image, container, false)
 
         val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
-        val imageUri: Uri? = arguments?.getParcelable("imageUri")
+        imageUri = arguments?.getParcelable("imageUri")!!
         uploadImage.setImageURI(imageUri)
         uploadImage.maxWidth = 800
         uploadImage.maxHeight = 800
+
         v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
             startEmptyActivity(SearchActivity())
         }
@@ -46,6 +49,7 @@ class UploadImageFragment : Fragment() {
 
         if(!currentActivity.equals(activityClassName)) {
             val intent = Intent(this.requireContext(), activity::class.java)
+            intent.putExtra("chosenImageUri", imageUri)
             startActivity(intent)
         }
     }
