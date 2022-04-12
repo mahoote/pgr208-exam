@@ -1,10 +1,12 @@
 package no.kristiania.prg208_1_exam
 
+import android.database.Cursor
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
@@ -14,9 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import no.kristiania.prg208_1_exam.adapters.ImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
-import no.kristiania.prg208_1_exam.models.Post
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.repository.Repository
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
+
 
 class SearchActivity : AppCompatActivity() {
 
@@ -63,15 +69,22 @@ class SearchActivity : AppCompatActivity() {
 
         val imageUri: Uri? = bundle?.getParcelable("chosenImageUri")
         if (imageUri != null) {
-            viewModel.postImage(imageUri)
+
+            val file = File(getRealPathFromURI(imageUri))
+            val requestFile = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
+            val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
+            val fullName = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), "image")
+            viewModel.postImage(body, fullName)
         }
         viewModel.postResponse.observe(this, Observer { response ->
             if (response.isSuccessful) {
+                Log.d("Response", "Response = Success!")
                 Log.d("Response", response.body().toString())
                 Log.d("Response", response.code().toString())
                 Log.d("Response", response.message())
             } else {
-              Toast.makeText(this, response.code(), Toast.LENGTH_SHORT).show()
+                Log.d("Response", "response is not successful" + response.code() + "\n" + response.message())
+              //Toast.makeText(this, response.code(), Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -90,6 +103,13 @@ class SearchActivity : AppCompatActivity() {
 //            }
 //        })
 
+    }
+
+    fun getRealPathFromURI(uri: Uri?): String? {
+        val cursor: Cursor? = contentResolver.query(uri!!, null, null, null, null)
+        cursor?.moveToFirst()
+        val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+        return idx?.let { cursor?.getString(it) }
     }
 
     private fun addImages(amount: Int) {

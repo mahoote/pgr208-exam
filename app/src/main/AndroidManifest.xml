@@ -11,7 +11,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PRG2081exam">
+        android:theme="@style/Theme.PRG2081exam"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".SavedActivity"
             android:exported="false" />

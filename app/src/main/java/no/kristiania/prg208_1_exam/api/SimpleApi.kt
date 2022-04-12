@@ -1,20 +1,21 @@
 package no.kristiania.prg208_1_exam.api
 
-import android.net.Uri
 import no.kristiania.prg208_1_exam.models.Post
-import no.kristiania.prg208_1_exam.models.ResultImage
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import java.net.URL
+import retrofit2.http.*
 
 interface SimpleApi {
 
-    @GET("/posts")
+    @GET("posts")
     suspend fun getAllPosts(): Response<List<Post>>
 
-    @POST("/upload")
-    suspend fun postImage(@Body image: Uri): Response<URL>
+    @Multipart
+    @POST("upload")
+    suspend fun postImage(
+        @Part("image") name: RequestBody,
+        @Part image: MultipartBody.Part
+    ): Response<String>
 
 }
