@@ -15,17 +15,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.androidnetworking.AndroidNetworking
+import com.jacksonandroidnetworking.JacksonParserFactory
 import no.kristiania.prg208_1_exam.adapters.ImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.repository.ImageRepo
+import no.kristiania.prg208_1_exam.services.APIService
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import java.io.File
-import kotlin.math.log
 
 
 class SearchActivity : AppCompatActivity() {
@@ -39,6 +41,8 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        initializeAndroidNetworking()
 
         fragmentManager = supportFragmentManager
 
@@ -76,6 +80,11 @@ class SearchActivity : AppCompatActivity() {
         })
     }
 
+    private fun initializeAndroidNetworking() {
+        AndroidNetworking.initialize(getApplicationContext())
+        AndroidNetworking.setParserFactory(JacksonParserFactory())
+    }
+
     private fun setRecyclerView(): ImageAdapter {
         val adapter = ImageAdapter(results)
         recyclerView = findViewById(R.id.s_results_view)
@@ -87,13 +96,15 @@ class SearchActivity : AppCompatActivity() {
 
     private fun uploadImageToServer(imageUri: Uri?) {
         if (imageUri != null) {
-            val requestName = "image"
+            /*val requestName = "image"
             val file = File(getPathFromURI(imageUri))
 
             val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
             val body = MultipartBody.Part.createFormData(requestName, file.name, requestFile)
             val fullName = requestName.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            viewModel.postImage(body, fullName)
+            viewModel.postImage(body, fullName)*/
+            val file = File(getPathFromURI(imageUri))
+            APIService().postImage(file)
         }
     }
 
