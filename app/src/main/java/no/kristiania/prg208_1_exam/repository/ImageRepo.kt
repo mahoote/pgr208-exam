@@ -1,7 +1,7 @@
 package no.kristiania.prg208_1_exam.repository
 
 import no.kristiania.prg208_1_exam.api.RetrofitInstance
-import no.kristiania.prg208_1_exam.models.ApiImage
+import no.kristiania.prg208_1_exam.models.ResultImage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -12,7 +12,7 @@ class ImageRepo {
         return RetrofitInstance.api.postImage(fullName, image)
     }
 
-    suspend fun getImage(searchEngine: String, url: String): Response<List<ApiImage>> {
+    suspend fun getImage(searchEngine: String, url: String): Response<List<ResultImage>> {
         return RetrofitInstance.api.getImages(searchEngine, url)
     }
 
