@@ -23,9 +23,9 @@ class SearchViewModel(private val imageRepo: ImageRepo): ViewModel() {
         }
     }
 
-    fun getImage(url: String){
+    fun getImage(searchEngine: String, url: String){
         viewModelScope.launch {
-            val response = imageRepo.getImage(url)
+            val response = imageRepo.getImage(searchEngine, url)
             getResponse.value = response
         }
     }

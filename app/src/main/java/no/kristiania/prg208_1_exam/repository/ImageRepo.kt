@@ -12,8 +12,8 @@ class ImageRepo {
         return RetrofitInstance.api.postImage(fullName, image)
     }
 
-    suspend fun getImage(url: String): Response<List<ApiImage>> {
-        return RetrofitInstance.api.getBingImages(url)
+    suspend fun getImage(searchEngine: String, url: String): Response<List<ApiImage>> {
+        return RetrofitInstance.api.getImages(searchEngine, url)
     }
 
 }

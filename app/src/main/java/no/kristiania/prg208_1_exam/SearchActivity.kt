@@ -114,7 +114,7 @@ class SearchActivity : AppCompatActivity() {
         val originalImage = findViewById<ImageView>(R.id.s_orig_img)
         originalImage.setImageURI(uri)
 
-        viewModel.getImage(response.body().toString())
+        viewModel.getImage("bing", response.body().toString())
 
         viewModel.getResponse.observe(this, Observer { res ->
             Log.d("Response", res.code().toString())
