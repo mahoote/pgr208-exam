@@ -16,4 +16,9 @@ interface SimpleApi {
         @Part image: MultipartBody.Part
     ): Response<String>
 
+    @GET("bing")
+    suspend fun getBingImages(
+        @Query("url") url: String
+    ): Response<List<ApiImage>>
+
 }

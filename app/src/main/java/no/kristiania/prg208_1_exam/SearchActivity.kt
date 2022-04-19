@@ -25,6 +25,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import java.io.File
+import kotlin.math.log
 
 
 class SearchActivity : AppCompatActivity() {
@@ -112,6 +113,13 @@ class SearchActivity : AppCompatActivity() {
 
         val originalImage = findViewById<ImageView>(R.id.s_orig_img)
         originalImage.setImageURI(uri)
+
+        viewModel.getImage(response.body().toString())
+
+        viewModel.getResponse.observe(this, Observer { res ->
+            Log.d("Response", res.code().toString())
+            Log.d("Response", res.body().toString())
+        })
     }
 
     private fun getPathFromURI(uri: Uri?): String? {

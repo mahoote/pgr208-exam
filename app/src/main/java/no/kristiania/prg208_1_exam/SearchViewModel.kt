@@ -14,11 +14,19 @@ import retrofit2.Response
 class SearchViewModel(private val imageRepo: ImageRepo): ViewModel() {
 
     val postResponse: MutableLiveData<Response<String>> = MutableLiveData()
+    val getResponse: MutableLiveData<Response<List<ApiImage>>> = MutableLiveData()
 
     fun postImage(image: MultipartBody.Part, fullName: RequestBody) {
         viewModelScope.launch {
             val response = imageRepo.postImage(image, fullName)
             postResponse.value = response
+        }
+    }
+
+    fun getImage(url: String){
+        viewModelScope.launch {
+            val response = imageRepo.getImage(url)
+            getResponse.value = response
         }
     }
 
