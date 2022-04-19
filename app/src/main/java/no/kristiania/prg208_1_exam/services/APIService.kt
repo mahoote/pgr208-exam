@@ -19,7 +19,11 @@ import java.util.concurrent.Executors
 
 class APIService {
 
-    fun postImage(file: File){
+    suspend fun postImage(file: File): Pair<String?, ANError?> {
+
+        var res: String? = null
+        var err: ANError? = null
+
         AndroidNetworking.upload("http://api-edu.gtl.ai/api/v1/imagesearch/upload")
             .addMultipartFile("image", file)
             .addMultipartParameter("key", "value")
@@ -30,14 +34,17 @@ class APIService {
 
             .getAsString(object : StringRequestListener {
                 override fun onResponse(response: String) {
-                    SearchActivity().onSuccessfulResponse(response)
+                    Log.i("debug", "Post: $response")
+                    res = response
                 }
 
                 override fun onError(anError: ANError) {
-                    SearchActivity().onErrorResponse(anError)
+                    err = anError
                 }
 
             })
+
+        return Pair(res, err)
     }
 
     fun getImages(){

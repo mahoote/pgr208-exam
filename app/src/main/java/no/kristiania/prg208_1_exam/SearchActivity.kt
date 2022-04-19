@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
+import kotlinx.coroutines.*
 import no.kristiania.prg208_1_exam.adapters.ImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
 import no.kristiania.prg208_1_exam.models.ResultImage
@@ -64,24 +65,33 @@ class SearchActivity : AppCompatActivity() {
 
     private fun uploadImageToServer(imageUri: Uri?) {
         if (imageUri != null) {
+            val file = File(getPathFromURI(imageUri)!!)
 
-            val file = File(getPathFromURI(imageUri))
-            APIService().postImage(file)
+            GlobalScope.launch {
+                val pair = async { APIService().postImage(file) }
+                val (res, err) =  pair.await()
+
+                res?.let { onSuccessfulResponse(it) }
+                if(res != null) Log.i("debug", "Res isn't null")
+                else err?.let { onErrorResponse(it) }
+
+                Log.i("debug", "After post: ${res.toString()}")
+            }
         }
     }
 
-    fun onErrorResponse(anError: ANError) {
+    private fun onErrorResponse(anError: ANError) {
         Log.d("debug", "An error occured")
         anError.printStackTrace()
         //Toast.makeText(this, response.code(), Toast.LENGTH_SHORT).show()
     }
 
-    fun onSuccessfulResponse(response: String) {
+    private fun onSuccessfulResponse(response: String) {
         Log.d("Response", "Response = Success!")
         Log.d("Response", response)
 
         val originalImage = findViewById<ImageView>(R.id.s_orig_img)
-
+        originalImage.setImageURI(Uri.parse(response))
 
 
 
