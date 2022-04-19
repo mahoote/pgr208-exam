@@ -1,7 +1,6 @@
 package no.kristiania.prg208_1_exam.api
 
-import no.kristiania.prg208_1_exam.models.ApiImage
-import no.kristiania.prg208_1_exam.models.Post
+import no.kristiania.prg208_1_exam.models.ResultImage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -20,6 +19,6 @@ interface SimpleApi {
     suspend fun getImages(
         @Path("searchEngine") searchEngine: String,
         @Query("url") url: String
-    ): Response<List<ApiImage>>
+    ): Response<List<ResultImage>>
 
 }

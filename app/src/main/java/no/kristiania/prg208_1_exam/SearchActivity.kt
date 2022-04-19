@@ -25,7 +25,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import java.io.File
-import kotlin.math.log
 
 
 class SearchActivity : AppCompatActivity() {
@@ -33,8 +32,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var fragmentManager: FragmentManager
     private lateinit var viewModel: SearchViewModel
-
-    private var results: ArrayList<ResultImage> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,19 +41,6 @@ class SearchActivity : AppCompatActivity() {
 
         Globals.setHeaderFragment(fragmentManager)
         overridePendingTransition(0, 0)
-
-        // TODO: Test.
-        addImages(10)
-
-        val adapter = setRecyclerView()
-
-        val chosenImageFragment = ChosenImageFragment()
-        adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
-            override fun onItemClick(position: Int) {
-                Toast.makeText(applicationContext, "Button $position pressed", Toast.LENGTH_SHORT).show()
-                switchFragment(chosenImageFragment)
-            }
-        })
 
         val imageRepo = ImageRepo()
         val viewModelFactory = SearchViewModelFactory(imageRepo)
@@ -76,7 +60,7 @@ class SearchActivity : AppCompatActivity() {
         })
     }
 
-    private fun setRecyclerView(): ImageAdapter {
+    private fun setRecyclerView(results: ArrayList<ResultImage>): ImageAdapter {
         val adapter = ImageAdapter(results)
         recyclerView = findViewById(R.id.s_results_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -117,8 +101,16 @@ class SearchActivity : AppCompatActivity() {
         viewModel.getImage("bing", response.body().toString())
 
         viewModel.getResponse.observe(this, Observer { res ->
-            Log.d("Response", res.code().toString())
-            Log.d("Response", res.body().toString())
+            val results = res.body() as ArrayList<ResultImage>
+            val adapter = setRecyclerView(results)
+
+            val chosenImageFragment = ChosenImageFragment()
+            adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
+                override fun onItemClick(position: Int) {
+                    Toast.makeText(applicationContext, "Button $position pressed", Toast.LENGTH_SHORT).show()
+                    switchFragment(chosenImageFragment)
+                }
+            })
         })
     }
 
@@ -127,12 +119,6 @@ class SearchActivity : AppCompatActivity() {
         cursor?.moveToFirst()
         val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
         return idx?.let { cursor?.getString(it) }
-    }
-
-    private fun addImages(amount: Int) {
-        for (i in 0..amount) {
-            results.add(ResultImage(R.drawable.ic_launcher_background, "Test"))
-        }
     }
 
     private fun switchFragment(fragment: Fragment) {
