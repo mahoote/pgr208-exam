@@ -21,6 +21,8 @@ import no.kristiania.prg208_1_exam.repository.Repository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
 
@@ -70,10 +72,10 @@ class SearchActivity : AppCompatActivity() {
         val imageUri: Uri? = bundle?.getParcelable("chosenImageUri")
         if (imageUri != null) {
 
-            val file = File(getRealPathFromURI(imageUri))
-            val requestFile = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
+            val file = File(getRealPathFromURI(imageUri)!!)
+            val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
             val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
-            val fullName = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), "image")
+            val fullName = "image".toRequestBody("multipart/form-data".toMediaTypeOrNull())
             viewModel.postImage(body, fullName)
         }
         viewModel.postResponse.observe(this, Observer { response ->
@@ -105,11 +107,11 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-    fun getRealPathFromURI(uri: Uri?): String? {
-        val cursor: Cursor? = contentResolver.query(uri!!, null, null, null, null)
+    private fun getRealPathFromURI(uri: Uri?): String? {
+        val cursor: Cursor? = uri?.let { contentResolver.query(it, null, null, null, null) }
         cursor?.moveToFirst()
         val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
-        return idx?.let { cursor?.getString(it) }
+        return idx?.let { cursor.getString(it) }
     }
 
     private fun addImages(amount: Int) {
