@@ -54,7 +54,7 @@
                     android:id="@+id/s_orig_img"
                     android:layout_width="120dp"
                     android:layout_height="120dp"
-                    android:background="@drawable/ic_launcher_background"
+                    android:src="@drawable/ic_launcher_background"
                     android:layout_marginVertical="20dp"/>
 
             </LinearLayout>

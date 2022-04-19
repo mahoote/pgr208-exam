@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -21,8 +22,7 @@ import no.kristiania.prg208_1_exam.repository.Repository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Response
 import java.io.File
 
 
@@ -70,23 +70,14 @@ class SearchActivity : AppCompatActivity() {
         val bundle: Bundle? = intent.extras
 
         val imageUri: Uri? = bundle?.getParcelable("chosenImageUri")
-        if (imageUri != null) {
 
-            val file = File(getRealPathFromURI(imageUri)!!)
-            val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
-            val fullName = "image".toRequestBody("multipart/form-data".toMediaTypeOrNull())
-            viewModel.postImage(body, fullName)
-        }
+        uploadImageToServer(imageUri)
+
         viewModel.postResponse.observe(this, Observer { response ->
             if (response.isSuccessful) {
-                Log.d("Response", "Response = Success!")
-                Log.d("Response", response.body().toString())
-                Log.d("Response", response.code().toString())
-                Log.d("Response", response.message())
+                onSuccessfulResponse(response, imageUri)
             } else {
-                Log.d("Response", "response is not successful" + response.code() + "\n" + response.message())
-              //Toast.makeText(this, response.code(), Toast.LENGTH_SHORT).show()
+                onErrorResponse(response)
             }
         })
 
@@ -107,11 +98,40 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-    private fun getRealPathFromURI(uri: Uri?): String? {
+    private fun uploadImageToServer(imageUri: Uri?) {
+        if (imageUri != null) {
+
+            val file = File(getPathFromURI(imageUri))
+            val requestFile = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
+            val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
+            val fullName = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), "image")
+            viewModel.postImage(body, fullName)
+        }
+    }
+
+    private fun onErrorResponse(response: Response<String>) {
+        Log.d(
+            "Response",
+            "response is not successful" + response.code() + "\n" + response.message()
+        )
+        //Toast.makeText(this, response.code(), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onSuccessfulResponse(response: Response<String>, uri: Uri?) {
+        Log.d("Response", "Response = Success!")
+        Log.d("Response", response.body().toString())
+        Log.d("Response", response.code().toString())
+        Log.d("Response", response.message())
+
+        val originalImage = findViewById<ImageView>(R.id.s_orig_img)
+        originalImage.setImageURI(uri)
+    }
+
+    private fun getPathFromURI(uri: Uri?): String? {
         val cursor: Cursor? = uri?.let { contentResolver.query(it, null, null, null, null) }
         cursor?.moveToFirst()
         val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
-        return idx?.let { cursor.getString(it) }
+        return idx?.let { cursor?.getString(it) }
     }
 
     private fun addImages(amount: Int) {
