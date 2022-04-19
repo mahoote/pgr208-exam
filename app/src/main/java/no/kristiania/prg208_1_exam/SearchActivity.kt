@@ -18,10 +18,11 @@ import androidx.recyclerview.widget.RecyclerView
 import no.kristiania.prg208_1_exam.adapters.ImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
 import no.kristiania.prg208_1_exam.models.ResultImage
-import no.kristiania.prg208_1_exam.repository.Repository
+import no.kristiania.prg208_1_exam.repository.ImageRepo
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import java.io.File
 
@@ -43,14 +44,10 @@ class SearchActivity : AppCompatActivity() {
         Globals.setHeaderFragment(fragmentManager)
         overridePendingTransition(0, 0)
 
+        // TODO: Test.
         addImages(10)
 
-        val adapter = ImageAdapter(results)
-        recyclerView = findViewById(R.id.s_results_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = GridLayoutManager(this, 3)
-        recyclerView.adapter = adapter
-
+        val adapter = setRecyclerView()
 
         val chosenImageFragment = ChosenImageFragment()
         adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
@@ -58,17 +55,13 @@ class SearchActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Button $position pressed", Toast.LENGTH_SHORT).show()
                 switchFragment(chosenImageFragment)
             }
-
         })
 
-        val repository = Repository()
-        val viewModelFactory = SearchViewModelFactory(repository)
+        val imageRepo = ImageRepo()
+        val viewModelFactory = SearchViewModelFactory(imageRepo)
         viewModel = ViewModelProvider(this, viewModelFactory)[SearchViewModel::class.java]
 
-        // TODO: POST request:
-
         val bundle: Bundle? = intent.extras
-
         val imageUri: Uri? = bundle?.getParcelable("chosenImageUri")
 
         uploadImageToServer(imageUri)
@@ -80,31 +73,25 @@ class SearchActivity : AppCompatActivity() {
                 onErrorResponse(response)
             }
         })
+    }
 
-        // TODO: GET request:
-//        viewModel.getAllPosts()
-//        viewModel.allPosts.observe(this, Observer { response ->
-//            if(response.isSuccessful) {
-//                response.body()?.forEach {
-//                    Log.d("Response", it.userId.toString())
-//                    Log.d("Response", it.id.toString())
-//                    Log.d("Response", it.title)
-//                    Log.d("Response", it.body)
-//                }
-//            } else {
-//                Log.d("Response", response.errorBody().toString())
-//            }
-//        })
-
+    private fun setRecyclerView(): ImageAdapter {
+        val adapter = ImageAdapter(results)
+        recyclerView = findViewById(R.id.s_results_view)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = GridLayoutManager(this, 3)
+        recyclerView.adapter = adapter
+        return adapter
     }
 
     private fun uploadImageToServer(imageUri: Uri?) {
         if (imageUri != null) {
-
+            val requestName = "image"
             val file = File(getPathFromURI(imageUri))
-            val requestFile = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
-            val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
-            val fullName = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), "image")
+
+            val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val body = MultipartBody.Part.createFormData(requestName, file.name, requestFile)
+            val fullName = requestName.toRequestBody("multipart/form-data".toMediaTypeOrNull())
             viewModel.postImage(body, fullName)
         }
     }
