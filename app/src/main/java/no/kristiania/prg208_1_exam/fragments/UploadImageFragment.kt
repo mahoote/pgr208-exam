@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
@@ -37,8 +38,10 @@ class UploadImageFragment : Fragment() {
         initializeAndroidNetworking()
 
         val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
+        val imgTxtStatus = v.findViewById<TextView>(R.id.uf_upload_img_status_txt)
+
         imageUri = arguments?.getParcelable("imageUri")!!
-        Picasso.get().load(imageUri).into(uploadImage)
+        Globals.loadImage(imageUri.toString(), uploadImage, imgTxtStatus)
         uploadImage.maxWidth = 800
         uploadImage.maxHeight = 800
 

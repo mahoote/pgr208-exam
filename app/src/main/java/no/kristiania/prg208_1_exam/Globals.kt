@@ -18,7 +18,7 @@ import java.lang.Exception
 
 object Globals : AppCompatActivity() {
 
-    fun setImage(
+    fun loadImage(
         uriString: String,
         target: ImageView?,
         statusTxt: TextView

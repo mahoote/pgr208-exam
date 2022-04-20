@@ -10,7 +10,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import no.kristiania.prg208_1_exam.Globals.setImage
+import no.kristiania.prg208_1_exam.Globals.loadImage
 import no.kristiania.prg208_1_exam.adapters.ImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
 import no.kristiania.prg208_1_exam.models.ResultImage
@@ -57,7 +57,7 @@ class SearchActivity : AppCompatActivity() {
         val imgTxtStatus = findViewById<TextView>(R.id.s_orig_img_status_txt)
 
         if (imgTxtStatus != null) {
-            setImage(response, originalImage, imgTxtStatus)
+            loadImage(response, originalImage, imgTxtStatus)
         }
     }
 
