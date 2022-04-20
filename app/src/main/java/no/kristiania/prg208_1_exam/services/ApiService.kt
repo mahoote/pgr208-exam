@@ -15,7 +15,6 @@ import java.io.File
 class ApiService {
 
     fun postImage(fragment: UploadImageFragment, file: File) {
-
         AndroidNetworking.upload("http://api-edu.gtl.ai/api/v1/imagesearch/upload")
             .addMultipartFile("image", file)
             .addMultipartParameter("key", "value")
@@ -38,15 +37,15 @@ class ApiService {
         AndroidNetworking.get("http://api-edu.gtl.ai/api/v1/imagesearch/{searchEngine}")
             .addPathParameter("searchEngine", searchEngine)
             .addQueryParameter("url", url)
-            .addHeaders("Connection", "close")
+            .addHeaders("Accept-Encoding", "identity")
             .build()
             .setDownloadProgressListener {bytesDownloaded, totalBytes ->
-                Log.d("debugger", "BytesDownloaded: $bytesDownloaded")
-                Log.d("debugger", "Total: $totalBytes")
+                Log.d("m_debug", "BytesDownloaded: $bytesDownloaded")
+                Log.d("m_debug", "Total: $totalBytes")
             }
             .getAsObjectList(ResultImage::class.java, object : ParsedRequestListener<List<ResultImage?>> {
                 override fun onResponse(images: List<ResultImage?>) {
-                    Log.d("debugger", "onResponse: $images")
+                    Log.d("m_debug", "onResponse: $images")
                     fragment.onSuccessfulGet(images)
                 }
 
@@ -54,15 +53,5 @@ class ApiService {
                     fragment.onErrorResponse(anError)
                 }
             })
-//            .getAsJSONArray(object : JSONArrayRequestListener {
-//                override fun onResponse(response: JSONArray?) {
-//                    Log.d("Response", "Json: $response")
-//                }
-//
-//                override fun onError(anError: ANError?) {
-//                    Log.e("Error", "onError: Error!", )
-//                }
-//
-//            })
     }
 }

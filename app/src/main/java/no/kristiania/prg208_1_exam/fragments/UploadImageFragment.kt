@@ -55,7 +55,7 @@ class UploadImageFragment : Fragment() {
     }
 
     private fun uploadImageToServer(imageUri: Uri?) {
-        Log.d("debugger", "uploadImageToServer")
+        Log.d("m_debug", "uploadImageToServer")
         if (imageUri != null) {
             val file = File(getPathFromURI(imageUri)!!)
             ApiService().postImage(this, file)
@@ -94,7 +94,7 @@ class UploadImageFragment : Fragment() {
         val currentActivity = Globals.getCurrentActivity(context)
 
         if(!currentActivity.equals(activityClassName)) {
-            Log.d("debugger", "Starting activity!")
+            Log.d("m_debug", "Starting activity!")
             val intent = Intent(this.requireContext(), activity::class.java)
 //            intent.putExtra("chosenImageUri", imageUri)
 //            intent.putExtra("results", results)
