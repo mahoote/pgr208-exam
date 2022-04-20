@@ -6,7 +6,6 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -16,10 +15,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import no.kristiania.prg208_1_exam.Globals.UriToBitmap
-import no.kristiania.prg208_1_exam.Globals.getBitmap
+import com.androidnetworking.AndroidNetworking
+import com.jacksonandroidnetworking.JacksonParserFactory
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
-import java.net.URI
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         fragmentManager = supportFragmentManager
 
         Globals.setHeaderFragment(fragmentManager)
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
         selectImage.setOnClickListener {
             if (askForPermissions()) {
-                openGalleryForImage()
+                openImageGallery()
             }
         }
     }
@@ -49,7 +48,6 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == this.requestCode){
             val imageUri = data?.data
-
 
             val uploadImageFragment = UploadImageFragment()
             addFragment(uploadImageFragment, imageUri)
@@ -75,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openGalleryForImage() {
+    private fun openImageGallery() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
         startActivityForResult(intent, requestCode)
