@@ -94,13 +94,13 @@
                     android:textSize="30sp"
                     android:textStyle="bold"/>
 
-                <!--<androidx.recyclerview.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/s_results_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="20dp"
                     android:overScrollMode="never"
-                    android:layout_gravity="center_horizontal"/>-->
+                    android:layout_gravity="center_horizontal"/>
 
             </LinearLayout>
 

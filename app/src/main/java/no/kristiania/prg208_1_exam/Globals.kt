@@ -30,6 +30,7 @@ object Globals : AppCompatActivity() {
             override fun onError(e: Exception?) {
                 statusTxt.text = "An error occurred"
                 Log.e("Error", "Picasso load image: ${e?.printStackTrace()}")
+                e?.printStackTrace()
             }
         })
     }
