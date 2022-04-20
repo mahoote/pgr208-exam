@@ -5,13 +5,34 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.fragments.HeaderFragment
+import java.lang.Exception
 
 object Globals : AppCompatActivity() {
 
-    const val LOG_TAG = "debugger"
+    fun setImage(
+        uriString: String,
+        target: ImageView?,
+        statusTxt: TextView
+    ) {
+        Picasso.get().load(uriString).into(target, object : Callback {
+            override fun onSuccess() {
+                statusTxt.visibility = View.INVISIBLE
+            }
+
+            override fun onError(e: Exception?) {
+                Log.e("Error", "Picasso load image: ${e?.printStackTrace()}")
+            }
+        })
+    }
 
     fun setHeaderFragment(fragmentManager: FragmentManager){
 

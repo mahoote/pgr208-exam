@@ -17,6 +17,7 @@ import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import no.kristiania.prg208_1_exam.Globals.setImage
 import no.kristiania.prg208_1_exam.services.APIService
 import java.io.File
 import java.lang.Exception
@@ -77,17 +78,9 @@ class SearchActivity : AppCompatActivity() {
         Log.d("Response", "After api: $response")
 
         val originalImage = findViewById<ImageView>(R.id.s_orig_img)
+        val imgTxtStatus = findViewById<TextView>(R.id.s_orig_img_status_txt)
 
-        Picasso.get().load(response).into(originalImage, object : Callback {
-            override fun onSuccess() {
-                val imgTxtStatus = findViewById<TextView>(R.id.s_orig_img_status_txt)
-                imgTxtStatus.visibility = View.INVISIBLE
-            }
-            override fun onError(e: Exception?) {
-                TODO("Not yet implemented")
-            }
-
-        })
+        setImage(response, originalImage, imgTxtStatus)
 
 
         /*viewModel.getImage("bing", response.body.toString())
