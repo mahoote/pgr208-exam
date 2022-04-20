@@ -32,21 +32,24 @@ class SearchActivity : AppCompatActivity() {
         overridePendingTransition(0, 0)
 
         val bundle: Bundle? = intent.extras
-        val chosenImageUri = bundle!!.getString("chosenImageUri")
-        val results = bundle.getSerializable("results")
 
-        Log.d("m_debug", "$results")
+        if(bundle != null) {
+            val chosenImageUri = bundle!!.getString("chosenImageUri")
+            val results = bundle.getSerializable("results")
 
-        val adapter = setRecyclerView(results as ArrayList<ResultImage>)
-        setOriginalImage(chosenImageUri)
+            Log.d("m_debug", "$results")
 
-        val chosenImageFragment = ChosenImageFragment()
-        adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
-            override fun onItemClick(position: Int) {
-                Toast.makeText(applicationContext, "Button $position pressed", Toast.LENGTH_SHORT).show()
-                switchFragment(chosenImageFragment)
-            }
-        })
+            val adapter = setRecyclerView(results as ArrayList<ResultImage>)
+            setOriginalImage(chosenImageUri)
+
+            val chosenImageFragment = ChosenImageFragment()
+            adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
+                override fun onItemClick(position: Int) {
+                    Toast.makeText(applicationContext, "Button $position pressed", Toast.LENGTH_SHORT).show()
+                    switchFragment(chosenImageFragment)
+                }
+            })
+        }
     }
 
     private fun setRecyclerView(results: ArrayList<ResultImage>): ImageAdapter {
