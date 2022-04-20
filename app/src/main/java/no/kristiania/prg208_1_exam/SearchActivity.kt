@@ -6,24 +6,15 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
-import kotlinx.coroutines.*
-import no.kristiania.prg208_1_exam.adapters.ImageAdapter
-import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
-import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.services.APIService
-import retrofit2.Response
 import java.io.File
-import java.net.URI
 
 
 class SearchActivity : AppCompatActivity() {
@@ -66,29 +57,21 @@ class SearchActivity : AppCompatActivity() {
     private fun uploadImageToServer(imageUri: Uri?) {
         if (imageUri != null) {
             val file = File(getPathFromURI(imageUri)!!)
-
-            GlobalScope.launch {
-                val pair = async { APIService().postImage(file) }
-                val (res, err) =  pair.await()
-
-                res?.let { onSuccessfulResponse(it) }
-                if(res != null) Log.i("debug", "Res isn't null")
-                else err?.let { onErrorResponse(it) }
-
-                Log.i("debug", "After post: ${res.toString()}")
-            }
+            APIService().postImage(this, file)
         }
     }
 
-    private fun onErrorResponse(anError: ANError) {
-        Log.d("debug", "An error occured")
+    fun onErrorResponse(anError: ANError) {
+        Log.d("Response", "An error occured")
         anError.printStackTrace()
         //Toast.makeText(this, response.code(), Toast.LENGTH_SHORT).show()
     }
 
-    private fun onSuccessfulResponse(response: String) {
+    fun onSuccessfulResponse(response: String) {
         Log.d("Response", "Response = Success!")
-        Log.d("Response", response)
+        Log.d("Response", "After api: $response")
+
+        Log.d("Response", "URI: ${Uri.parse(response)}")
 
         val originalImage = findViewById<ImageView>(R.id.s_orig_img)
         originalImage.setImageURI(Uri.parse(response))
