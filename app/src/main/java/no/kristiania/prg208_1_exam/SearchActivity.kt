@@ -80,7 +80,7 @@ class SearchActivity : AppCompatActivity() {
         val originalImage = findViewById<ImageView>(R.id.s_orig_img)
         val imgTxtStatus = findViewById<TextView>(R.id.s_orig_img_status_txt)
 
-        setImage(response, originalImage, imgTxtStatus)
+        setImage("response", originalImage, imgTxtStatus)
 
 
         /*viewModel.getImage("bing", response.body.toString())

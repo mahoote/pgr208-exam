@@ -27,8 +27,8 @@ object Globals : AppCompatActivity() {
             override fun onSuccess() {
                 statusTxt.visibility = View.INVISIBLE
             }
-
             override fun onError(e: Exception?) {
+                statusTxt.text = "An error occurred"
                 Log.e("Error", "Picasso load image: ${e?.printStackTrace()}")
             }
         })

@@ -15,7 +15,6 @@ import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatButton
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.Globals
-import no.kristiania.prg208_1_exam.Globals.LOG_TAG
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.SearchActivity
 
