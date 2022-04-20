@@ -1,9 +1,12 @@
 package no.kristiania.prg208_1_exam.services
 
 import android.app.Activity
+import android.view.View.INVISIBLE
+import android.widget.TextView
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.StringRequestListener
+import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.SearchActivity
 import java.io.File
 
@@ -17,7 +20,6 @@ class APIService {
             .addMultipartParameter("key", "value")
             .build()
             .setUploadProgressListener { bytesUploaded, totalBytes ->
-                // do anything with progress
             }
 
             .getAsString(object : StringRequestListener {

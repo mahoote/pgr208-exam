@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatButton
+import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.Globals
 import no.kristiania.prg208_1_exam.Globals.LOG_TAG
 import no.kristiania.prg208_1_exam.R
@@ -31,7 +32,7 @@ class UploadImageFragment : Fragment() {
 
         val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
         imageUri = arguments?.getParcelable("imageUri")!!
-        uploadImage.setImageURI(imageUri)
+        Picasso.get().load(imageUri).into(uploadImage)
         uploadImage.maxWidth = 800
         uploadImage.maxHeight = 800
 

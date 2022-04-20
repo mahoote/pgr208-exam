@@ -5,7 +5,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -13,8 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.services.APIService
 import java.io.File
+import java.lang.Exception
 
 
 class SearchActivity : AppCompatActivity() {
@@ -71,11 +76,18 @@ class SearchActivity : AppCompatActivity() {
         Log.d("Response", "Response = Success!")
         Log.d("Response", "After api: $response")
 
-        Log.d("Response", "URI: ${Uri.parse(response)}")
-
         val originalImage = findViewById<ImageView>(R.id.s_orig_img)
-        originalImage.setImageURI(Uri.parse(response))
 
+        Picasso.get().load(response).into(originalImage, object : Callback {
+            override fun onSuccess() {
+                val imgTxtStatus = findViewById<TextView>(R.id.s_orig_img_status_txt)
+                imgTxtStatus.visibility = View.INVISIBLE
+            }
+            override fun onError(e: Exception?) {
+                TODO("Not yet implemented")
+            }
+
+        })
 
 
         /*viewModel.getImage("bing", response.body.toString())
