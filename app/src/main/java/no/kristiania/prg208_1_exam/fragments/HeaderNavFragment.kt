@@ -8,12 +8,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import no.kristiania.prg208_1_exam.*
 
-class HeaderFragment : Fragment() {
+class HeaderNavFragment : Fragment() {
 
     private lateinit var v: View
 
@@ -21,7 +20,7 @@ class HeaderFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        v = inflater.inflate(R.layout.fragment_header, container, false)
+        v = inflater.inflate(R.layout.fragment_nav_header, container, false)
 
         highlightCurrentActivity()
         headerButtonsOnClick()
@@ -61,7 +60,7 @@ class HeaderFragment : Fragment() {
         if(!currentActivity.equals(activityClassName)) {
             val intent = Intent(this.requireContext(), activity::class.java)
             startActivity(intent)
-//            activity.finish()
+            // activity.finish()
         }
     }
 
