@@ -1,6 +1,7 @@
 package no.kristiania.prg208_1_exam
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -30,7 +31,14 @@ class SearchActivity : AppCompatActivity() {
         Globals.setHeaderFragment(fragmentManager)
         overridePendingTransition(0, 0)
 
-        val adapter = setRecyclerView(ArrayList())
+        val bundle: Bundle? = intent.extras
+        val chosenImageUri = bundle!!.getString("chosenImageUri")
+        val results = bundle.getSerializable("results")
+
+        Log.d("m_debug", "$results")
+
+        val adapter = setRecyclerView(results as ArrayList<ResultImage>)
+        setOriginalImage(chosenImageUri)
 
         val chosenImageFragment = ChosenImageFragment()
         adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
@@ -50,14 +58,12 @@ class SearchActivity : AppCompatActivity() {
         return adapter
     }
 
-    private fun setImagesData() {
-        val response = "DUMMY"
-
+    private fun setOriginalImage(uriString: String?) {
         val originalImage = findViewById<ImageView>(R.id.s_orig_img)
         val imgTxtStatus = findViewById<TextView>(R.id.s_orig_img_status_txt)
 
-        if (imgTxtStatus != null) {
-            loadImage(response, originalImage, imgTxtStatus)
+        if (imgTxtStatus != null && uriString != null) {
+            loadImage(uriString, originalImage, imgTxtStatus)
         }
     }
 

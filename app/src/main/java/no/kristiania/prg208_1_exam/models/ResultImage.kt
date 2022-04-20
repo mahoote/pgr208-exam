@@ -1,6 +1,8 @@
 package no.kristiania.prg208_1_exam.models
 
-data class ResultImage(
+import java.io.Serializable
+
+data class ResultImage (
     val current_date: String? = null,
     val description: String? = null,
     val domain: String? = null,
@@ -10,4 +12,4 @@ data class ResultImage(
     val store_link: String? = null,
     val thumbnail_link: String? = null,
     val tracking_id: String? = null
-)
+) : Serializable
