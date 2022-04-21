@@ -14,8 +14,6 @@ import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
 import no.kristiania.prg208_1_exam.permissions.CameraPermission
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 
-
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var fragmentManager: FragmentManager

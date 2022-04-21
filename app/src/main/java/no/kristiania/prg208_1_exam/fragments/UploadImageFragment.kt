@@ -46,7 +46,7 @@ class UploadImageFragment : Fragment() {
         val imgTxtStatus = v.findViewById<TextView>(R.id.uf_upload_img_status_txt)
 
         val origUri: Uri? = arguments?.getParcelable("imageUri")
-        imageUri = toJPEG(origUri)
+        imageUri = Globals.toJPEG(requireContext(), origUri)
 
         printRealPath(imageUri)
 
@@ -77,12 +77,6 @@ class UploadImageFragment : Fragment() {
     private fun printRealPath(uri: Uri, TAG: String = "m_debug") {
         val path = Globals.getPathFromURI(requireActivity(), uri)
         Log.d(TAG, "printRealPath: $path")
-    }
-
-    private fun toJPEG(origUri: Uri?): Uri {
-        val imageBitmap = Globals.uriToBitmap(requireContext(), origUri.toString())
-        return Globals.bitmapToUri(requireContext(), imageBitmap)
-
     }
 
     private fun retrieveImagesFromSrc() {

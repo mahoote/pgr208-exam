@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.FragmentManager
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -25,8 +26,8 @@ import java.util.*
 
 object Globals : AppCompatActivity() {
 
-    const val GALLERY_REQUEST_CODE = 1
-    const val CAMERA_REQUEST_CODE = 2
+    const val GALLERY_REQUEST_CODE = 100
+    const val CAMERA_REQUEST_CODE = 101
 
     val cachedImages: MutableMap<String, CachedImages> = mutableMapOf()
 
@@ -48,9 +49,7 @@ object Globals : AppCompatActivity() {
     }
 
     fun setHeaderFragment(fragmentManager: FragmentManager){
-
         val headerFragment = HeaderNavFragment()
-
         // Add header fragment to activity
         fragmentManager.beginTransaction().add(R.id.header_fragment_container, headerFragment).commit()
     }
@@ -62,8 +61,7 @@ object Globals : AppCompatActivity() {
     }
 
     fun uriToBitmap(context: Context, uri: String): Bitmap {
-        val image: Bitmap = MediaStore.Images.Media.getBitmap(context!!.contentResolver, Uri.parse(uri))
-        return image
+        return MediaStore.Images.Media.getBitmap(context.contentResolver, Uri.parse(uri))
     }
 
     fun bitmapToUri(context: Context, bitmap: Bitmap): Uri {
@@ -96,5 +94,10 @@ object Globals : AppCompatActivity() {
 
     fun openCamera(): Intent {
         return Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+    }
+
+    fun toJPEG(context: Context, origUri: Uri?): Uri {
+        val imageBitmap = uriToBitmap(context, origUri.toString())
+        return bitmapToUri(context, imageBitmap)
     }
 }

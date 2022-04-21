@@ -76,7 +76,7 @@ class SearchActivity : AppCompatActivity() {
         val adapter = ImageAdapter(results)
         recyclerView = findViewById(R.id.s_results_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = GridLayoutManager(this, 3)
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
         recyclerView.adapter = adapter
         return adapter
     }
