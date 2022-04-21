@@ -61,17 +61,17 @@ object Globals : AppCompatActivity() {
         return activityManager.getRunningTasks(1)[0].topActivity?.className
     }
 
-    fun uriToBitmap(context: Context, id: Int?, uri: String?): Bitmap {
+    fun uriToBitmap(context: Context, uri: String): Bitmap {
         val image: Bitmap = MediaStore.Images.Media.getBitmap(context!!.contentResolver, Uri.parse(uri))
         return image
     }
 
-    fun bitmapToUri(context: Context, bitmap: Bitmap): Uri? {
+    fun bitmapToUri(context: Context, bitmap: Bitmap): Uri {
         val bytes = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val path =
-            MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "JPEG_${timeStamp}", null)
+            MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "JPEG_${timeStamp}.jpeg", null)
         return Uri.parse(path)
     }
 

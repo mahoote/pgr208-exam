@@ -28,6 +28,8 @@ import kotlin.collections.ArrayList
 
 class UploadImageFragment : Fragment() {
 
+    val TAG: String = "m_debug"
+
     private lateinit var imageUri: Uri
     private lateinit var imageFilePath: String
     private lateinit var loadingDialog: LoadingDialog
@@ -43,18 +45,24 @@ class UploadImageFragment : Fragment() {
         val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
         val imgTxtStatus = v.findViewById<TextView>(R.id.uf_upload_img_status_txt)
 
-        imageUri = arguments?.getParcelable("imageUri")!!
+        val origUri: Uri? = arguments?.getParcelable("imageUri")
+        imageUri = toJPEG(origUri)
+
+        printRealPath(imageUri)
+
         Globals.loadImage(imageUri.toString(), uploadImage, imgTxtStatus)
         uploadImage.maxWidth = 800
         uploadImage.maxHeight = 800
 
         loadingDialog = LoadingDialog(requireActivity())
 
+        // Upload btn.
         v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
             loadingDialog.startLoadingDialog()
             retrieveImagesFromSrc()
         }
 
+        // Select new image btn.
         v.findViewById<AppCompatButton>(R.id.uf_select_new_btn).setOnClickListener {
             val mainActivity = activity as MainActivity
             val requestCode = Globals.GALLERY_REQUEST_CODE
@@ -66,8 +74,19 @@ class UploadImageFragment : Fragment() {
         return v
     }
 
+    private fun printRealPath(uri: Uri, TAG: String = "m_debug") {
+        val path = Globals.getPathFromURI(requireActivity(), uri)
+        Log.d(TAG, "printRealPath: $path")
+    }
+
+    private fun toJPEG(origUri: Uri?): Uri {
+        val imageBitmap = Globals.uriToBitmap(requireContext(), origUri.toString())
+        return Globals.bitmapToUri(requireContext(), imageBitmap)
+
+    }
+
     private fun retrieveImagesFromSrc() {
-        imageFilePath = Globals.getPathFromURI(activity, imageUri)!!
+        imageFilePath = Globals.getPathFromURI(requireActivity(), imageUri).toString()
 
         if (Globals.cachedImages[imageFilePath] != null) {
             getCachedImages(Globals.cachedImages[imageFilePath])
@@ -77,27 +96,24 @@ class UploadImageFragment : Fragment() {
     }
 
     private fun initializeAndroidNetworking() {
-        AndroidNetworking.initialize(activity?.applicationContext)
+        AndroidNetworking.initialize(requireContext())
         AndroidNetworking.setParserFactory(JacksonParserFactory())
     }
 
-    private fun uploadImageToServer(imageUri: Uri?) {
+    private fun uploadImageToServer(uri: Uri) {
         Log.d("m_debug", "uploadImageToServer")
-        imageUri?.let { uri ->
-            val pathFromUri = Globals.getPathFromURI(activity, uri)
-
-            pathFromUri?.let { path ->
-                val file = File(path)
-                ApiService().postImage(this, file)
-            }
-        }
+        val uriPath = Globals.getPathFromURI(requireActivity(), uri).toString()
+        val file = File(uriPath)
+        Log.d(TAG, "uploadImageToServer: file: $file")
+        ApiService().postImage(this, file)
     }
 
     fun onErrorResponse(anError: ANError) {
         Log.e("Response", "An error occurred: ${Log.getStackTraceString(anError)}")
+        anError.printStackTrace()
 
-        val errorStatusTxt = activity?.findViewById<TextView>(R.id.uf_error_status_txt)
-        errorStatusTxt?.visibility = VISIBLE
+        val errorStatusTxt = requireActivity().findViewById<TextView>(R.id.uf_error_status_txt)
+        errorStatusTxt.visibility = VISIBLE
         loadingDialog.dismissDialog()
     }
 
