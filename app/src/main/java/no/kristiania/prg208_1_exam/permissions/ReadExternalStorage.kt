@@ -11,16 +11,9 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import no.kristiania.prg208_1_exam.Globals
 
-object PermissionsImageGallery {
-
-    const val requestCode = 100
-
-    fun openImageGallery(): Intent {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
-        return intent
-    }
+object ReadExternalStorage {
 
     private fun isPermissionsAllowed(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -29,7 +22,7 @@ object PermissionsImageGallery {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun askForStoragePermissions(context: Context): Boolean {
+    fun askForStoragePermissions(context: Context, requestCode: Int): Boolean {
         if (!isPermissionsAllowed(context)) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     context as Activity,

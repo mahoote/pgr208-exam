@@ -12,7 +12,6 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
@@ -21,7 +20,7 @@ import no.kristiania.prg208_1_exam.*
 import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.ResultImage
-import no.kristiania.prg208_1_exam.permissions.PermissionsImageGallery
+import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import no.kristiania.prg208_1_exam.services.ApiService
 import java.io.File
 import java.util.*
@@ -58,9 +57,10 @@ class UploadImageFragment : Fragment() {
 
         v.findViewById<AppCompatButton>(R.id.uf_select_new_btn).setOnClickListener {
             val mainActivity = activity as MainActivity
+            val requestCode = Globals.GALLERY_REQUEST_CODE
 
-            if (PermissionsImageGallery.askForStoragePermissions(mainActivity)) {
-                mainActivity.startActivityForResult(PermissionsImageGallery.openImageGallery(), PermissionsImageGallery.requestCode)
+            if (ReadExternalStorage.askForStoragePermissions(mainActivity, requestCode)) {
+                mainActivity.startActivityForResult(Globals.openImageGallery(), requestCode)
             }
         }
         return v

@@ -3,6 +3,7 @@ package no.kristiania.prg208_1_exam
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
@@ -20,6 +21,9 @@ import no.kristiania.prg208_1_exam.fragments.HeaderNavFragment
 import java.lang.Exception
 
 object Globals : AppCompatActivity() {
+
+    const val GALLERY_REQUEST_CODE = 1
+    const val CAMERA_REQUEST_CODE = 2
 
     val cachedImages: MutableMap<String, CachedImages> = mutableMapOf()
 
@@ -68,5 +72,16 @@ object Globals : AppCompatActivity() {
         cursor?.moveToFirst()
         val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
         return idx?.let { cursor.getString(it) }
+    }
+
+    fun openImageGallery(): Intent {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        return intent
+    }
+
+    fun openCamera(): Intent {
+        val intent =  Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        return intent
     }
 }

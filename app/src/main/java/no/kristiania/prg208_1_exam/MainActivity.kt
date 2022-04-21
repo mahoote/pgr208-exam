@@ -2,19 +2,25 @@ package no.kristiania.prg208_1_exam
 
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
-import no.kristiania.prg208_1_exam.permissions.PermissionsImageGallery
+import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
+import android.os.Environment
+import android.text.format.DateFormat
+import java.io.File
+import java.io.IOException
+import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
 
-    private val requestCode = 100
     private lateinit var fragmentManager: FragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,11 +32,32 @@ class MainActivity : AppCompatActivity() {
         Globals.setHeaderFragment(fragmentManager)
         overridePendingTransition(0, 0)
 
-        val selectImage = findViewById<AppCompatButton>(R.id.m_select_image_btn)
+        findViewById<AppCompatButton>(R.id.m_select_image_btn).setOnClickListener {
+            val requestCode = Globals.GALLERY_REQUEST_CODE
 
-        selectImage.setOnClickListener {
-            if (PermissionsImageGallery.askForStoragePermissions(this)) {
-                startActivityForResult(PermissionsImageGallery.openImageGallery(), PermissionsImageGallery.requestCode)
+            if (ReadExternalStorage.askForStoragePermissions(this, requestCode)) {
+                startActivityForResult(
+                    Globals.openImageGallery(),
+                    requestCode
+                )
+            }
+            else {
+                Toast.makeText(applicationContext, "Unable to open gallery", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+
+        findViewById<AppCompatButton>(R.id.m_take_photo_btn).setOnClickListener {
+            val requestCode = Globals.CAMERA_REQUEST_CODE
+
+            if (ReadExternalStorage.askForStoragePermissions(this, requestCode)) {
+                startActivityForResult(
+                    Globals.openCamera(),
+                    requestCode
+                )
+            } else {
+                Toast.makeText(applicationContext, "Unable to open camera", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -47,29 +74,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == this.requestCode){
-            val imageUri = data?.data
-
-            val uploadImageFragment = UploadImageFragment()
-            replaceFragment(uploadImageFragment, imageUri)
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            this.requestCode -> {
-                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission is granted, you can perform your operation here
-                } else {
-                    // permission is denied, you can ask for permission again, if you want
-                    //  askForPermissions()
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                Globals.GALLERY_REQUEST_CODE -> {
+                    val imageUri = data?.data
+                    val uploadImageFragment = UploadImageFragment()
+                    replaceFragment(uploadImageFragment, imageUri)
                 }
-                return
+                Globals.CAMERA_REQUEST_CODE -> {
+                    // TODO: Save image to phone and get Uri
+//                    val imageUri = data?.data
+//                    val uploadImageFragment = UploadImageFragment()
+//                    replaceFragment(uploadImageFragment, imageUri)
+                }
             }
         }
     }
