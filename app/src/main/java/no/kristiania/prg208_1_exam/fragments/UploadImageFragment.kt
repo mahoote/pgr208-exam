@@ -10,8 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
@@ -56,7 +58,7 @@ class UploadImageFragment : Fragment() {
         uploadImage.maxHeight = 800*/
 
         uploadImage.setImageUriAsync(imageUri)
-        // uploadImage.isShowCropOverlay = false
+        uploadImage.isShowCropOverlay = false
 
         loadingDialog = LoadingDialog(requireActivity())
 
@@ -77,6 +79,15 @@ class UploadImageFragment : Fragment() {
                 mainActivity.startActivityForResult(Globals.openImageGallery(), requestCode)
             }
         }
+
+        v.findViewById<SwitchCompat>(R.id.uf_crop_switch).setOnCheckedChangeListener { switchView, isChecked ->
+            uploadImage.isShowCropOverlay = isChecked
+            if(!isChecked){
+                uploadImage.resetCropRect()
+            }
+        }
+
+
         return v
     }
 
