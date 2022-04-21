@@ -47,12 +47,12 @@ class SearchActivity : AppCompatActivity() {
 
             var latestCache: Map.Entry<String, CachedImages>? = null
             if(Globals.cachedImages.isNotEmpty()) {
-                Globals.cachedImages.forEach { cache ->
-                    latestCache?.let { lts ->
-                        if(lts.value.created < lts.value.created)
-                            latestCache = lts
+                Globals.cachedImages.forEach { cachedImage ->
+                    latestCache?.let {
+                        if(it.value.created < cachedImage.value.created)
+                            latestCache = cachedImage
                     } ?: run {
-                        latestCache = cache
+                        latestCache = cachedImage
                     }
                 }
 
