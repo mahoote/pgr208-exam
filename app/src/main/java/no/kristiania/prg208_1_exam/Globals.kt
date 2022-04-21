@@ -13,7 +13,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.FragmentManager
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -40,6 +39,7 @@ object Globals : AppCompatActivity() {
             override fun onSuccess() {
                 statusTxt.visibility = View.INVISIBLE
             }
+
             override fun onError(e: Exception?) {
                 statusTxt.text = resources.getString(R.string.error_message_01)
                 Log.e("Error", "Picasso load image: ${e?.printStackTrace()}")
@@ -48,14 +48,15 @@ object Globals : AppCompatActivity() {
         })
     }
 
-    fun setHeaderFragment(fragmentManager: FragmentManager){
+    fun setHeaderFragment(fragmentManager: FragmentManager) {
         val headerFragment = HeaderNavFragment()
         // Add header fragment to activity
-        fragmentManager.beginTransaction().add(R.id.header_fragment_container, headerFragment).commit()
+        fragmentManager.beginTransaction().add(R.id.header_fragment_container, headerFragment)
+            .commit()
     }
 
     //    TODO: Find alternative way.
-    fun getCurrentActivity(context: Context?):String? {
+    fun getCurrentActivity(context: Context?): String? {
         val activityManager = context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         return activityManager.getRunningTasks(1)[0].topActivity?.className
     }
@@ -65,20 +66,75 @@ object Globals : AppCompatActivity() {
     }
 
     fun bitmapToUri(context: Context, bitmap: Bitmap): Uri {
-        val bytes = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val compressedBitmap = compressBitmap(bitmap)
+
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val path =
-            MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "JPEG_${timeStamp}.jpeg", null)
+            MediaStore.Images.Media.insertImage(
+                context.contentResolver,
+                compressedBitmap,
+                "JPEG_${timeStamp}.jpeg",
+                null
+            )
         return Uri.parse(path)
     }
 
-    fun getBitmap(context: Context, id: Int?, uri: String?, decoder: (Context, Int?, String?) -> Bitmap): Bitmap {
+    private fun compressBitmap(bitmap: Bitmap): Bitmap? {
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, bytes)
+        val compressedBitmap = createScaledBitmap(bitmap, 800)
+        return compressedBitmap
+    }
+
+    private fun createScaledBitmap(bitmap: Bitmap, maxSize: Int): Bitmap? {
+        val bWidth = bitmap.width
+        val bHeight = bitmap.height
+
+        Log.d("m_debug", "createScaledBitmap: width: $bWidth, height: $bHeight")
+
+        val compressedBitmap = when {
+            bWidth > bHeight -> {
+
+                if (bWidth < maxSize) {
+                    val diff = maxSize / bWidth
+                    val scaledHeight = bHeight * diff
+                    Bitmap.createScaledBitmap(bitmap, maxSize, scaledHeight, true)
+                } else {
+                    val diff = bWidth / maxSize
+                    val scaledHeight = bHeight / diff
+                    Bitmap.createScaledBitmap(bitmap, maxSize, scaledHeight, true)
+                }
+            }
+            bHeight > bWidth -> {
+                if (bHeight < maxSize) {
+                    val diff = maxSize / bHeight
+                    val scaledWidth = bWidth * diff
+                    Bitmap.createScaledBitmap(bitmap, scaledWidth, maxSize, true)
+                } else {
+                    val diff = bHeight / maxSize
+                    val scaledWidth = bWidth / diff
+                    Bitmap.createScaledBitmap(bitmap, scaledWidth, maxSize, true)
+                }
+            }
+            else -> {
+                Bitmap.createScaledBitmap(bitmap, maxSize, maxSize, true)
+            }
+        }
+        return compressedBitmap
+    }
+
+    fun getBitmap(
+        context: Context,
+        id: Int?,
+        uri: String?,
+        decoder: (Context, Int?, String?) -> Bitmap
+    ): Bitmap {
         return decoder(context, id, uri)
     }
 
     fun getPathFromURI(activity: Activity?, uri: Uri): String? {
-        val cursor: Cursor? = uri.let {activity?.contentResolver?.query(it, null, null, null, null) }
+        val cursor: Cursor? =
+            uri.let { activity?.contentResolver?.query(it, null, null, null, null) }
         cursor?.moveToFirst()
         val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
         val path = idx?.let { cursor.getString(it) }
