@@ -68,7 +68,7 @@ class DataBaseHelper(
     fun deleteByUri(uri: Uri): Boolean {
         val db = this.writableDatabase
         val originalImageQueryString =
-            "DELETE FROM $TABLE_ORIGINAL_IMAGE WHERE $COLUMN_IMAGE_URI = uri"
+            "DELETE FROM $TABLE_ORIGINAL_IMAGE WHERE $COLUMN_IMAGE_URI = $uri"
 
         val originalImage: DBOriginalImage? = getOriginalImageByUri(uri)
 
@@ -98,6 +98,8 @@ class DataBaseHelper(
         if (searchInsertStatus < 0) {
             return false
         }
+
+        db.close()
         if(!addResultImages(cachedImages)){
             return false
         }
@@ -143,7 +145,7 @@ class DataBaseHelper(
         )
 
         val resultInsertStatus = db.insert(TABLE_RESULT_IMAGE, null, resultImageCV)
-
+        db.close()
         if(resultInsertStatus < 0) {
             return false
         }
@@ -168,6 +170,8 @@ class DataBaseHelper(
         } else {
             // No results, empty list will be returned.
         }
+        db.close()
+        cursor.close()
         return list
     }
 
@@ -209,6 +213,8 @@ class DataBaseHelper(
         } else {
             // No results, empty list will be returned.
         }
+        db.close()
+        cursor.close()
         return list
     }
 
@@ -230,6 +236,8 @@ class DataBaseHelper(
         } else {
             // Nothing found
         }
+        db.close()
+        cursor.close()
         return originalImage
     }
 
