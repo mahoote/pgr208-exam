@@ -82,11 +82,10 @@
                 android:id="@+id/uf_upload_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
-                android:layout_marginVertical="20dp"
                 android:layout_centerHorizontal="true"
-                android:src="@drawable/ic_launcher_background"/>
+                android:layout_marginVertical="20dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY" />
         </RelativeLayout>
 
     </LinearLayout>
