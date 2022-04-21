@@ -13,14 +13,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.net.toUri
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
-import id.zelory.compressor.Compressor
-import id.zelory.compressor.constraint.size
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import no.kristiania.prg208_1_exam.*
 import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
 import no.kristiania.prg208_1_exam.models.CachedImages
