@@ -11,11 +11,10 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import no.kristiania.prg208_1_exam.Globals
 
-object ReadExternalStorage {
+object CameraPermission {
 
-    private const val permission = Manifest.permission.READ_EXTERNAL_STORAGE
+    private const val permission = Manifest.permission.CAMERA
 
     private fun isPermissionsAllowed(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(

@@ -2,21 +2,18 @@ package no.kristiania.prg208_1_exam
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
+import no.kristiania.prg208_1_exam.permissions.CameraPermission
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
-import android.os.Environment
-import android.text.format.DateFormat
-import java.io.File
-import java.io.IOException
-import java.util.*
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -50,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<AppCompatButton>(R.id.m_take_photo_btn).setOnClickListener {
             val requestCode = Globals.CAMERA_REQUEST_CODE
 
-            if (ReadExternalStorage.askForStoragePermissions(this, requestCode)) {
+            if (CameraPermission.askForStoragePermissions(this, requestCode)) {
                 startActivityForResult(
                     Globals.openCamera(),
                     requestCode
@@ -83,9 +80,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 Globals.CAMERA_REQUEST_CODE -> {
                     // TODO: Save image to phone and get Uri
-//                    val imageUri = data?.data
-//                    val uploadImageFragment = UploadImageFragment()
-//                    replaceFragment(uploadImageFragment, imageUri)
+                    val bitmapImage = data?.extras?.get("data") as Bitmap
+                    val imageUri = Globals.bitmapToUri(this, bitmapImage)
+                    val uploadImageFragment = UploadImageFragment()
+                    replaceFragment(uploadImageFragment, imageUri)
                 }
             }
         }

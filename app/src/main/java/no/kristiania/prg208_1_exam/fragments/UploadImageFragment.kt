@@ -134,6 +134,7 @@ class UploadImageFragment : Fragment() {
             intent.putExtras(bundle)
             startActivity(intent)
             Log.d("m_debug", "Starting activity!")
+            loadingDialog.dismissDialog()
         }
     }
 }

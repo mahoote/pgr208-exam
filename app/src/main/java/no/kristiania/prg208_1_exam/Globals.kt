@@ -18,7 +18,10 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.fragments.HeaderNavFragment
+import java.io.ByteArrayOutputStream
 import java.lang.Exception
+import java.text.SimpleDateFormat
+import java.util.*
 
 object Globals : AppCompatActivity() {
 
@@ -63,6 +66,15 @@ object Globals : AppCompatActivity() {
         return image
     }
 
+    fun bitmapToUri(context: Context, bitmap: Bitmap): Uri? {
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val path =
+            MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "JPEG_${timeStamp}", null)
+        return Uri.parse(path)
+    }
+
     fun getBitmap(context: Context, id: Int?, uri: String?, decoder: (Context, Int?, String?) -> Bitmap): Bitmap {
         return decoder(context, id, uri)
     }
@@ -71,7 +83,9 @@ object Globals : AppCompatActivity() {
         val cursor: Cursor? = uri.let {activity?.contentResolver?.query(it, null, null, null, null) }
         cursor?.moveToFirst()
         val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
-        return idx?.let { cursor.getString(it) }
+        val path = idx?.let { cursor.getString(it) }
+        cursor?.close()
+        return path
     }
 
     fun openImageGallery(): Intent {
@@ -81,7 +95,6 @@ object Globals : AppCompatActivity() {
     }
 
     fun openCamera(): Intent {
-        val intent =  Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        return intent
+        return Intent(MediaStore.ACTION_IMAGE_CAPTURE)
     }
 }
