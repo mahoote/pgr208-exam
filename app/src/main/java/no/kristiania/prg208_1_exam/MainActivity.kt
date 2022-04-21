@@ -10,14 +10,17 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.androidnetworking.AndroidNetworking
-import com.jacksonandroidnetworking.JacksonParserFactory
+import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
+import no.kristiania.prg208_1_exam.models.CachedImages
+import no.kristiania.prg208_1_exam.models.ResultImage
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,6 +45,17 @@ class MainActivity : AppCompatActivity() {
                 openImageGallery()
             }
         }
+
+        jonas()
+    }
+
+    private fun jonas() {
+        val dbHelper = DataBaseHelper(this)
+        val list = ArrayList<ResultImage?>()
+        val cachedTemp = CachedImages(Uri.parse("petter"), list, Calendar.getInstance().time)
+
+        val code = dbHelper.addSearch(cachedTemp)
+        Log.d("db", "db insert code : " + code.toString())
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -4,7 +4,7 @@ import android.net.Uri
 import java.util.*
 
 data class CachedImages(
-    val imageUri: Uri,
+    var imageUri: Uri,
     val images: ArrayList<ResultImage?>,
     var created: Date
 )
