@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import no.kristiania.prg208_1_exam.Globals.loadImage
 import no.kristiania.prg208_1_exam.adapters.ImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
+import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.ResultImage
 
 
@@ -21,6 +22,7 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var fragmentManager: FragmentManager
+    private lateinit var adapter: ImageAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +41,25 @@ class SearchActivity : AppCompatActivity() {
 
             Log.d("m_debug", "$results")
 
-            val adapter = setRecyclerView(results as ArrayList<ResultImage>)
+            adapter = setRecyclerView(results as ArrayList<ResultImage>)
             setOriginalImage(chosenImageUri)
+        } else {
 
+            var latestCache: Map.Entry<String, CachedImages>? = null
+            if(Globals.cachedImages.isNotEmpty()) {
+                Globals.cachedImages.forEach {
+                    if(latestCache == null)
+                        latestCache = it
+                    else if(latestCache!!.value.created < it.value.created)
+                        latestCache = it
+                }
+
+                adapter = setRecyclerView(latestCache!!.value.images as ArrayList<ResultImage>)
+                setOriginalImage(latestCache!!.value.imageUri.toString())
+            }
+        }
+
+        if(::adapter.isInitialized) {
             val chosenImageFragment = ChosenImageFragment()
             adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int) {
@@ -50,6 +68,8 @@ class SearchActivity : AppCompatActivity() {
                 }
             })
         }
+
+
     }
 
     private fun setRecyclerView(results: ArrayList<ResultImage>): ImageAdapter {

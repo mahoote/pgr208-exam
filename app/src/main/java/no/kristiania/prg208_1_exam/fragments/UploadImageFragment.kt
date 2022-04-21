@@ -59,7 +59,7 @@ class UploadImageFragment : Fragment() {
                 uploadImageToServer(imageUri)
             } else {
                 Log.d("Response", "Cache get")
-                Globals.cachedImages[filePath]?.let { cachedImages -> getCachedImages(cachedImages.images) }
+                Globals.cachedImages[filePath]?.let { cachedImages -> getCachedImages(cachedImages) }
             }
         }
         return v
@@ -98,14 +98,15 @@ class UploadImageFragment : Fragment() {
         Log.d("Response", "Get successful")
         val results = images as ArrayList<ResultImage>
 
-        Globals.cachedImages[filePath] = CachedImages(images, Calendar.getInstance().time)
+        Globals.cachedImages[filePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
 
         startSearchActivity(SearchActivity(), results)
     }
 
-    private fun getCachedImages(images: List<ResultImage?>) {
+    private fun getCachedImages(cachedImages: CachedImages) {
         Log.d("Response", "Get cached images")
-        val results = images as ArrayList<ResultImage>
+        cachedImages.created = Calendar.getInstance().time
+        val results = cachedImages.images as ArrayList<ResultImage>
         startSearchActivity(SearchActivity(), results)
     }
 
