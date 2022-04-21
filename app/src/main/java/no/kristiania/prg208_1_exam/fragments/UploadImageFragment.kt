@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,6 +17,7 @@ import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
 import no.kristiania.prg208_1_exam.Globals
+import no.kristiania.prg208_1_exam.LoadingDialog
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.SearchActivity
 import no.kristiania.prg208_1_exam.models.CachedImages
@@ -29,6 +31,7 @@ class UploadImageFragment : Fragment() {
 
     private lateinit var imageUri: Uri
     private lateinit var imageFilePath: String
+    private lateinit var loadingDialog: LoadingDialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +49,10 @@ class UploadImageFragment : Fragment() {
         uploadImage.maxWidth = 800
         uploadImage.maxHeight = 800
 
+        loadingDialog = LoadingDialog(requireActivity())
+
         v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
+            loadingDialog.startLoadingDialog()
             retrieveImagesFromSrc()
         }
         return v
@@ -80,9 +86,11 @@ class UploadImageFragment : Fragment() {
     }
 
     fun onErrorResponse(anError: ANError) {
-        Log.d("Response", "An error occurred")
-        anError.printStackTrace()
-        //Toast.makeText(this, response.code(), Toast.LENGTH_SHORT).show()
+        Log.e("Response", "An error occurred: ${Log.getStackTraceString(anError)}")
+
+        val errorStatusTxt = activity?.findViewById<TextView>(R.id.uf_error_status_txt)
+        errorStatusTxt?.visibility = VISIBLE
+        loadingDialog.dismissDialog()
     }
 
     fun onSuccessfulPost(response: String) {

@@ -33,7 +33,7 @@ object Globals : AppCompatActivity() {
                 statusTxt.visibility = View.INVISIBLE
             }
             override fun onError(e: Exception?) {
-                statusTxt.text = resources.getString(R.string.error_message)
+                statusTxt.text = resources.getString(R.string.error_message_01)
                 Log.e("Error", "Picasso load image: ${e?.printStackTrace()}")
                 e?.printStackTrace()
             }

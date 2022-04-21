@@ -2,5 +2,6 @@
     <string name="app_name">PRG208–1-exam</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="image_status_not_loaded">No image to display</string>
-    <string name="error_message">An error occurred</string>
+    <string name="error_message_01">An error occurred</string>
+    <string name="error_message_image_upload">Something went wrong. We were not able to upload your image.</string>
 </resources>
