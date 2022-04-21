@@ -15,9 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import no.kristiania.prg208_1_exam.fragments.HeaderFragment
 import no.kristiania.prg208_1_exam.models.CachedImages
-import no.kristiania.prg208_1_exam.models.ResultImage
+import no.kristiania.prg208_1_exam.fragments.HeaderNavFragment
 import java.lang.Exception
 
 object Globals : AppCompatActivity() {
@@ -43,7 +42,7 @@ object Globals : AppCompatActivity() {
 
     fun setHeaderFragment(fragmentManager: FragmentManager){
 
-        val headerFragment = HeaderFragment()
+        val headerFragment = HeaderNavFragment()
 
         // Add header fragment to activity
         fragmentManager.beginTransaction().add(R.id.header_fragment_container, headerFragment).commit()
