@@ -29,22 +29,25 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
+                android:paddingHorizontal="5dp"
                 android:layout_weight="1"
                 android:background="@drawable/small_blue_btn"
                 android:text="Select New Image"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="15sp" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/uf_take_photo_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
+                android:paddingHorizontal="5dp"
+
                 android:layout_weight="1"
                 android:background="@drawable/small_blue_btn"
                 android:text="Take New Photo"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="15sp" />
 
         </LinearLayout>
 

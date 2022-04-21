@@ -1,7 +1,8 @@
-package no.kristiania.prg208_1_exam
+package no.kristiania.prg208_1_exam.dialogs
 
 import android.app.Activity
 import android.app.AlertDialog
+import no.kristiania.prg208_1_exam.R
 
 class LoadingDialog(private val activity: Activity) {
 

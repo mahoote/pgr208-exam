@@ -64,7 +64,7 @@ object Globals : AppCompatActivity() {
     }
 
     fun getPathFromURI(activity: Activity?, uri: Uri): String? {
-        val cursor: Cursor? = uri?.let {activity?.contentResolver?.query(it, null, null, null, null) }
+        val cursor: Cursor? = uri.let {activity?.contentResolver?.query(it, null, null, null, null) }
         cursor?.moveToFirst()
         val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
         return idx?.let { cursor.getString(it) }
