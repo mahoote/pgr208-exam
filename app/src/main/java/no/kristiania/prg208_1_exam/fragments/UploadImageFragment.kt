@@ -2,20 +2,21 @@ package no.kristiania.prg208_1_exam.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
+import androidx.fragment.app.Fragment
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
+import com.theartofdev.edmodo.cropper.CropImageView
 import no.kristiania.prg208_1_exam.*
 import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
 import no.kristiania.prg208_1_exam.models.CachedImages
@@ -24,7 +25,7 @@ import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import no.kristiania.prg208_1_exam.services.ApiService
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class UploadImageFragment : Fragment() {
 
@@ -42,7 +43,7 @@ class UploadImageFragment : Fragment() {
 
         initializeAndroidNetworking()
 
-        val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
+        val uploadImage = v.findViewById<CropImageView>(R.id.uf_upload_img)
         val imgTxtStatus = v.findViewById<TextView>(R.id.uf_upload_img_status_txt)
 
         val origUri: Uri? = arguments?.getParcelable("imageUri")
@@ -50,15 +51,20 @@ class UploadImageFragment : Fragment() {
 
         printRealPath(imageUri)
 
-        Globals.loadImage(imageUri.toString(), uploadImage, imgTxtStatus)
+        /*Globals.loadImage(imageUri.toString(), uploadImage, imgTxtStatus)
         uploadImage.maxWidth = 800
-        uploadImage.maxHeight = 800
+        uploadImage.maxHeight = 800*/
+
+        uploadImage.setImageUriAsync(imageUri)
+        // uploadImage.isShowCropOverlay = false
 
         loadingDialog = LoadingDialog(requireActivity())
 
         // Upload btn.
         v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
             loadingDialog.startLoadingDialog()
+            val cropped: Bitmap = uploadImage.croppedImage
+            imageUri = context?.let { it1 -> Globals.bitmapToUri(it1, cropped) }!!
             retrieveImagesFromSrc()
         }
 

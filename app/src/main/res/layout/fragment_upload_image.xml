@@ -81,7 +81,8 @@
                 android:text="@string/image_status_not_loaded"
                 android:textSize="20sp" />
 
-            <ImageView
+            <com.theartofdev.edmodo.cropper.CropImageView
+                xmlns:custom="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/uf_upload_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
