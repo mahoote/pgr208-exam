@@ -43,8 +43,8 @@ class ApiService {
                 Log.d("m_debug", "BytesDownloaded: $bytesDownloaded")
                 Log.d("m_debug", "Total: $totalBytes")
             }
-            .getAsObjectList(ResultImage::class.java, object : ParsedRequestListener<List<ResultImage?>> {
-                override fun onResponse(images: List<ResultImage?>) {
+            .getAsObjectList(ResultImage::class.java, object : ParsedRequestListener<ArrayList<ResultImage?>> {
+                override fun onResponse(images: ArrayList<ResultImage?>) {
                     Log.d("m_debug", "onResponse: $images")
                     fragment.onSuccessfulGet(images)
                 }

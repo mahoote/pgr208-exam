@@ -33,7 +33,7 @@ object Globals : AppCompatActivity() {
                 statusTxt.visibility = View.INVISIBLE
             }
             override fun onError(e: Exception?) {
-                statusTxt.text = "An error occurred"
+                statusTxt.text = resources.getString(R.string.error_message)
                 Log.e("Error", "Picasso load image: ${e?.printStackTrace()}")
                 e?.printStackTrace()
             }
@@ -63,7 +63,7 @@ object Globals : AppCompatActivity() {
         return decoder(context, id, uri)
     }
 
-    fun getPathFromURI(activity: Activity?, uri: Uri?): String? {
+    fun getPathFromURI(activity: Activity?, uri: Uri): String? {
         val cursor: Cursor? = uri?.let {activity?.contentResolver?.query(it, null, null, null, null) }
         cursor?.moveToFirst()
         val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)

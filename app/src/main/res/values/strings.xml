@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">PRG208–1-exam</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="image_status_not_loaded">No image to display</string>
+    <string name="error_message">An error occurred</string>
 </resources>

@@ -28,7 +28,7 @@ import kotlin.collections.ArrayList
 class UploadImageFragment : Fragment() {
 
     private lateinit var imageUri: Uri
-    private lateinit var filePath: String
+    private lateinit var imageFilePath: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,22 +47,19 @@ class UploadImageFragment : Fragment() {
         uploadImage.maxHeight = 800
 
         v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
-
-            filePath = Globals.getPathFromURI(activity, imageUri)!!
-
-            Globals.cachedImages.forEach {
-                Log.d("Response", "Map: ${it.key}: ${it.value}")
-            }
-
-            if(Globals.cachedImages[filePath] == null) {
-                Log.d("Response", "API get")
-                uploadImageToServer(imageUri)
-            } else {
-                Log.d("Response", "Cache get")
-                Globals.cachedImages[filePath]?.let { cachedImages -> getCachedImages(cachedImages) }
-            }
+            retrieveImagesFromSrc()
         }
         return v
+    }
+
+    private fun retrieveImagesFromSrc() {
+        imageFilePath = Globals.getPathFromURI(activity, imageUri)!!
+
+        if (Globals.cachedImages[imageFilePath] != null) {
+            getCachedImages(Globals.cachedImages[imageFilePath])
+        } else {
+            uploadImageToServer(imageUri)
+        }
     }
 
     private fun initializeAndroidNetworking() {
@@ -72,17 +69,18 @@ class UploadImageFragment : Fragment() {
 
     private fun uploadImageToServer(imageUri: Uri?) {
         Log.d("m_debug", "uploadImageToServer")
-        if (imageUri != null) {
-            val file = File(Globals.getPathFromURI(activity, imageUri)!!)
+        imageUri?.let { uri ->
+            val pathFromUri = Globals.getPathFromURI(activity, uri)
 
-            Log.d("Response", "uploadImageToServer: file: $file")
-
-            ApiService().postImage(this, file)
+            pathFromUri?.let { path ->
+                val file = File(path)
+                ApiService().postImage(this, file)
+            }
         }
     }
 
     fun onErrorResponse(anError: ANError) {
-        Log.d("Response", "An error occured")
+        Log.d("Response", "An error occurred")
         anError.printStackTrace()
         //Toast.makeText(this, response.code(), Toast.LENGTH_SHORT).show()
     }
@@ -94,24 +92,20 @@ class UploadImageFragment : Fragment() {
         ApiService().getImages(this, "bing", response)
     }
 
-    fun onSuccessfulGet(images: List<ResultImage?>){
+    fun onSuccessfulGet(images: ArrayList<ResultImage?>){
         Log.d("Response", "Get successful")
-        val results = images as ArrayList<ResultImage>
-
-        Globals.cachedImages[filePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
-
-        startSearchActivity(SearchActivity(), results)
+        Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
+        startSearchActivity(SearchActivity(), images)
     }
 
-    private fun getCachedImages(cachedImages: CachedImages) {
+    private fun getCachedImages(cachedImages: CachedImages?) {
         Log.d("Response", "Get cached images")
-        cachedImages.created = Calendar.getInstance().time
-        val results = cachedImages.images as ArrayList<ResultImage>
+        cachedImages?.created = Calendar.getInstance().time
+        val results = cachedImages?.images
         startSearchActivity(SearchActivity(), results)
     }
 
-    // Dummy method!!
-    private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage>){
+    private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?){
         val activityClassName = activity::class.java.name
         val currentActivity = Globals.getCurrentActivity(context)
 

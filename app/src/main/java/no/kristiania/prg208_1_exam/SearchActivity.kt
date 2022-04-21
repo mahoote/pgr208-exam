@@ -47,11 +47,13 @@ class SearchActivity : AppCompatActivity() {
 
             var latestCache: Map.Entry<String, CachedImages>? = null
             if(Globals.cachedImages.isNotEmpty()) {
-                Globals.cachedImages.forEach {
-                    if(latestCache == null)
-                        latestCache = it
-                    else if(latestCache!!.value.created < it.value.created)
-                        latestCache = it
+                Globals.cachedImages.forEach { cache ->
+                    latestCache?.let { lts ->
+                        if(lts.value.created < lts.value.created)
+                            latestCache = lts
+                    } ?: run {
+                        latestCache = cache
+                    }
                 }
 
                 adapter = setRecyclerView(latestCache!!.value.images as ArrayList<ResultImage>)
@@ -68,8 +70,6 @@ class SearchActivity : AppCompatActivity() {
                 }
             })
         }
-
-
     }
 
     private fun setRecyclerView(results: ArrayList<ResultImage>): ImageAdapter {
