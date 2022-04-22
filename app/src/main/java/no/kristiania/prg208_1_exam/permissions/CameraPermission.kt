@@ -12,35 +12,29 @@ import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
-object PermissionsImageGallery {
+object CameraPermission {
 
-    const val requestCode = 100
-
-    fun openImageGallery(): Intent {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
-        return intent
-    }
+    private const val permission = Manifest.permission.CAMERA
 
     private fun isPermissionsAllowed(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            permission
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun askForStoragePermissions(context: Context): Boolean {
+    fun askForStoragePermissions(context: Context, requestCode: Int): Boolean {
         if (!isPermissionsAllowed(context)) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     context as Activity,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
+                    permission
                 )
             ) {
                 showPermissionDeniedDialog(context)
             } else {
                 ActivityCompat.requestPermissions(
                     context,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    arrayOf(permission),
                     requestCode
                 )
             }

@@ -2,6 +2,7 @@ package no.kristiania.prg208_1_exam.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -10,24 +11,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.SwitchCompat
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
+import com.theartofdev.edmodo.cropper.CropImageView
 import no.kristiania.prg208_1_exam.*
 import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.ResultImage
-import no.kristiania.prg208_1_exam.permissions.PermissionsImageGallery
+import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import no.kristiania.prg208_1_exam.services.ApiService
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
 class UploadImageFragment : Fragment() {
+
+    val TAG: String = "m_debug"
 
     private lateinit var imageUri: Uri
     private lateinit var imageFilePath: String
@@ -41,33 +45,64 @@ class UploadImageFragment : Fragment() {
 
         initializeAndroidNetworking()
 
-        val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
-        val imgTxtStatus = v.findViewById<TextView>(R.id.uf_upload_img_status_txt)
+        val uploadImage = v.findViewById<CropImageView>(R.id.uf_upload_img)
 
-        imageUri = arguments?.getParcelable("imageUri")!!
-        Globals.loadImage(imageUri.toString(), uploadImage, imgTxtStatus)
-        uploadImage.maxWidth = 800
-        uploadImage.maxHeight = 800
+        val origUri: Uri? = arguments?.getParcelable("imageUri")
+
+        origUri?.let {
+            imageUri = it
+
+            Log.d(TAG, "onCreateView: Imageuri: $imageUri")
+
+            printRealPath(imageUri)
+
+            uploadImage.setImageUriAsync(imageUri)
+            uploadImage.isShowCropOverlay = false
+        }
 
         loadingDialog = LoadingDialog(requireActivity())
 
-        v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
+        // Upload btn.
+        v.findViewById<AppCompatImageButton>(R.id.uf_upload_search_btn).setOnClickListener{
+
             loadingDialog.startLoadingDialog()
+
+            if(uploadImage.isShowCropOverlay) {
+                val cropped: Bitmap = uploadImage.croppedImage
+                val fileName = Globals.getFileNameFromUri(requireContext(), imageUri)
+                imageUri = context?.let { context -> Globals.bitmapToUri(context, cropped, "${fileName}_crop") }!!
+            }
+
             retrieveImagesFromSrc()
         }
 
-        v.findViewById<AppCompatButton>(R.id.uf_select_new_btn).setOnClickListener {
+        // Select new image btn.
+        v.findViewById<AppCompatImageButton>(R.id.uf_select_new_btn).setOnClickListener {
             val mainActivity = activity as MainActivity
+            val requestCode = Globals.GALLERY_REQUEST_CODE
 
-            if (PermissionsImageGallery.askForStoragePermissions(mainActivity)) {
-                mainActivity.startActivityForResult(PermissionsImageGallery.openImageGallery(), PermissionsImageGallery.requestCode)
+            if (ReadExternalStorage.askForStoragePermissions(mainActivity, requestCode)) {
+                mainActivity.startActivityForResult(Globals.openImageGallery(), requestCode)
             }
         }
+
+        v.findViewById<SwitchCompat>(R.id.uf_crop_switch).setOnCheckedChangeListener { switchView, isChecked ->
+            uploadImage.isShowCropOverlay = isChecked
+            if(!isChecked){
+                uploadImage.resetCropRect()
+            }
+        }
+
         return v
     }
 
+    private fun printRealPath(uri: Uri, TAG: String = "m_debug") {
+        val path = Globals.getPathFromURI(requireActivity(), uri)
+        Log.d(TAG, "printRealPath: $path")
+    }
+
     private fun retrieveImagesFromSrc() {
-        imageFilePath = Globals.getPathFromURI(activity, imageUri)!!
+        imageFilePath = Globals.getPathFromURI(requireActivity(), imageUri).toString()
 
         if (Globals.cachedImages[imageFilePath] != null) {
             getCachedImages(Globals.cachedImages[imageFilePath])
@@ -77,27 +112,24 @@ class UploadImageFragment : Fragment() {
     }
 
     private fun initializeAndroidNetworking() {
-        AndroidNetworking.initialize(activity?.applicationContext)
+        AndroidNetworking.initialize(requireContext())
         AndroidNetworking.setParserFactory(JacksonParserFactory())
     }
 
-    private fun uploadImageToServer(imageUri: Uri?) {
+    private fun uploadImageToServer(uri: Uri) {
         Log.d("m_debug", "uploadImageToServer")
-        imageUri?.let { uri ->
-            val pathFromUri = Globals.getPathFromURI(activity, uri)
-
-            pathFromUri?.let { path ->
-                val file = File(path)
-                ApiService().postImage(this, file)
-            }
-        }
+        val uriPath = Globals.getPathFromURI(requireActivity(), uri).toString()
+        val file = File(uriPath)
+        Log.d(TAG, "uploadImageToServer: file: $file")
+        ApiService().postImage(this, file)
     }
 
     fun onErrorResponse(anError: ANError) {
         Log.e("Response", "An error occurred: ${Log.getStackTraceString(anError)}")
+        anError.printStackTrace()
 
-        val errorStatusTxt = activity?.findViewById<TextView>(R.id.uf_error_status_txt)
-        errorStatusTxt?.visibility = VISIBLE
+        val errorStatusTxt = requireActivity().findViewById<TextView>(R.id.uf_error_status_txt)
+        errorStatusTxt.visibility = VISIBLE
         loadingDialog.dismissDialog()
     }
 
@@ -134,6 +166,7 @@ class UploadImageFragment : Fragment() {
             intent.putExtras(bundle)
             startActivity(intent)
             Log.d("m_debug", "Starting activity!")
+            loadingDialog.dismissDialog()
         }
     }
 }
