@@ -10,11 +10,13 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
 import no.kristiania.prg208_1_exam.permissions.CameraPermission
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -79,14 +81,8 @@ class MainActivity : AppCompatActivity() {
                     replaceFragment(uploadImageFragment, imageUri)
                 }
                 Globals.CAMERA_REQUEST_CODE -> {
-
                     val currentPhotoPath: String = Globals.currentPhotoPath
-
-                    Log.d("m_debug", "openCamera: imagepath: $currentPhotoPath")
-
-                    val bitmap = BitmapFactory.decodeFile(currentPhotoPath)
-                    val imageUri = Globals.bitmapToUri(this, bitmap)
-
+                    val imageUri = File(currentPhotoPath).toUri()
                     val uploadImageFragment = UploadImageFragment()
                     replaceFragment(uploadImageFragment, imageUri)
                 }

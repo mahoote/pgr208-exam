@@ -45,7 +45,9 @@ class UploadImageFragment : Fragment() {
         val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
         val imgTxtStatus = v.findViewById<TextView>(R.id.uf_upload_img_status_txt)
 
-        imageUri = arguments?.getParcelable("imageUri")!!
+        val origUri: Uri? = arguments?.getParcelable("imageUri")
+        imageUri = Globals.uriToJPEG(requireContext(), origUri)
+        printRealPath(imageUri)
 
         Globals.loadImage(imageUri.toString(), uploadImage, imgTxtStatus)
         uploadImage.maxWidth = 800
