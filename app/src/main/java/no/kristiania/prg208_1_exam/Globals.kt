@@ -7,18 +7,21 @@ import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentManager
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.fragments.HeaderNavFragment
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,6 +30,7 @@ object Globals : AppCompatActivity() {
 
     const val GALLERY_REQUEST_CODE = 100
     const val CAMERA_REQUEST_CODE = 101
+    lateinit var currentPhotoPath: String
 
     val cachedImages: MutableMap<String, CachedImages> = mutableMapOf()
 
@@ -148,11 +152,24 @@ object Globals : AppCompatActivity() {
         return intent
     }
 
-    fun openCamera(): Intent {
-        return Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+    fun openCamera(context: Context): Intent {
+        val fileName = "photo"
+        val storageDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val imageFile = File.createTempFile(fileName, ".jpg", storageDirectory)
+
+        currentPhotoPath = imageFile.absolutePath
+
+        Log.d("m_debug", "openCamera: imagepath: $currentPhotoPath")
+
+        val imageUri = FileProvider.getUriForFile(context, "no.kristiania.prg208_1_exam.fileprovider", imageFile)
+
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+        return intent
     }
 
-    fun toJPEG(context: Context, origUri: Uri?): Uri {
+    fun uriToJPEG(context: Context, origUri: Uri?): Uri {
         val imageBitmap = uriToBitmap(context, origUri.toString())
         return bitmapToUri(context, imageBitmap)
     }

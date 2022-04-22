@@ -47,7 +47,7 @@ class UploadImageFragment : Fragment() {
 
         val origUri: Uri? = arguments?.getParcelable("imageUri")
 
-        imageUri = Globals.toJPEG(requireContext(), origUri)
+        imageUri = Globals.uriToJPEG(requireContext(), origUri)
 
         printRealPath(imageUri)
 

@@ -3,9 +3,11 @@ package no.kristiania.prg208_1_exam
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
@@ -47,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
             if (CameraPermission.askForStoragePermissions(this, requestCode)) {
                 startActivityForResult(
-                    Globals.openCamera(),
+                    Globals.openCamera(this),
                     requestCode
                 )
             } else {
@@ -77,9 +79,16 @@ class MainActivity : AppCompatActivity() {
                     replaceFragment(uploadImageFragment, imageUri)
                 }
                 Globals.CAMERA_REQUEST_CODE -> {
-                    // TODO: Save image to phone and get Uri
-                    val bitmapImage = data?.extras?.get("data") as Bitmap
-                    val imageUri = Globals.bitmapToUri(this, bitmapImage)
+
+                    val currentPhotoPath: String = Globals.currentPhotoPath
+
+                    Log.d("m_debug", "openCamera: imagepath: $currentPhotoPath")
+
+
+                    val bitmap = BitmapFactory.decodeFile(currentPhotoPath)
+
+                    val imageUri = Globals.bitmapToUri(this, bitmap)
+
                     val uploadImageFragment = UploadImageFragment()
                     replaceFragment(uploadImageFragment, imageUri)
                 }
