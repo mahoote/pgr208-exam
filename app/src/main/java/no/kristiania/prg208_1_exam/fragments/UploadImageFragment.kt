@@ -85,12 +85,37 @@ class UploadImageFragment : Fragment() {
                 mainActivity.startActivityForResult(Globals.openImageGallery(), requestCode)
             }
         }
+        // Take new photo btn.
+        v.findViewById<AppCompatImageButton>(R.id.uf_take_photo_btn).setOnClickListener {
+            val mainActivity = activity as MainActivity
+            val requestCode = Globals.CAMERA_REQUEST_CODE
 
-        v.findViewById<SwitchCompat>(R.id.uf_crop_switch).setOnCheckedChangeListener { switchView, isChecked ->
-            uploadImage.isShowCropOverlay = isChecked
-            if(!isChecked){
-                uploadImage.resetCropRect()
+            if (ReadExternalStorage.askForStoragePermissions(mainActivity, requestCode)) {
+                mainActivity.startActivityForResult(Globals.openCamera(requireContext()), requestCode)
             }
+        }
+
+        // Crop btn.
+        val cropBtn = v.findViewById<AppCompatImageButton>(R.id.uf_crop_btn)
+
+        cropBtn.setOnClickListener {
+            val isChecked = !uploadImage.isShowCropOverlay
+            uploadImage.isShowCropOverlay = isChecked
+
+            if(!isChecked) {
+                cropBtn.alpha = 1f
+                uploadImage.resetCropRect()
+            } else {
+                cropBtn.alpha = 0.7f
+            }
+        }
+
+        // Rotate switch.
+        v.findViewById<AppCompatImageButton>(R.id.uf_rotate_btn).setOnClickListener {
+            val degree = uploadImage.rotation
+            val plusDegree = 90f
+
+            uploadImage.rotation = degree + plusDegree
         }
 
         return v
