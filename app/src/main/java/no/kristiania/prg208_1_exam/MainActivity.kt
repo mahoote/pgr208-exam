@@ -84,9 +84,7 @@ class MainActivity : AppCompatActivity() {
 
                     Log.d("m_debug", "openCamera: imagepath: $currentPhotoPath")
 
-
                     val bitmap = BitmapFactory.decodeFile(currentPhotoPath)
-
                     val imageUri = Globals.bitmapToUri(this, bitmap)
 
                     val uploadImageFragment = UploadImageFragment()

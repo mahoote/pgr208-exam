@@ -70,6 +70,9 @@ object Globals : AppCompatActivity() {
     }
 
     fun bitmapToUri(context: Context, bitmap: Bitmap): Uri {
+
+        Log.d("m_debug", "Save image to phone")
+
         val compressedBitmap = compressBitmap(bitmap)
 
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
@@ -85,9 +88,8 @@ object Globals : AppCompatActivity() {
 
     private fun compressBitmap(bitmap: Bitmap): Bitmap? {
         val bytes = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, bytes)
-        val compressedBitmap = createScaledBitmap(bitmap, 800)
-        return compressedBitmap
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        return createScaledBitmap(bitmap, 800)
     }
 
     private fun createScaledBitmap(bitmap: Bitmap, maxSize: Int): Bitmap? {
@@ -98,26 +100,25 @@ object Globals : AppCompatActivity() {
 
         val compressedBitmap = when {
             bWidth > bHeight -> {
-
                 if (bWidth < maxSize) {
-                    val diff = maxSize / bWidth
+                    val diff = maxSize.toFloat() / bWidth
                     val scaledHeight = bHeight * diff
-                    Bitmap.createScaledBitmap(bitmap, maxSize, scaledHeight, true)
+                    Bitmap.createScaledBitmap(bitmap, maxSize, scaledHeight.toInt(), true)
                 } else {
-                    val diff = bWidth / maxSize
+                    val diff = bWidth.toFloat() / maxSize
                     val scaledHeight = bHeight / diff
-                    Bitmap.createScaledBitmap(bitmap, maxSize, scaledHeight, true)
+                    Bitmap.createScaledBitmap(bitmap, maxSize, scaledHeight.toInt(), true)
                 }
             }
             bHeight > bWidth -> {
                 if (bHeight < maxSize) {
-                    val diff = maxSize / bHeight
+                    val diff = maxSize.toFloat() / bHeight
                     val scaledWidth = bWidth * diff
-                    Bitmap.createScaledBitmap(bitmap, scaledWidth, maxSize, true)
+                    Bitmap.createScaledBitmap(bitmap, scaledWidth.toInt(), maxSize, true)
                 } else {
-                    val diff = bHeight / maxSize
+                    val diff = bHeight.toFloat() / maxSize
                     val scaledWidth = bWidth / diff
-                    Bitmap.createScaledBitmap(bitmap, scaledWidth, maxSize, true)
+                    Bitmap.createScaledBitmap(bitmap, scaledWidth.toInt(), maxSize, true)
                 }
             }
             else -> {
