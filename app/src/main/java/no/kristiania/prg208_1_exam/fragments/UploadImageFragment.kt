@@ -2,6 +2,7 @@ package no.kristiania.prg208_1_exam.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -10,12 +11,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.SwitchCompat
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
+import com.theartofdev.edmodo.cropper.CropImageView
 import no.kristiania.prg208_1_exam.*
 import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
 import no.kristiania.prg208_1_exam.models.CachedImages
@@ -42,7 +45,7 @@ class UploadImageFragment : Fragment() {
 
         initializeAndroidNetworking()
 
-        val uploadImage = v.findViewById<ImageView>(R.id.uf_upload_img)
+        val uploadImage = v.findViewById<CropImageView>(R.id.uf_upload_img)
         val imgTxtStatus = v.findViewById<TextView>(R.id.uf_upload_img_status_txt)
 
         val origUri: Uri? = arguments?.getParcelable("imageUri")
@@ -51,12 +54,11 @@ class UploadImageFragment : Fragment() {
             imageUri = it
 
             Log.d(TAG, "onCreateView: Imageuri: $imageUri")
-            
+
             printRealPath(imageUri)
 
-            Globals.loadImage(imageUri.toString(), uploadImage, imgTxtStatus)
-            uploadImage.maxWidth = 800
-            uploadImage.maxHeight = 800
+            uploadImage.setImageUriAsync(imageUri)
+            uploadImage.isShowCropOverlay = false
         }
 
         loadingDialog = LoadingDialog(requireActivity())
@@ -64,6 +66,8 @@ class UploadImageFragment : Fragment() {
         // Upload btn.
         v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
             loadingDialog.startLoadingDialog()
+            val cropped: Bitmap = uploadImage.croppedImage
+            imageUri = context?.let { context -> Globals.bitmapToUri(context, cropped) }!!
             retrieveImagesFromSrc()
         }
 
@@ -76,6 +80,15 @@ class UploadImageFragment : Fragment() {
                 mainActivity.startActivityForResult(Globals.openImageGallery(), requestCode)
             }
         }
+
+        v.findViewById<SwitchCompat>(R.id.uf_crop_switch).setOnCheckedChangeListener { switchView, isChecked ->
+            uploadImage.isShowCropOverlay = isChecked
+            if(!isChecked){
+                uploadImage.resetCropRect()
+            }
+        }
+
+
         return v
     }
 
