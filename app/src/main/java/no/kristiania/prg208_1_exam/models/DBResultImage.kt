@@ -11,5 +11,5 @@ data class DBResultImage(
     val description: String? = null,
     val imageLink: String? = null,
     val currentDate: String? = null,
-    val originalImgID: String
+    val originalImgID: Int
 )

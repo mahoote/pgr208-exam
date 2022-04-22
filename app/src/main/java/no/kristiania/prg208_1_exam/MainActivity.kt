@@ -19,6 +19,8 @@ import androidx.fragment.app.FragmentManager
 import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
 import no.kristiania.prg208_1_exam.models.CachedImages
+import no.kristiania.prg208_1_exam.models.DBOriginalImage
+import no.kristiania.prg208_1_exam.models.DBResultImage
 import no.kristiania.prg208_1_exam.models.ResultImage
 import java.util.*
 
@@ -52,15 +54,14 @@ class MainActivity : AppCompatActivity() {
     private fun jonas() {
         val dbHelper = DataBaseHelper(this)
         val list = ArrayList<ResultImage?>()
-        val cachedTemp = CachedImages(Uri.parse("petter"), list, Calendar.getInstance().time)
 
-        val code = dbHelper.addSearch(cachedTemp)
-        Log.d("db", "db insert code : " + code.toString())
+        // Test put and retrieve original image
+        /**/
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == this.requestCode){
+        if (resultCode == Activity.RESULT_OK && requestCode == this.requestCode) {
             val imageUri = data?.data
 
             val uploadImageFragment = UploadImageFragment()

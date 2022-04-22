@@ -2,9 +2,9 @@ package no.kristiania.prg208_1_exam.db
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.net.Uri
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
@@ -14,7 +14,7 @@ class DataBaseHelper(
 ) : SQLiteOpenHelper(context, "prg208.db", null, 1) {
 
     companion object {
-        const val TABLE_ORIGINAL_IMAGE = "SEARCH_IMAGE"
+        const val TABLE_ORIGINAL_IMAGE = "ORIGINAL_IMAGE"
         const val COLUMN_PK_ORIGINAL_ID = "ID"
         const val COLUMN_IMAGE_URI = "IMAGE_URL"
         const val COLUMN_CREATED = "CREATED"
@@ -33,7 +33,7 @@ class DataBaseHelper(
         const val COLUMN_CURRENT_DATE = "CURR_DATE"
     }
 
-    // TODO: Check injection safety
+    // TODO: Check injection safety + close resources
 
     override fun onCreate(db: SQLiteDatabase?) {
         val createSearchImageTable =
@@ -62,127 +62,94 @@ class DataBaseHelper(
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        TODO("Not yet implemented")
+        db?.execSQL("DROP TABLE IF EXISTS $TABLE_ORIGINAL_IMAGE")
+        db?.execSQL("DROP TABLE IF EXISTS $TABLE_RESULT_IMAGE")
     }
 
-    fun deleteByUri(uri: Uri): Boolean {
-        val db = this.writableDatabase
-        val originalImageQueryString =
-            "DELETE FROM $TABLE_ORIGINAL_IMAGE WHERE $COLUMN_IMAGE_URI = $uri"
 
-        val originalImage: DBOriginalImage? = getOriginalImageByUri(uri)
-
-        if (originalImage != null) {
-            val resultImageQueryString =
-                "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = ${originalImage?.id}"
-            db.execSQL(resultImageQueryString)
-        } else {
-            return false
-        }
-        return true
-    }
-
-    fun addSearch(cachedImages: CachedImages): Boolean {
+    fun putOriginalImage(dbOriginalImage: DBOriginalImage): Boolean {
         val db: SQLiteDatabase = this.writableDatabase
+        val originalImageCV = ContentValues()
 
-        val searchImageCV = ContentValues()
+        originalImageCV.put(COLUMN_IMAGE_URI, dbOriginalImage.uri)
+        originalImageCV.put(COLUMN_CREATED, dbOriginalImage.created)
 
-        searchImageCV.put(COLUMN_IMAGE_URI, cachedImages.imageUri.toString())
-        searchImageCV.put(COLUMN_CREATED, cachedImages.created.toString())
-
-        addResultImages(cachedImages)
-
-        val searchInsertStatus = db.insert(TABLE_ORIGINAL_IMAGE, null, searchImageCV)
+        val origImgInsertStatus = db.insert(TABLE_ORIGINAL_IMAGE, null, originalImageCV)
 
         // TODO: Error handling
-        if (searchInsertStatus < 0) {
+        if (origImgInsertStatus < 0) {
+            closeDB(db)
             return false
         }
-
-        db.close()
-        if(!addResultImages(cachedImages)){
-            return false
-        }
+        closeDB(db)
         return true
     }
 
-    private fun addResultImages(cachedImages: CachedImages): Boolean {
+    fun putResultImages(dbResultImage: DBResultImage): Boolean {
         val resultImageCV = ContentValues()
         val db = this.writableDatabase
 
-        resultImageCV.put(
-            COLUMN_STORE_LINK,
-            cachedImages.images.map { image -> image?.store_link }.toString()
-        )
-        resultImageCV.put(COLUMN_NAME, cachedImages.images.map { image -> image?.name }.toString())
-        resultImageCV.put(
-            COLUMN_DOMAIN,
-            cachedImages.images.map { image -> image?.domain }.toString()
-        )
-        resultImageCV.put(
-            COLUMN_IDENTIFIER,
-            cachedImages.images.map { image -> image?.identifier }.toString()
-        )
-        resultImageCV.put(
-            COLUMN_TRACKING_ID,
-            cachedImages.images.map { image -> image?.tracking_id }.toString()
-        )
-        resultImageCV.put(
-            COLUMN_THUMBNAIL_LINK,
-            cachedImages.images.map { image -> image?.thumbnail_link }.toString()
-        )
-        resultImageCV.put(
-            COLUMN_DESCRIPTION,
-            cachedImages.images.map { image -> image?.description }.toString()
-        )
-        resultImageCV.put(
-            COLUMN_IMAGE_LINK,
-            cachedImages.images.map { image -> image?.image_link }.toString()
-        )
-        resultImageCV.put(
-            COLUMN_CURRENT_DATE,
-            cachedImages.images.map { image -> image?.current_date }.toString()
-        )
+        resultImageCV.put(COLUMN_STORE_LINK, dbResultImage.storeLink)
+        resultImageCV.put(COLUMN_NAME, dbResultImage.name)
+        resultImageCV.put(COLUMN_DOMAIN, dbResultImage.domain)
+        resultImageCV.put(COLUMN_IDENTIFIER, dbResultImage.identifier)
+        resultImageCV.put(COLUMN_TRACKING_ID, dbResultImage.trackingID)
+        resultImageCV.put(COLUMN_THUMBNAIL_LINK, dbResultImage.thumbnailLink)
+        resultImageCV.put(COLUMN_DESCRIPTION, dbResultImage.description)
+        resultImageCV.put(COLUMN_IMAGE_LINK, dbResultImage.imageLink)
+        resultImageCV.put(COLUMN_CURRENT_DATE, dbResultImage.currentDate)
+        resultImageCV.put(COLUMN_FK_ORIGINAL_IMG_ID, dbResultImage.originalImgID)
 
         val resultInsertStatus = db.insert(TABLE_RESULT_IMAGE, null, resultImageCV)
-        db.close()
-        if(resultInsertStatus < 0) {
+
+        // TODO: Error handling
+        if (resultInsertStatus < 0) {
+            closeDB(db)
             return false
         }
+        closeDB(db)
         return true
     }
 
-    private fun getAllOriginalImages(): ArrayList<DBOriginalImage> {
-        val list = arrayListOf<DBOriginalImage>()
-
-        val queryString = "SELECT * FROM $TABLE_ORIGINAL_IMAGE"
+    fun getAllOriginalImages(): ArrayList<DBOriginalImage> {
+        val query = "SELECT * FROM $TABLE_ORIGINAL_IMAGE"
         val db = this.readableDatabase
-        val cursor = db.rawQuery(queryString, null)
-        if (cursor.moveToFirst()) {
-            do {
+
+        val resultList: ArrayList<DBOriginalImage> = arrayListOf()
+
+        var cursor: Cursor? = null
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+
+        if (cursor?.count != 0) {
+            // there is data
+            while (cursor?.moveToNext() == true) {
                 val id = cursor.getInt(0)
                 val uri = cursor.getString(1)
                 val created = cursor.getString(2)
-
-                val originalImage = DBOriginalImage(id, uri, created)
-                list.add(originalImage)
-            } while (cursor.moveToFirst())
+                resultList.add(DBOriginalImage(id, uri, created))
+            }
         } else {
-            // No results, empty list will be returned.
+            // TODO: Error handling: there is no data.
         }
-        db.close()
-        cursor.close()
-        return list
+        return resultList
     }
 
-    private fun getAllResultImages(): ArrayList<DBResultImage> {
-        val list = arrayListOf<DBResultImage>()
-
-        val queryString = "SELECT * FROM $TABLE_RESULT_IMAGE"
+    fun getAllResultImages(): ArrayList<DBResultImage> {
+        val query = "SELECT * FROM $TABLE_RESULT_IMAGE"
         val db = this.readableDatabase
-        val cursor = db.rawQuery(queryString, null)
-        if (cursor.moveToFirst()) {
-            do {
+
+        val resultList: ArrayList<DBResultImage> = arrayListOf()
+
+        var cursor: Cursor? = null
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+
+        if (cursor?.count != 0) {
+            // there is data
+            while (cursor?.moveToNext() == true) {
                 val id = cursor.getInt(0)
                 val storeLink = cursor.getString(1)
                 val name = cursor.getString(2)
@@ -190,63 +157,35 @@ class DataBaseHelper(
                 val identifier = cursor.getString(4)
                 val trackingID = cursor.getString(5)
                 val thumbnailLink = cursor.getString(6)
-                val desc = cursor.getString(7)
+                val description = cursor.getString(7)
                 val imageLink = cursor.getString(8)
                 val currentDate = cursor.getString(9)
-                val originalImgId = cursor.getString(10)
-
-                val resultImage = DBResultImage(
-                    id,
-                    storeLink,
-                    name,
-                    domain,
-                    identifier,
-                    trackingID,
-                    thumbnailLink,
-                    desc,
-                    imageLink,
-                    currentDate,
-                    originalImgId
+                val originalImageID = cursor.getInt(10)
+                resultList.add(
+                    DBResultImage(
+                        id,
+                        storeLink,
+                        name,
+                        domain,
+                        identifier,
+                        trackingID,
+                        thumbnailLink,
+                        description,
+                        imageLink,
+                        currentDate,
+                        originalImageID
+                    )
                 )
-                list.add(resultImage)
-            } while (cursor.moveToFirst())
+            }
         } else {
-            // No results, empty list will be returned.
+            // TODO: Error handling: there is no data.
         }
+        return resultList
+    }
+
+    fun closeDB(db: SQLiteDatabase){
         db.close()
-        cursor.close()
-        return list
-    }
-
-    private fun getOriginalImageByUri(uri: Uri): DBOriginalImage? {
-        val db = this.readableDatabase
-        val queryString = "SELECT * FROM $TABLE_ORIGINAL_IMAGE WHERE $COLUMN_IMAGE_URI = $uri"
-        val cursor = db.rawQuery(queryString, null)
-
-        var originalImage: DBOriginalImage? = null
-
-        if (cursor.moveToFirst()) {
-            do {
-                val id = cursor.getInt(0)
-                val uri = cursor.getString(1)
-                val created = cursor.getString(2)
-                originalImage = DBOriginalImage(id, uri, created)
-
-            } while (cursor.moveToFirst())
-        } else {
-            // Nothing found
-        }
-        db.close()
-        cursor.close()
-        return originalImage
     }
 
 
-    fun sortSearches(): ArrayList<CachedImages> {
-        val originalImages = getAllOriginalImages()
-        val resultImages = getAllResultImages()
-        val list = arrayListOf<CachedImages>()
-
-        return arrayListOf()
-    }
 }
