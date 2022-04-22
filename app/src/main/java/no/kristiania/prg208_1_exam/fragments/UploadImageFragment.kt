@@ -11,9 +11,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.SwitchCompat
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
@@ -63,7 +63,7 @@ class UploadImageFragment : Fragment() {
         loadingDialog = LoadingDialog(requireActivity())
 
         // Upload btn.
-        v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
+        v.findViewById<AppCompatImageButton>(R.id.uf_upload_search_btn).setOnClickListener{
 
             loadingDialog.startLoadingDialog()
 
@@ -77,7 +77,7 @@ class UploadImageFragment : Fragment() {
         }
 
         // Select new image btn.
-        v.findViewById<AppCompatButton>(R.id.uf_select_new_btn).setOnClickListener {
+        v.findViewById<AppCompatImageButton>(R.id.uf_select_new_btn).setOnClickListener {
             val mainActivity = activity as MainActivity
             val requestCode = Globals.GALLERY_REQUEST_CODE
 
