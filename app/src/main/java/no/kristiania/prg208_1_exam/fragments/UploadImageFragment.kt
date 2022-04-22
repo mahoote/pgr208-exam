@@ -46,12 +46,18 @@ class UploadImageFragment : Fragment() {
         val imgTxtStatus = v.findViewById<TextView>(R.id.uf_upload_img_status_txt)
 
         val origUri: Uri? = arguments?.getParcelable("imageUri")
-        imageUri = Globals.uriToJPEG(requireContext(), origUri)
-        printRealPath(imageUri)
 
-        Globals.loadImage(imageUri.toString(), uploadImage, imgTxtStatus)
-        uploadImage.maxWidth = 800
-        uploadImage.maxHeight = 800
+        origUri?.let {
+            imageUri = Globals.uriToJPEG(requireActivity(), requireContext(), it)
+
+            Log.d(TAG, "onCreateView: Imageuri: $imageUri")
+            
+            printRealPath(imageUri)
+
+            Globals.loadImage(imageUri.toString(), uploadImage, imgTxtStatus)
+            uploadImage.maxWidth = 800
+            uploadImage.maxHeight = 800
+        }
 
         loadingDialog = LoadingDialog(requireActivity())
 

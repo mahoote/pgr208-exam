@@ -82,7 +82,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 Globals.CAMERA_REQUEST_CODE -> {
                     val currentPhotoPath: String = Globals.currentPhotoPath
-                    val imageUri = File(currentPhotoPath).toUri()
+                    val imageUri = Uri.parse(currentPhotoPath)
+                    Log.d("m_debug", "onActivityResult: File URI: $imageUri")
                     val uploadImageFragment = UploadImageFragment()
                     replaceFragment(uploadImageFragment, imageUri)
                 }

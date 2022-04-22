@@ -1,5 +1,6 @@
 package no.kristiania.prg208_1_exam
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
@@ -9,12 +10,14 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
 import androidx.fragment.app.FragmentManager
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -23,8 +26,8 @@ import no.kristiania.prg208_1_exam.fragments.HeaderNavFragment
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Exception
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlin.math.log
+
 
 object Globals : AppCompatActivity() {
 
@@ -69,18 +72,18 @@ object Globals : AppCompatActivity() {
         return MediaStore.Images.Media.getBitmap(context.contentResolver, Uri.parse(uri))
     }
 
-    fun bitmapToUri(context: Context, bitmap: Bitmap): Uri {
-
-        Log.d("m_debug", "Save image to phone")
-
+    fun bitmapToUri(context: Context, bitmap: Bitmap, fileName: String): Uri {
+        Log.i("MethodAction", "Saving image to phone...")
         val compressedBitmap = compressBitmap(bitmap)
 
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+//        If we want timestamp in filename.
+//        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+
         val path =
             MediaStore.Images.Media.insertImage(
                 context.contentResolver,
                 compressedBitmap,
-                "JPEG_${timeStamp}.jpeg",
+                "$fileName.jpeg",
                 null
             )
         return Uri.parse(path)
@@ -138,6 +141,9 @@ object Globals : AppCompatActivity() {
     }
 
     fun getPathFromURI(activity: Activity?, uri: Uri): String? {
+
+        Log.d("m_debug", "getPathFromURI: URI: $uri")
+
         val cursor: Cursor? =
             uri.let { activity?.contentResolver?.query(it, null, null, null, null) }
         cursor?.moveToFirst()
@@ -170,8 +176,45 @@ object Globals : AppCompatActivity() {
         return intent
     }
 
-    fun uriToJPEG(context: Context, origUri: Uri?): Uri {
+    fun uriToJPEG(activity: Activity?, context: Context, origUri: Uri): Uri {
+        val fileName = getFileNameWithoutFormat(context, origUri)
+
+        Log.d("m_debug", "uriToJPEG: fileName: $fileName")
+        
         val imageBitmap = uriToBitmap(context, origUri.toString())
-        return bitmapToUri(context, imageBitmap)
+        return bitmapToUri(context, imageBitmap, fileName)
     }
+
+    private fun getFileNameWithoutFormat(context: Context, origUri: Uri): String {
+
+        val TAG = "m_debug"
+
+        val fullFileName = getFileName(context, origUri)
+
+        Log.d("m_debug", "getFileNameWithoutFormat: full name: $fullFileName")
+
+        val dotPos = fullFileName.indexOf(".")
+
+        Log.d("m_debug", "getFileNameWithoutFormat: dot: $dotPos")
+
+        return fullFileName.substring(0, dotPos)
+    }
+
+    @SuppressLint("Range")
+    private fun getFileName(context: Context, uri: Uri): String {
+
+        if (uri.scheme == "content") {
+            val cursor = context.contentResolver.query(uri, null, null, null, null)
+            cursor.use {
+                if (it != null) {
+                    if(it.moveToFirst()) {
+                        return it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                    }
+                }
+            }
+        }
+
+        return uri.path?.lastIndexOf('/')?.plus(1)?.let { uri.path?.substring(it) }.toString()
+    }
+
 }
