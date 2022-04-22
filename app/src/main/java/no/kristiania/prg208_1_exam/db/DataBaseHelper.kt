@@ -187,5 +187,73 @@ class DataBaseHelper(
         db.close()
     }
 
+    fun clear() {
+        this.writableDatabase?.execSQL("VACUUM")
+    }
+
+    fun getOriginalImageByUri(imageUri: String): DBOriginalImage? {
+        val originals = getAllOriginalImages()
+        var dbOriginalImage: DBOriginalImage? = null
+
+        for (o in originals) {
+            if(o.uri == imageUri) {
+                dbOriginalImage = o
+            }
+        }
+        if(dbOriginalImage != null) {
+            return dbOriginalImage
+        }
+        // TODO: No image found.
+        return dbOriginalImage
+    }
+
+    fun getListOfResultsById(originalImageId: Int): ArrayList<DBResultImage> {
+        val query = "SELECT * FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = $originalImageId"
+        val db = this.readableDatabase
+
+        val resultList: ArrayList<DBResultImage> = arrayListOf()
+
+        var cursor: Cursor? = null
+
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+
+        if (cursor?.count != 0) {
+
+            while (cursor?.moveToNext() == true) {
+                val id = cursor.getInt(0)
+                val storeLink = cursor.getString(1)
+                val name = cursor.getString(2)
+                val domain = cursor.getString(3)
+                val identifier = cursor.getString(4)
+                val trackingID = cursor.getString(5)
+                val thumbnailLink = cursor.getString(6)
+                val description = cursor.getString(7)
+                val imageLink = cursor.getString(8)
+                val currentDate = cursor.getString(9)
+                val originalImageID = cursor.getInt(10)
+                resultList.add(
+                    DBResultImage(
+                        id,
+                        storeLink,
+                        name,
+                        domain,
+                        identifier,
+                        trackingID,
+                        thumbnailLink,
+                        description,
+                        imageLink,
+                        currentDate,
+                        originalImageID
+                    )
+                )
+            }
+        } else {
+            // TODO: Error handling: there is no data.
+        }
+        return resultList
+    }
+
 
 }
