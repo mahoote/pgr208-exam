@@ -46,7 +46,6 @@ class UploadImageFragment : Fragment() {
         initializeAndroidNetworking()
 
         val uploadImage = v.findViewById<CropImageView>(R.id.uf_upload_img)
-        val imgTxtStatus = v.findViewById<TextView>(R.id.uf_upload_img_status_txt)
 
         val origUri: Uri? = arguments?.getParcelable("imageUri")
 
@@ -65,9 +64,15 @@ class UploadImageFragment : Fragment() {
 
         // Upload btn.
         v.findViewById<AppCompatButton>(R.id.uf_upload_search_btn).setOnClickListener{
+
             loadingDialog.startLoadingDialog()
-            val cropped: Bitmap = uploadImage.croppedImage
-            imageUri = context?.let { context -> Globals.bitmapToUri(context, cropped) }!!
+
+            if(uploadImage.isShowCropOverlay) {
+                val cropped: Bitmap = uploadImage.croppedImage
+                val fileName = Globals.getFileNameFromUri(requireContext(), imageUri)
+                imageUri = context?.let { context -> Globals.bitmapToUri(context, cropped, "${fileName}_crop") }!!
+            }
+
             retrieveImagesFromSrc()
         }
 
@@ -87,7 +92,6 @@ class UploadImageFragment : Fragment() {
                 uploadImage.resetCropRect()
             }
         }
-
 
         return v
     }

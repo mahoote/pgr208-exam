@@ -180,7 +180,7 @@ object Globals : AppCompatActivity() {
         return bitmapToUri(context, imageBitmap, fileName)
     }
 
-    private fun getFileNameFromUri(context: Context, origUri: Uri): String {
+    fun getFileNameFromUri(context: Context, origUri: Uri): String {
         val fullFileName = getFileName(context, origUri)
         return removeFileFormat(fullFileName)
     }
