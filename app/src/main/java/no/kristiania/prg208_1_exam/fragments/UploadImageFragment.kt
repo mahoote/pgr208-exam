@@ -48,7 +48,7 @@ class UploadImageFragment : Fragment() {
         val origUri: Uri? = arguments?.getParcelable("imageUri")
 
         origUri?.let {
-            imageUri = Globals.uriToJPEG(requireActivity(), requireContext(), it)
+            imageUri = it
 
             Log.d(TAG, "onCreateView: Imageuri: $imageUri")
             

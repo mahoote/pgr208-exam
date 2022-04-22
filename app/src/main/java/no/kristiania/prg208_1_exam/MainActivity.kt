@@ -76,14 +76,19 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 Globals.GALLERY_REQUEST_CODE -> {
-                    val imageUri = data?.data
+                    val imageUri = data?.data?.let { Globals.uriToJPEG(this, it) }
                     val uploadImageFragment = UploadImageFragment()
                     replaceFragment(uploadImageFragment, imageUri)
                 }
                 Globals.CAMERA_REQUEST_CODE -> {
                     val currentPhotoPath: String = Globals.currentPhotoPath
-                    val imageUri = Uri.parse(currentPhotoPath)
-                    Log.d("m_debug", "onActivityResult: File URI: $imageUri")
+
+                    Log.d("m_debug", "openCamera: imagepath: $currentPhotoPath")
+
+                    val bitmap = BitmapFactory.decodeFile(currentPhotoPath)
+                    val fileName = Globals.getFileNameFromPath(currentPhotoPath)
+                    val imageUri = Globals.bitmapToUri(this, bitmap, fileName)
+
                     val uploadImageFragment = UploadImageFragment()
                     replaceFragment(uploadImageFragment, imageUri)
                 }

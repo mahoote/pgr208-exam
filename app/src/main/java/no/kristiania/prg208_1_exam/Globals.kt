@@ -1,6 +1,5 @@
 package no.kristiania.prg208_1_exam
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
@@ -17,7 +16,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.net.toFile
 import androidx.fragment.app.FragmentManager
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -26,7 +24,7 @@ import no.kristiania.prg208_1_exam.fragments.HeaderNavFragment
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Exception
-import kotlin.math.log
+import android.annotation.SuppressLint
 
 
 object Globals : AppCompatActivity() {
@@ -99,7 +97,7 @@ object Globals : AppCompatActivity() {
         val bWidth = bitmap.width
         val bHeight = bitmap.height
 
-        Log.d("m_debug", "createScaledBitmap: width: $bWidth, height: $bHeight")
+        Log.d("m_debug", "createScaledBitmap: Original scale = width: $bWidth, height: $bHeight")
 
         val compressedBitmap = when {
             bWidth > bHeight -> {
@@ -141,9 +139,6 @@ object Globals : AppCompatActivity() {
     }
 
     fun getPathFromURI(activity: Activity?, uri: Uri): String? {
-
-        Log.d("m_debug", "getPathFromURI: URI: $uri")
-
         val cursor: Cursor? =
             uri.let { activity?.contentResolver?.query(it, null, null, null, null) }
         cursor?.moveToFirst()
@@ -176,8 +171,8 @@ object Globals : AppCompatActivity() {
         return intent
     }
 
-    fun uriToJPEG(activity: Activity?, context: Context, origUri: Uri): Uri {
-        val fileName = getFileNameWithoutFormat(context, origUri)
+    fun uriToJPEG(context: Context, origUri: Uri): Uri {
+        val fileName = getFileNameFromUri(context, origUri)
 
         Log.d("m_debug", "uriToJPEG: fileName: $fileName")
         
@@ -185,16 +180,20 @@ object Globals : AppCompatActivity() {
         return bitmapToUri(context, imageBitmap, fileName)
     }
 
-    private fun getFileNameWithoutFormat(context: Context, origUri: Uri): String {
-
-        val TAG = "m_debug"
-
+    private fun getFileNameFromUri(context: Context, origUri: Uri): String {
         val fullFileName = getFileName(context, origUri)
+        return removeFileFormat(fullFileName)
+    }
 
+    fun getFileNameFromPath(path: String): String {
+        val fullFileName: String = path.substring(path.lastIndexOf("/") + 1)
+        return removeFileFormat(fullFileName)
+    }
+
+    private fun removeFileFormat(fullFileName: String): String {
         Log.d("m_debug", "getFileNameWithoutFormat: full name: $fullFileName")
 
         val dotPos = fullFileName.indexOf(".")
-
         Log.d("m_debug", "getFileNameWithoutFormat: dot: $dotPos")
 
         return fullFileName.substring(0, dotPos)
