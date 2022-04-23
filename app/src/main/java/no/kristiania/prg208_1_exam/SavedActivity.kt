@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import no.kristiania.prg208_1_exam.adapters.MainRecyclerAdapter
-import no.kristiania.prg208_1_exam.models.AllCategory
-import no.kristiania.prg208_1_exam.models.CategoryItem
+import no.kristiania.prg208_1_exam.db.DataBaseHelper
+import no.kristiania.prg208_1_exam.fragments.NoSavedResultsFragment
+import no.kristiania.prg208_1_exam.models.AllSearches
+import no.kristiania.prg208_1_exam.models.SearchItem
 
 class SavedActivity : AppCompatActivity() {
     private var mainCategoryRecycler: RecyclerView? = null
@@ -19,69 +21,31 @@ class SavedActivity : AppCompatActivity() {
         Globals.setHeaderFragment(supportFragmentManager)
         overridePendingTransition(0, 0)
 
+        val dbHelper = DataBaseHelper(applicationContext)
+        val allOriginalImages = dbHelper.getAllOriginalImages()
+        val allSearchesList: MutableList<AllSearches> = ArrayList()
 
-        val categoryItemList: MutableList<CategoryItem> = ArrayList()
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
+        if(allOriginalImages.size > 0) {
 
+            allOriginalImages.forEach { o ->
+                val list = o.id?.let { dbHelper.getListOfResultsAsSearchItemById(it) }
+                o.uri?.let { o.id?.let { it1 -> SearchItem(it1, it, true) } }?.let { list?.add(0, it) }
+                list?.let { AllSearches(o.created.toString(), it) }?.let { allSearchesList.add(it) }
+            }
+            setMainRecycler(allSearchesList)
 
-        // added in second category
-        val categoryItemList2: MutableList<CategoryItem> = ArrayList()
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-
-
-        // added in 3rd category
-        val categoryItemList3: MutableList<CategoryItem> = ArrayList()
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-
-
-        // added in 4th category
-        val categoryItemList4: MutableList<CategoryItem> = ArrayList()
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-
-
-        // added in 5th category
-        val categoryItemList5: MutableList<CategoryItem> = ArrayList()
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-
-        val allCategoryList: MutableList<AllCategory> = ArrayList()
-        allCategoryList.add(AllCategory("Hollywood", categoryItemList))
-        allCategoryList.add(AllCategory("Best of Oscars", categoryItemList2))
-        allCategoryList.add(AllCategory("Movies Dubbed in Hindi", categoryItemList3))
-        allCategoryList.add(AllCategory("Category 4th", categoryItemList4))
-        allCategoryList.add(AllCategory("Category 5th", categoryItemList5))
-        setMainRecycler(allCategoryList)
+        } else {
+            val fragmentManager = supportFragmentManager
+            fragmentManager.beginTransaction()
+                .add(R.id.sa_content_fragment_container, NoSavedResultsFragment(), "content-fragment").commit()
+        }
     }
 
-    private fun setMainRecycler(allCategoryList: List<AllCategory>) {
+    private fun setMainRecycler(allSearchesList: List<AllSearches>) {
         mainCategoryRecycler = findViewById(R.id.main_recycler)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         mainCategoryRecycler?.layoutManager = layoutManager
-        mainRecyclerAdapter = MainRecyclerAdapter(this, allCategoryList)
+        mainRecyclerAdapter = MainRecyclerAdapter(this, allSearchesList)
         mainCategoryRecycler?.adapter = mainRecyclerAdapter
     }
 }

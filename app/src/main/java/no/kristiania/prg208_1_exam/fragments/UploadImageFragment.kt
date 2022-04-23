@@ -1,6 +1,7 @@
 package no.kristiania.prg208_1_exam.fragments
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -21,7 +22,13 @@ import com.jacksonandroidnetworking.JacksonParserFactory
 import com.theartofdev.edmodo.cropper.CropImageView
 import no.kristiania.prg208_1_exam.*
 import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
+import no.kristiania.prg208_1_exam.Globals
+import no.kristiania.prg208_1_exam.R
+import no.kristiania.prg208_1_exam.SearchActivity
+import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.models.CachedImages
+import no.kristiania.prg208_1_exam.models.DBOriginalImage
+import no.kristiania.prg208_1_exam.models.DBResultImage
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import no.kristiania.prg208_1_exam.runnables.FetchImagesRunnable
@@ -38,6 +45,7 @@ class UploadImageFragment : Fragment() {
 
     private lateinit var imageUri: Uri
     private lateinit var imageFilePath: String
+    private var dbHelper: DataBaseHelper? = null
     private lateinit var loadingDialog: LoadingDialog
     private var waitForThread: Boolean = true
 
@@ -125,6 +133,11 @@ class UploadImageFragment : Fragment() {
         return v
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        dbHelper = DataBaseHelper(context)
+    }
+
     private fun printRealPath(uri: Uri, TAG: String = "m_debug") {
         val path = Globals.getPathFromURI(requireActivity(), uri)
         Log.d(TAG, "printRealPath: $path")
@@ -170,6 +183,8 @@ class UploadImageFragment : Fragment() {
         Log.d("Response", "Response = Success!")
         Log.d("Response", "After api: $response")
 
+        dbHelper?.putOriginalImage(DBOriginalImage(null, Uri.parse(response), Calendar.getInstance().time.toString()))
+
         val fetchBingRunnable = FetchImagesRunnable(this,"bing", response)
         val fetchGoogleRunnable = FetchImagesRunnable(this,"google", response)
         val fetchTineyeRunnable = FetchImagesRunnable(this,"tineye", response)
@@ -190,6 +205,14 @@ class UploadImageFragment : Fragment() {
             Log.d("Response", "Get successful")
             Log.d("r_debug", "onSuccessfulGet: Return images from $returnEngine")
             Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
+
+            val originalImageID = dbHelper?.getOriginalImageByUri(url)?.id
+            val dbResultImages = originalImageID?.let { Globals.convertResultImagesToDBModel(images, it) }
+
+            if (dbResultImages != null) {
+                dbHelper?.putResultImages(dbResultImages)
+            }
+
             startSearchActivity(SearchActivity(), images)
         }
 

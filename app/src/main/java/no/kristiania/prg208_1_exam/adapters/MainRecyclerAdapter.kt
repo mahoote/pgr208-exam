@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import no.kristiania.prg208_1_exam.models.AllCategory
+import no.kristiania.prg208_1_exam.models.AllSearches
 import no.kristiania.prg208_1_exam.R
-import no.kristiania.prg208_1_exam.models.CategoryItem
+import no.kristiania.prg208_1_exam.models.SearchItem
 
 class MainRecyclerAdapter(
     private val context: Context,
-    private val allCategoryList: List<AllCategory>
+    private val allSearchesList: List<AllSearches>
 ) :
     RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>() {
 
@@ -26,12 +26,12 @@ class MainRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
-        holder.categoryTitle.text = allCategoryList[position].categoryTitle
-        setSearchItemRecycler(holder.itemRecycler, allCategoryList[position].categoryItemList)
+        holder.categoryTitle.text = allSearchesList[position].searchTitle
+        setSearchItemRecycler(holder.itemRecycler, allSearchesList[position].searchItemList)
     }
 
     override fun getItemCount(): Int {
-        return allCategoryList.size
+        return allSearchesList.size
     }
 
     class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -42,7 +42,7 @@ class MainRecyclerAdapter(
 
     private fun setSearchItemRecycler(
         recyclerView: RecyclerView,
-        categoryItemList: List<CategoryItem>
+        categoryItemList: List<SearchItem>
     ) {
         val itemRecyclerAdapter = CategoryItemRecyclerAdapter(context, categoryItemList)
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)

@@ -21,6 +21,8 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.fragments.HeaderNavFragment
+import no.kristiania.prg208_1_exam.models.DBResultImage
+import no.kristiania.prg208_1_exam.models.ResultImage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Exception
@@ -175,7 +177,7 @@ object Globals : AppCompatActivity() {
         val fileName = getFileNameFromUri(context, origUri)
 
         Log.d("m_debug", "uriToJPEG: fileName: $fileName")
-        
+
         val imageBitmap = uriToBitmap(context, origUri.toString())
         return bitmapToUri(context, imageBitmap, fileName)
     }
@@ -183,6 +185,28 @@ object Globals : AppCompatActivity() {
     fun getFileNameFromUri(context: Context, origUri: Uri): String {
         val fullFileName = getFileName(context, origUri)
         return removeFileFormat(fullFileName)
+    }
+
+    fun convertResultImagesToDBModel(resultImages: ArrayList<ResultImage?>, originalImageId: Int) : ArrayList<DBResultImage> {
+        val dbResultImages = arrayListOf<DBResultImage>()
+
+        resultImages.forEach { resimg ->
+            val dbResultImage = DBResultImage(
+                null,
+                resimg?.store_link,
+                resimg?.name,
+                resimg?.domain,
+                resimg?.tracking_id,
+                resimg?.thumbnail_link,
+                resimg?.thumbnail_link,
+                resimg?.description,
+                resimg?.image_link,
+                resimg?.current_date,
+                originalImageId
+            )
+            dbResultImages.add(dbResultImage)
+        }
+        return dbResultImages
     }
 
     fun getFileNameFromPath(path: String): String {

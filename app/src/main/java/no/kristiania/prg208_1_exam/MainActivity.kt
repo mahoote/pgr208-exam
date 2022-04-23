@@ -9,14 +9,21 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import android.provider.Settings
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
 import no.kristiania.prg208_1_exam.permissions.CameraPermission
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import java.io.File
+import no.kristiania.prg208_1_exam.models.CachedImages
+import no.kristiania.prg208_1_exam.models.DBOriginalImage
+import no.kristiania.prg208_1_exam.models.DBResultImage
+import no.kristiania.prg208_1_exam.models.ResultImage
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
