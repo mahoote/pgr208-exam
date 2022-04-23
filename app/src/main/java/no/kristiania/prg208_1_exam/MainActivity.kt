@@ -47,16 +47,6 @@ class MainActivity : AppCompatActivity() {
                 openImageGallery()
             }
         }
-
-        jonas()
-    }
-
-    private fun jonas() {
-        val dbHelper = DataBaseHelper(this)
-        val list = ArrayList<ResultImage?>()
-
-        // Test put and retrieve original image
-        /**/
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

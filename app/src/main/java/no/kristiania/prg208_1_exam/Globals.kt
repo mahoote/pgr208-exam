@@ -17,6 +17,8 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.fragments.HeaderNavFragment
+import no.kristiania.prg208_1_exam.models.DBResultImage
+import no.kristiania.prg208_1_exam.models.ResultImage
 import java.lang.Exception
 
 object Globals : AppCompatActivity() {
@@ -68,5 +70,27 @@ object Globals : AppCompatActivity() {
         cursor?.moveToFirst()
         val idx: Int? = cursor?.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
         return idx?.let { cursor.getString(it) }
+    }
+
+    fun convertResultImagesToDBModel(resultImages: ArrayList<ResultImage?>, originalImageId: Int) : ArrayList<DBResultImage> {
+        val dbResultImages = arrayListOf<DBResultImage>()
+
+        resultImages.forEach { resimg ->
+            val dbResultImage = DBResultImage(
+                null,
+                resimg?.store_link,
+                resimg?.name,
+                resimg?.domain,
+                resimg?.tracking_id,
+                resimg?.thumbnail_link,
+                resimg?.thumbnail_link,
+                resimg?.description,
+                resimg?.image_link,
+                resimg?.current_date,
+                originalImageId
+            )
+            dbResultImages.add(dbResultImage)
+        }
+        return dbResultImages
     }
 }

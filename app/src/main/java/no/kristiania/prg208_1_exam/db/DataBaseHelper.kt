@@ -5,9 +5,12 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import no.kristiania.prg208_1_exam.models.CachedImages
+import android.net.Uri
+import android.util.Log
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
+import no.kristiania.prg208_1_exam.models.ResultImage
+import no.kristiania.prg208_1_exam.models.SearchItem
 
 class DataBaseHelper(
     context: Context?,
@@ -71,7 +74,7 @@ class DataBaseHelper(
         val db: SQLiteDatabase = this.writableDatabase
         val originalImageCV = ContentValues()
 
-        originalImageCV.put(COLUMN_IMAGE_URI, dbOriginalImage.uri)
+        originalImageCV.put(COLUMN_IMAGE_URI, dbOriginalImage.uri.toString())
         originalImageCV.put(COLUMN_CREATED, dbOriginalImage.created)
 
         val origImgInsertStatus = db.insert(TABLE_ORIGINAL_IMAGE, null, originalImageCV)
@@ -85,27 +88,29 @@ class DataBaseHelper(
         return true
     }
 
-    fun putResultImages(dbResultImage: DBResultImage): Boolean {
+    fun putResultImages(dbResultImages: ArrayList<DBResultImage>): Boolean {
         val resultImageCV = ContentValues()
         val db = this.writableDatabase
 
-        resultImageCV.put(COLUMN_STORE_LINK, dbResultImage.storeLink)
-        resultImageCV.put(COLUMN_NAME, dbResultImage.name)
-        resultImageCV.put(COLUMN_DOMAIN, dbResultImage.domain)
-        resultImageCV.put(COLUMN_IDENTIFIER, dbResultImage.identifier)
-        resultImageCV.put(COLUMN_TRACKING_ID, dbResultImage.trackingID)
-        resultImageCV.put(COLUMN_THUMBNAIL_LINK, dbResultImage.thumbnailLink)
-        resultImageCV.put(COLUMN_DESCRIPTION, dbResultImage.description)
-        resultImageCV.put(COLUMN_IMAGE_LINK, dbResultImage.imageLink)
-        resultImageCV.put(COLUMN_CURRENT_DATE, dbResultImage.currentDate)
-        resultImageCV.put(COLUMN_FK_ORIGINAL_IMG_ID, dbResultImage.originalImgID)
+        dbResultImages.forEach { img ->
+            resultImageCV.put(COLUMN_STORE_LINK, img.storeLink)
+            resultImageCV.put(COLUMN_NAME, img.name)
+            resultImageCV.put(COLUMN_DOMAIN, img.domain)
+            resultImageCV.put(COLUMN_IDENTIFIER, img.identifier)
+            resultImageCV.put(COLUMN_TRACKING_ID, img.trackingID)
+            resultImageCV.put(COLUMN_THUMBNAIL_LINK, img.thumbnailLink)
+            resultImageCV.put(COLUMN_DESCRIPTION, img.description)
+            resultImageCV.put(COLUMN_IMAGE_LINK, img.imageLink)
+            resultImageCV.put(COLUMN_CURRENT_DATE, img.currentDate)
+            resultImageCV.put(COLUMN_FK_ORIGINAL_IMG_ID, img.originalImgID)
 
-        val resultInsertStatus = db.insert(TABLE_RESULT_IMAGE, null, resultImageCV)
+            val resultInsertStatus = db.insert(TABLE_RESULT_IMAGE, null, resultImageCV)
 
-        // TODO: Error handling
-        if (resultInsertStatus < 0) {
-            closeDB(db)
-            return false
+            // TODO: Error handling
+            if (resultInsertStatus < 0) {
+                closeDB(db)
+                return false
+            }
         }
         closeDB(db)
         return true
@@ -128,7 +133,7 @@ class DataBaseHelper(
                 val id = cursor.getInt(0)
                 val uri = cursor.getString(1)
                 val created = cursor.getString(2)
-                resultList.add(DBOriginalImage(id, uri, created))
+                resultList.add(DBOriginalImage(id, Uri.parse(uri), created))
             }
         } else {
             // TODO: Error handling: there is no data.
@@ -183,7 +188,7 @@ class DataBaseHelper(
         return resultList
     }
 
-    fun closeDB(db: SQLiteDatabase){
+    private fun closeDB(db: SQLiteDatabase){
         db.close()
     }
 
@@ -194,9 +199,11 @@ class DataBaseHelper(
     fun getOriginalImageByUri(imageUri: String): DBOriginalImage? {
         val originals = getAllOriginalImages()
         var dbOriginalImage: DBOriginalImage? = null
+        Log.d("db", "input uri :" + imageUri)
 
         for (o in originals) {
-            if(o.uri == imageUri) {
+            Log.d("db", "correct uri :" + o.uri)
+            if(o.uri == Uri.parse(imageUri)) {
                 dbOriginalImage = o
             }
         }
@@ -246,6 +253,46 @@ class DataBaseHelper(
                         imageLink,
                         currentDate,
                         originalImageID
+                    )
+                )
+            }
+        } else {
+            // TODO: Error handling: there is no data.
+        }
+        return resultList
+    }
+
+    fun getListOfResultsAsSearchItemById(originalImageId: Int): ArrayList<SearchItem> {
+        val query = "SELECT * FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = $originalImageId"
+        val db = this.readableDatabase
+
+        val resultList: ArrayList<SearchItem> = arrayListOf()
+
+        var cursor: Cursor? = null
+
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+
+        if (cursor?.count != 0) {
+
+            while (cursor?.moveToNext() == true) {
+                val id = cursor.getInt(0)
+                val storeLink = cursor.getString(1)
+                val name = cursor.getString(2)
+                val domain = cursor.getString(3)
+                val identifier = cursor.getString(4)
+                val trackingID = cursor.getString(5)
+                val thumbnailLink = cursor.getString(6)
+                val description = cursor.getString(7)
+                val imageLink = cursor.getString(8)
+                val currentDate = cursor.getString(9)
+                val originalImageID = cursor.getInt(10)
+                resultList.add(
+                    SearchItem(
+                        id,
+                        Uri.parse(imageLink),
+                        false
                     )
                 )
             }

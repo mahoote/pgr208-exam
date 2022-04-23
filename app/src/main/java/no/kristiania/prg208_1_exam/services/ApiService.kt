@@ -23,7 +23,7 @@ class ApiService {
             .setUploadProgressListener { bytesUploaded, totalBytes ->
             }
             .getAsString(object : StringRequestListener {
-                override fun onResponse(response: String) {
+                override fun onResponse(response: String){
                     fragment.onSuccessfulPost(response)
                 }
 
@@ -46,7 +46,7 @@ class ApiService {
             .getAsObjectList(ResultImage::class.java, object : ParsedRequestListener<ArrayList<ResultImage?>> {
                 override fun onResponse(images: ArrayList<ResultImage?>) {
                     Log.d("m_debug", "onResponse: $images")
-                    fragment.onSuccessfulGet(images)
+                    fragment.onSuccessfulGet(images, url)
                 }
 
                 override fun onError(anError: ANError) {

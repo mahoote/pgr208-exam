@@ -1,6 +1,7 @@
 package no.kristiania.prg208_1_exam.fragments
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -18,7 +19,10 @@ import com.jacksonandroidnetworking.JacksonParserFactory
 import no.kristiania.prg208_1_exam.Globals
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.SearchActivity
+import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.models.CachedImages
+import no.kristiania.prg208_1_exam.models.DBOriginalImage
+import no.kristiania.prg208_1_exam.models.DBResultImage
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.services.ApiService
 import java.io.File
@@ -29,6 +33,7 @@ class UploadImageFragment : Fragment() {
 
     private lateinit var imageUri: Uri
     private lateinit var imageFilePath: String
+    private var dbHelper: DataBaseHelper? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +55,11 @@ class UploadImageFragment : Fragment() {
             retrieveImagesFromSrc()
         }
         return v
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        dbHelper = DataBaseHelper(context)
     }
 
     private fun retrieveImagesFromSrc() {
@@ -90,11 +100,20 @@ class UploadImageFragment : Fragment() {
         Log.d("Response", "After api: $response")
 
         ApiService().getImages(this, "bing", response)
+        dbHelper?.putOriginalImage(DBOriginalImage(null, Uri.parse(response), Calendar.getInstance().time.toString()))
+        Log.d("db", "uri when saving: " + response)
     }
 
-    fun onSuccessfulGet(images: ArrayList<ResultImage?>){
+    fun onSuccessfulGet(images: ArrayList<ResultImage?>, url: String){
         Log.d("Response", "Get successful")
         Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
+
+        val originalImageID = dbHelper?.getOriginalImageByUri(url)?.id
+        val dbResultImages = originalImageID?.let { Globals.convertResultImagesToDBModel(images, it) }
+
+        if (dbResultImages != null) {
+            dbHelper?.putResultImages(dbResultImages)
+        }
         startSearchActivity(SearchActivity(), images)
     }
 
