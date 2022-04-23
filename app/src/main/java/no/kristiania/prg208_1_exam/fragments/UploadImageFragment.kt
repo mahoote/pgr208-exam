@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,9 +13,8 @@ import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatButton
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.SwitchCompat
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
@@ -24,8 +24,11 @@ import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
+import no.kristiania.prg208_1_exam.runnables.FetchImagesRunnable
 import no.kristiania.prg208_1_exam.services.ApiService
 import java.io.File
+import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -36,6 +39,11 @@ class UploadImageFragment : Fragment() {
     private lateinit var imageUri: Uri
     private lateinit var imageFilePath: String
     private lateinit var loadingDialog: LoadingDialog
+    private var waitForThread: Boolean = true
+
+    private lateinit var googleThread: Thread
+    private lateinit var bingThread: Thread
+    private lateinit var tineyeThread: Thread
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,15 +72,11 @@ class UploadImageFragment : Fragment() {
 
         // Upload btn.
         v.findViewById<AppCompatImageButton>(R.id.uf_upload_search_btn).setOnClickListener{
-
-            loadingDialog.startLoadingDialog()
-
             if(uploadImage.isShowCropOverlay) {
                 val cropped: Bitmap = uploadImage.croppedImage
                 val fileName = Globals.getFileNameFromUri(requireContext(), imageUri)
                 imageUri = context?.let { context -> Globals.bitmapToUri(context, cropped, "${fileName}_crop") }!!
             }
-
             retrieveImagesFromSrc()
         }
 
@@ -127,6 +131,8 @@ class UploadImageFragment : Fragment() {
     }
 
     private fun retrieveImagesFromSrc() {
+        waitForThread = true
+        loadingDialog.startLoadingDialog()
         imageFilePath = Globals.getPathFromURI(requireActivity(), imageUri).toString()
 
         if (Globals.cachedImages[imageFilePath] != null) {
@@ -151,24 +157,42 @@ class UploadImageFragment : Fragment() {
 
     fun onErrorResponse(anError: ANError) {
         Log.e("Response", "An error occurred: ${Log.getStackTraceString(anError)}")
-        anError.printStackTrace()
 
-        val errorStatusTxt = requireActivity().findViewById<TextView>(R.id.uf_error_status_txt)
-        errorStatusTxt.visibility = VISIBLE
-        loadingDialog.dismissDialog()
+        if(waitForThread) {
+            waitForThread = false
+            val errorStatusTxt = requireActivity().findViewById<TextView>(R.id.uf_error_status_txt)
+            errorStatusTxt.visibility = VISIBLE
+            loadingDialog.endLoadingDialog()
+        }
     }
 
     fun onSuccessfulPost(response: String) {
         Log.d("Response", "Response = Success!")
         Log.d("Response", "After api: $response")
 
-        ApiService().getImages(this, "bing", response)
+        val fetchBingRunnable = FetchImagesRunnable(this,"bing", response)
+        val fetchGoogleRunnable = FetchImagesRunnable(this,"google", response)
+        val fetchTineyeRunnable = FetchImagesRunnable(this,"tineye", response)
+
+        googleThread = Thread(fetchGoogleRunnable)
+        bingThread = Thread(fetchBingRunnable)
+        tineyeThread = Thread(fetchTineyeRunnable)
+
+        googleThread.start()
+        bingThread.start()
+        tineyeThread.start()
     }
 
-    fun onSuccessfulGet(images: ArrayList<ResultImage?>){
-        Log.d("Response", "Get successful")
-        Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
-        startSearchActivity(SearchActivity(), images)
+    fun onSuccessfulGet(images: ArrayList<ResultImage?>, returnEngine: String) {
+        Log.d("r_debug", "onSuccessfulGet: Wait for thread: $waitForThread")
+        if(waitForThread) {
+            waitForThread = false
+            Log.d("Response", "Get successful")
+            Log.d("r_debug", "onSuccessfulGet: Return images from $returnEngine")
+            Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
+            startSearchActivity(SearchActivity(), images)
+        }
+
     }
 
     private fun getCachedImages(cachedImages: CachedImages?) {
@@ -191,7 +215,7 @@ class UploadImageFragment : Fragment() {
             intent.putExtras(bundle)
             startActivity(intent)
             Log.d("m_debug", "Starting activity!")
-            loadingDialog.dismissDialog()
+            loadingDialog.endLoadingDialog()
         }
     }
 }
