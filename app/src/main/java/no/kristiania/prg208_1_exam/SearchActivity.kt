@@ -24,6 +24,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var fragmentManager: FragmentManager
     private lateinit var adapter: ImageAdapter
     private lateinit var results: ArrayList<ResultImage>
+    private var originalImageUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +40,7 @@ class SearchActivity : AppCompatActivity() {
         if(bundle != null) {
             val chosenImageUri = bundle!!.getString("chosenImageUri")
             results = bundle.getSerializable("results") as ArrayList<ResultImage>
+            originalImageUrl = bundle.getString("originalImageUrl")
 
             Log.d("m_debug", "$results")
 
@@ -66,7 +68,7 @@ class SearchActivity : AppCompatActivity() {
             val chosenImageFragment = ChosenImageFragment()
             adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int) {
-                    replaceFragment(chosenImageFragment, position)
+                    replaceFragment(chosenImageFragment, position, originalImageUrl)
                 }
             })
         }
@@ -90,10 +92,15 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun replaceFragment(fragment: Fragment, position: Int) {
+    private fun replaceFragment(fragment: Fragment, position: Int, originalImageUrl: String?) {
         if(::results.isInitialized) {
             val bundle = Bundle()
             bundle.putSerializable("resultImage", results[position])
+
+            if(originalImageUrl != null) {
+                bundle.putString("originalImageUrl", originalImageUrl)
+            }
+
             fragment.arguments = bundle
 
             fragmentManager.beginTransaction()

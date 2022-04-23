@@ -292,4 +292,85 @@ class DBUnitTests {
 
         assertEquals(3, list.size)
     }
+
+    @Test
+    fun shouldGetResultImageByImageLink() {
+        val resultImages = arrayListOf<DBResultImage>()
+
+        val resImg1 = DBResultImage(
+            null,
+            "storeLink1",
+            "name1",
+            "domain1",
+            "identifier1",
+            "trackingID1",
+            "thumb1",
+            "desc1",
+            "imageLink1",
+            "curDate1",
+            1
+        )
+
+        resultImages.add(resImg1)
+
+        db.putResultImages(resultImages)
+        val dbResultImage = db.getResultImageByImageLink(Uri.parse("imageLink1"))
+        assertEquals("imageLink1", dbResultImage?.imageLink)
+    }
+
+    @Test
+    fun shouldDeleteResultImage(){
+        val resultImages = arrayListOf<DBResultImage>()
+
+        val resImg1 = DBResultImage(
+            null,
+            "storeLink1",
+            "name1",
+            "domain1",
+            "identifier1",
+            "trackingID1",
+            "thumb1",
+            "desc1",
+            "imageLink1",
+            "curDate1",
+            1
+        )
+
+        resultImages.add(resImg1)
+
+        db.putResultImages(resultImages)
+        db.deleteResultImageByUri("imageLink1")
+    }
+
+    @Test
+    fun shouldDeleteOriginalImageAndResultImages(){
+        val resultImages = arrayListOf<DBResultImage>()
+
+        val resImg1 = DBResultImage(
+            null,
+            "storeLink1",
+            "name1",
+            "domain1",
+            "identifier1",
+            "trackingID1",
+            "thumb1",
+            "desc1",
+            "imageLink1",
+            "curDate1",
+            1
+        )
+
+        resultImages.add(resImg1)
+
+        db.putResultImages(resultImages)
+
+        val imageUri = "testuri1"
+        val img1 = DBOriginalImage(1, Uri.parse(imageUri), "now")
+        db.putOriginalImage(img1)
+
+        db.deleteOriginalAndResults(1)
+
+        assertEquals(0, db.getAllResultImages().size)
+        assertEquals(0, db.getAllOriginalImages().size)
+    }
 }

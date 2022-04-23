@@ -9,7 +9,6 @@ import android.net.Uri
 import android.util.Log
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
-import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.models.SearchItem
 
 class DataBaseHelper(
@@ -105,7 +104,8 @@ class DataBaseHelper(
             resultImageCV.put(COLUMN_FK_ORIGINAL_IMG_ID, img.originalImgID)
 
             val resultInsertStatus = db.insert(TABLE_RESULT_IMAGE, null, resultImageCV)
-
+            Log.d("db", "truing to save" + resultImageCV.toString())
+            Log.d("db", "put status result img : " + resultInsertStatus)
             // TODO: Error handling
             if (resultInsertStatus < 0) {
                 closeDB(db)
@@ -302,5 +302,68 @@ class DataBaseHelper(
         return resultList
     }
 
+    fun getResultImageByImageLink(imageLink: Uri) : DBResultImage? {
+        val uriString = imageLink.toString()
+        val db = this.readableDatabase
 
+        val query = "SELECT * FROM RESULT_IMAGE WHERE IMAGE_LINK = '${uriString}'"
+
+        var cursor: Cursor? = null
+
+        var dbResultImage: DBResultImage? = null
+
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+
+        if (cursor?.count != 0) {
+
+            while (cursor?.moveToNext() == true) {
+                val id = cursor.getInt(0)
+                val storeLink = cursor.getString(1)
+                val name = cursor.getString(2)
+                val domain = cursor.getString(3)
+                val identifier = cursor.getString(4)
+                val trackingID = cursor.getString(5)
+                val thumbnailLink = cursor.getString(6)
+                val description = cursor.getString(7)
+                val imageLink = cursor.getString(8)
+                val currentDate = cursor.getString(9)
+                val originalImageID = cursor.getInt(10)
+
+                dbResultImage = DBResultImage(
+                    id,
+                    storeLink,
+                    name,
+                    domain,
+                    identifier,
+                    trackingID,
+                    thumbnailLink,
+                    description,
+                    imageLink,
+                    currentDate,
+                    originalImageID
+                )
+
+            }
+        } else {
+            // TODO: Error handling: there is no data.
+        }
+        return dbResultImage
+    }
+
+    fun deleteResultImageByUri(uri: String){
+        val db = this.writableDatabase
+        val query = "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_IMAGE_LINK = '${uri}'"
+        db.execSQL(query)
+    }
+
+    fun deleteOriginalAndResults(originalImgId: Int){
+        val db = this.writableDatabase
+        val firstQuery = "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = '${originalImgId}'"
+        val secondQuery = "DELETE FROM $TABLE_ORIGINAL_IMAGE WHERE $COLUMN_PK_ORIGINAL_ID = '${originalImgId}'"
+
+        db.execSQL(firstQuery)
+        db.execSQL(secondQuery)
+    }
 }

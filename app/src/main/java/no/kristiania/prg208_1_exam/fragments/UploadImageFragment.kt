@@ -179,7 +179,7 @@ class UploadImageFragment : Fragment() {
         Log.d("Response", "Response = Success!")
         Log.d("Response", "After api: $response")
 
-        dbHelper?.putOriginalImage(DBOriginalImage(null, Uri.parse(response), Calendar.getInstance().time.toString()))
+        //dbHelper?.putOriginalImage(DBOriginalImage(null, Uri.parse(response), Calendar.getInstance().time.toString()))
 
         val fetchBingRunnable = FetchImagesRunnable(this,"bing", response)
         val fetchGoogleRunnable = FetchImagesRunnable(this,"google", response)
@@ -202,14 +202,14 @@ class UploadImageFragment : Fragment() {
             Log.d("r_debug", "onSuccessfulGet: Return images from $returnEngine")
             Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
 
-            val originalImageID = dbHelper?.getOriginalImageByUri(url)?.id
+            /*val originalImageID = dbHelper?.getOriginalImageByUri(url)?.id
             val dbResultImages = originalImageID?.let { Globals.convertResultImagesToDBModel(images, it) }
 
             if (dbResultImages != null) {
                 dbHelper?.putResultImages(dbResultImages)
-            }
+            }*/
 
-            startSearchActivity(SearchActivity(), images)
+            startSearchActivity(SearchActivity(), images, url)
         }
 
     }
@@ -218,10 +218,10 @@ class UploadImageFragment : Fragment() {
         Log.d("Response", "Get cached images")
         cachedImages?.created = Calendar.getInstance().time
         val results = cachedImages?.images
-        startSearchActivity(SearchActivity(), results)
+        startSearchActivity(SearchActivity(), results, null)
     }
 
-    private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?){
+    private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?, url: String?){
         val activityClassName = activity::class.java.name
         val currentActivity = Globals.getCurrentActivity(context)
 
@@ -229,6 +229,10 @@ class UploadImageFragment : Fragment() {
             val bundle = Bundle()
             bundle.putString("chosenImageUri", imageUri.toString())
             bundle.putSerializable("results", results)
+
+            if(url != null){
+                bundle.putString("originalImageUrl", url)
+            }
 
             val intent = Intent(this.requireContext(), activity::class.java)
             intent.putExtras(bundle)
