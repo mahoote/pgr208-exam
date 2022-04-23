@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Exception
 import android.annotation.SuppressLint
+import androidx.core.content.ContentProviderCompat.requireContext
 
 
 object Globals : AppCompatActivity() {
@@ -238,6 +239,12 @@ object Globals : AppCompatActivity() {
         }
 
         return uri.path?.lastIndexOf('/')?.plus(1)?.let { uri.path?.substring(it) }.toString()
+    }
+
+    fun Float.toDp(context: Context): Int {
+        val metrics = context.resources.displayMetrics
+        val fpixels = metrics.density * this
+        return (fpixels + 0.5f).toInt()
     }
 
 }

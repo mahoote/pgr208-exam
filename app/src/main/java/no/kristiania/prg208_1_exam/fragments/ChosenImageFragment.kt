@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.squareup.picasso.Picasso
+import no.kristiania.prg208_1_exam.Globals.toDp
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.models.ResultImage
 
@@ -55,7 +56,7 @@ class ChosenImageFragment : Fragment() {
     private fun sizeCheck(imageView: ImageView) {
         val width = imageView.width
         val height = imageView.height
-        val maxSize = 350f.toDp()
+        val maxSize = 350f.toDp(requireContext())
 
         if(width > height) {
             imageView.layoutParams.width = maxSize
@@ -66,12 +67,4 @@ class ChosenImageFragment : Fragment() {
         }
         imageView.requestLayout()
     }
-    
-    private fun Float.toDp(): Int {
-        val metrics = requireContext().resources.displayMetrics
-        val fpixels = metrics.density * this
-        return (fpixels + 0.5f).toInt()
-    }
-
-
 }

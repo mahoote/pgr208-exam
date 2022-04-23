@@ -1,5 +1,6 @@
 package no.kristiania.prg208_1_exam
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
@@ -90,11 +91,18 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun replaceFragment(fragment: Fragment, position: Int) {
-        val bundle = Bundle()
-        bundle.putSerializable("resultImage", results[position])
-        fragment.arguments = bundle
+        if(::results.isInitialized) {
+            val bundle = Bundle()
+            bundle.putSerializable("resultImage", results[position])
+            fragment.arguments = bundle
 
-        fragmentManager.beginTransaction()
-            .replace(R.id.se_content_layout, fragment, "content_fragment").commit()
+            fragmentManager.beginTransaction()
+                .replace(R.id.se_content_layout, fragment, "content_fragment").commit()
+        }
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 }

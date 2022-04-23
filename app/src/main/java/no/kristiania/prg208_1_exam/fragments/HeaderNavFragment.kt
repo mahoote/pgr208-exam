@@ -58,9 +58,8 @@ class HeaderNavFragment : Fragment() {
         val currentActivity = Globals.getCurrentActivity(context)
 
         if(!currentActivity.equals(activityClassName)) {
-            val intent = Intent(this.requireContext(), activity::class.java)
+            val intent = Intent(requireContext(), activity::class.java)
             startActivity(intent)
-            // activity.finish()
         }
     }
 

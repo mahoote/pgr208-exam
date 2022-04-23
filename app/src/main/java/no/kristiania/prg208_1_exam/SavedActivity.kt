@@ -1,5 +1,6 @@
 package no.kristiania.prg208_1_exam
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,5 +48,10 @@ class SavedActivity : AppCompatActivity() {
         mainCategoryRecycler?.layoutManager = layoutManager
         mainRecyclerAdapter = MainRecyclerAdapter(this, allSearchesList)
         mainCategoryRecycler?.adapter = mainRecyclerAdapter
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 }
