@@ -198,7 +198,7 @@ class UploadImageFragment : Fragment() {
         tineyeThread.start()
     }
 
-    fun onSuccessfulGet(images: ArrayList<ResultImage?>, returnEngine: String) {
+    fun onSuccessfulGet(images: ArrayList<ResultImage?>, returnEngine: String, url: String) {
         Log.d("r_debug", "onSuccessfulGet: Wait for thread: $waitForThread")
         if(waitForThread) {
             waitForThread = false

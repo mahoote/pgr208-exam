@@ -183,7 +183,7 @@ object Globals : AppCompatActivity() {
     }
 
     fun getFileNameFromUri(context: Context, origUri: Uri): String {
-        val fullFileName = getFileName(context, origUri)
+        val fullFileName = getFileNameWithFormatFromUri(context, origUri)
         return removeFileFormat(fullFileName)
     }
 
@@ -224,7 +224,7 @@ object Globals : AppCompatActivity() {
     }
 
     @SuppressLint("Range")
-    private fun getFileName(context: Context, uri: Uri): String {
+    private fun getFileNameWithFormatFromUri(context: Context, uri: Uri): String {
 
         if (uri.scheme == "content") {
             val cursor = context.contentResolver.query(uri, null, null, null, null)

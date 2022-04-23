@@ -14,10 +14,10 @@ class FetchImagesRunnable(private val fragment: UploadImageFragment, private val
         ApiService().getImages(this, fragment, searchEngine, response)
     }
 
-    fun onSuccessfulGet(images: ArrayList<ResultImage?>, engine: String) {
-//        if(images.size > 0) {
-            fragment.onSuccessfulGet(images, engine)
-//        }
+    fun onSuccessfulGet(images: ArrayList<ResultImage?>, engine: String, url: String) {
+        if(images.size > 0) {
+            fragment.onSuccessfulGet(images, engine, url)
+        }
     }
 
 }
