@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,8 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageButton
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
@@ -28,14 +27,11 @@ import no.kristiania.prg208_1_exam.SearchActivity
 import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
-import no.kristiania.prg208_1_exam.models.DBResultImage
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import no.kristiania.prg208_1_exam.runnables.FetchImagesRunnable
 import no.kristiania.prg208_1_exam.services.ApiService
 import java.io.File
-import java.time.Duration
-import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -79,7 +75,7 @@ class UploadImageFragment : Fragment() {
         loadingDialog = LoadingDialog(requireActivity())
 
         // Upload btn.
-        v.findViewById<AppCompatImageButton>(R.id.uf_upload_search_btn).setOnClickListener{
+        v.findViewById<ImageButton>(R.id.uf_upload_search_btn).setOnClickListener{
             if(uploadImage.isShowCropOverlay) {
                 val cropped: Bitmap = uploadImage.croppedImage
                 val fileName = Globals.getFileNameFromUri(requireContext(), imageUri)

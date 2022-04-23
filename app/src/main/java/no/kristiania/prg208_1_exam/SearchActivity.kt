@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -23,6 +22,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var fragmentManager: FragmentManager
     private lateinit var adapter: ImageAdapter
+    private lateinit var results: ArrayList<ResultImage>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +37,11 @@ class SearchActivity : AppCompatActivity() {
 
         if(bundle != null) {
             val chosenImageUri = bundle!!.getString("chosenImageUri")
-            val results = bundle.getSerializable("results")
+            results = bundle.getSerializable("results") as ArrayList<ResultImage>
 
             Log.d("m_debug", "$results")
 
-            adapter = setRecyclerView(results as ArrayList<ResultImage>)
+            adapter = setRecyclerView(results)
             setOriginalImage(chosenImageUri)
         } else {
 
@@ -65,8 +65,7 @@ class SearchActivity : AppCompatActivity() {
             val chosenImageFragment = ChosenImageFragment()
             adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int) {
-                    Toast.makeText(applicationContext, "Button $position pressed", Toast.LENGTH_SHORT).show()
-                    switchFragment(chosenImageFragment)
+                    replaceFragment(chosenImageFragment, position)
                 }
             })
         }
@@ -90,7 +89,11 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun switchFragment(fragment: Fragment) {
+    private fun replaceFragment(fragment: Fragment, position: Int) {
+        val bundle = Bundle()
+        bundle.putSerializable("resultImage", results[position])
+        fragment.arguments = bundle
+
         fragmentManager.beginTransaction()
             .replace(R.id.se_content_layout, fragment, "content_fragment").commit()
     }
