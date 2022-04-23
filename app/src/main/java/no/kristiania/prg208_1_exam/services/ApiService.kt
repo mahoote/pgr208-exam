@@ -3,6 +3,7 @@ package no.kristiania.prg208_1_exam.services
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.Lifecycle
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.ParsedRequestListener
@@ -62,6 +63,7 @@ class ApiService {
                     val runnableUseTime = Duration.between(startThreadTime, endThreadTime).toMillis()
                     Log.d("r_debug", "onSuccessfulPost: Thread $searchEngine used $runnableUseTime milliseconds")
                     Log.d("m_debug", "onResponse: $images")
+
                     runnable.onSuccessfulGet(images, searchEngine)
                 }
 
