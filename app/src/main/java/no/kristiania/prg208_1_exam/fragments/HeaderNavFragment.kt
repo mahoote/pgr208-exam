@@ -66,19 +66,23 @@ class HeaderNavFragment : Fragment() {
     private fun highlightCurrentActivity() {
         val currentActivity = Globals.getCurrentActivity(context)
         if(currentActivity != null) {
-            val blueBtn: Drawable? = context?.let { ContextCompat.getDrawable(it, R.drawable.nav_blue_btn) }
             when {
                 currentActivity.contains("MainActivity") -> {
-                    v.findViewById<AppCompatButton>(R.id.hf_new_image_btn).background = blueBtn
+                    setBtnDetails(v.findViewById<AppCompatButton>(R.id.hf_new_image_btn))
                 }
                 currentActivity.contains("SearchActivity") -> {
-                    v.findViewById<AppCompatButton>(R.id.hf_search_btn).background = blueBtn
+                    setBtnDetails(v.findViewById<AppCompatButton>(R.id.hf_search_btn))
                 }
                 currentActivity.contains("SavedActivity") -> {
-                    v.findViewById<AppCompatButton>(R.id.hf_saved_btn).background = blueBtn
+                    setBtnDetails(v.findViewById<AppCompatButton>(R.id.hf_saved_btn))
                 }
             }
         }
+    }
+
+    private fun setBtnDetails(btn: AppCompatButton) {
+        btn.background = ContextCompat.getDrawable(requireContext(), R.drawable.nav_blue_btn)
+        btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_blue_text_color))
     }
 
 }

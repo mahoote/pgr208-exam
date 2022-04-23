@@ -33,7 +33,7 @@
                 android:layout_marginHorizontal="5dp"
                 android:padding="10dp"
                 android:background="@color/app_transparent"
-                android:src="@drawable/ic_file_image_solid"
+                android:src="@drawable/ic_file_image_stroke"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"/>
 
@@ -44,7 +44,7 @@
                 android:layout_marginHorizontal="5dp"
                 android:padding="10dp"
                 android:background="@color/app_transparent"
-                android:src="@drawable/ic_camera_solid"
+                android:src="@drawable/ic_camera_stroke"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"/>
 
@@ -66,7 +66,7 @@
                 android:layout_marginHorizontal="5dp"
                 android:padding="10dp"
                 android:background="@color/app_transparent"
-                android:src="@drawable/ic_rotate_right_solid"
+                android:src="@drawable/ic_rotate_image_stroke"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"/>
 

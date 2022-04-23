@@ -37,26 +37,28 @@
                 android:id="@+id/m_select_image_btn"
                 android:layout_width="158dp"
                 android:layout_height="170dp"
-                android:text="Select Image"
+                android:text="@string/select_image"
+                android:textStyle="bold"
                 android:textSize="18sp"
                 android:background="@drawable/large_blue_btn"
                 android:drawableBottom="@drawable/ic_file_image_solid"
                 android:paddingBottom="20dp"
                 android:layout_marginHorizontal="10dp"
-                android:textColor="@color/white"
+                android:textColor="@color/app_blue_text_color"
                 />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/m_take_photo_btn"
                 android:layout_width="158dp"
                 android:layout_height="170dp"
-                android:text="Take Photo"
+                android:text="@string/take_photo"
+                android:textStyle="bold"
                 android:textSize="18sp"
                 android:background="@drawable/large_blue_btn"
                 android:drawableBottom="@drawable/ic_camera_solid"
                 android:paddingBottom="20dp"
                 android:layout_marginHorizontal="10dp"
-                android:textColor="@color/white"
+                android:textColor="@color/app_blue_text_color"
                 />
 
 
