@@ -54,23 +54,17 @@ class ChosenImageFragment : Fragment() {
         v.findViewById<ImageButton>(R.id.cif_bookmark_btn).setOnClickListener {
             // TODO: Save image to DB if not checked, remove from DB if checked
 
-            if(dbHelper.getOriginalImageByUri(originalImageUrl.toString()) == null) {
-                dbHelper.putOriginalImage(DBOriginalImage(null, originalImageUrl,
-                    Calendar.getInstance().time.toString()
-                ))
-            }
+            if(dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link)) == null) {
+                val originalImage = originalImageExists(dbHelper, originalImageUrl)
 
-            val originalImage = dbHelper.getOriginalImageByUri(originalImageUrl.toString())
+                val resultImages = arrayListOf<ResultImage?>()
+                resultImages.add(resultImage)
 
-            var resultImages = arrayListOf<ResultImage?>()
-            resultImages.add(resultImage)
-            val correctFormat = originalImage?.id?.let { it1 ->
-                Globals.convertResultImagesToDBModel(resultImages,
-                    it1
-                )
-            }
-            if (correctFormat != null) {
-                dbHelper.putResultImages(correctFormat)
+                val dbResultImages = convertFormat(originalImage, resultImages)
+
+                if (!dbResultImages.isNullOrEmpty()) {
+                    dbHelper.putResultImages(dbResultImages)
+                }
             }
             /*if(dbHelper.getOriginalImageByUri(originalImageUrl.toString()) != null){
 
@@ -108,6 +102,31 @@ class ChosenImageFragment : Fragment() {
         }
 
         return v
+    }
+
+    private fun convertFormat(
+        originalImage: DBOriginalImage?,
+        resultImages: ArrayList<ResultImage?>
+    ): ArrayList<DBResultImage>? {
+        return originalImage?.id?.let { ogi ->
+            Globals.convertResultImagesToDBModel(resultImages, ogi)
+        }
+    }
+
+    private fun originalImageExists(
+        dbHelper: DataBaseHelper,
+        originalImageUrl: Uri?
+    ): DBOriginalImage? {
+        if (dbHelper.getOriginalImageByUri(originalImageUrl.toString()) == null) {
+            dbHelper.putOriginalImage(
+                DBOriginalImage(
+                    null, originalImageUrl,
+                    Calendar.getInstance().time.toString()
+                )
+            )
+        }
+
+        return dbHelper.getOriginalImageByUri(originalImageUrl.toString())
     }
 
     private fun sizeCheck(imageView: ImageView) {
