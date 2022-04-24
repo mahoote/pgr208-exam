@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.NoSavedResultsFragment"
-    android:background="@color/white"
-    android:layout_weight="1">
+    android:background="@color/white">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/no_results_to_display"
+        android:textColor="@android:color/tab_indicator_text"
         android:textSize="30sp"
         android:gravity="center"/>
 </FrameLayout>
