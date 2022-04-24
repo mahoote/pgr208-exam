@@ -23,7 +23,7 @@ class DataBaseHelper(
 
         const val TABLE_RESULT_IMAGE = "RESULT_IMAGE"
         const val COLUMN_PK_RESULT_ID = "ID"
-        const val COLUMN_FK_ORIGINAL_IMG_ID = "SEARCH_IMG_ID"
+        const val COLUMN_FK_ORIGINAL_IMG_ID = "ORIGINAL_IMG_ID"
         const val COLUMN_STORE_LINK = "STORE_LINK"
         const val COLUMN_NAME = "NAME"
         const val COLUMN_DOMAIN = "DOMAIN"
