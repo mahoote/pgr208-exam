@@ -214,6 +214,22 @@ class DataBaseHelper(
         return dbOriginalImage
     }
 
+    fun getOriginalImageById(id: Int): DBOriginalImage? {
+        val originals = getAllOriginalImages()
+        var dbOriginalImage: DBOriginalImage? = null
+
+        for (o in originals) {
+            if(o.id == id) {
+                dbOriginalImage = o
+            }
+        }
+        if(dbOriginalImage != null) {
+            return dbOriginalImage
+        }
+        // TODO: No image found.
+        return dbOriginalImage
+    }
+
     fun getListOfResultsById(originalImageId: Int): ArrayList<DBResultImage> {
         val query = "SELECT * FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = $originalImageId"
         val db = this.readableDatabase

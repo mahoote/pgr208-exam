@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.content.ContextCompat
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.Globals
 import no.kristiania.prg208_1_exam.Globals.toDp
@@ -51,9 +52,14 @@ class ChosenImageFragment : Fragment() {
         nameView.text = resultImage.name
         descView.text = resultImage.description
 
-        v.findViewById<ImageButton>(R.id.cif_bookmark_btn).setOnClickListener {
-            // TODO: Save image to DB if not checked, remove from DB if checked
+        val bookmarkBtn = v.findViewById<ImageButton>(R.id.cif_bookmark_btn)
 
+        if(dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link)) != null) {
+            bookmarkBtn.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bookmark_solid))
+        }
+
+        bookmarkBtn.setOnClickListener {
+            // TODO: Save image to DB if not checked, remove from DB if checked
             if(dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link)) == null) {
                 val originalImage = originalImageExists(dbHelper, originalImageUrl)
 
@@ -64,6 +70,20 @@ class ChosenImageFragment : Fragment() {
 
                 if (!dbResultImages.isNullOrEmpty()) {
                     dbHelper.putResultImages(dbResultImages)
+                    bookmarkBtn.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bookmark_solid))
+                }
+            } else {
+                val selectedImage = dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link))
+                val origId = selectedImage?.originalImgID
+
+                dbHelper.deleteResultImageByUri(resultImage.image_link.toString())
+                bookmarkBtn.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bookmark_stroke))
+
+                if (origId != null) {
+                    val results = dbHelper.getListOfResultsById(origId)
+                    if(results.isNullOrEmpty()) {
+                        dbHelper.deleteOriginalAndResults(origId)
+                    }
                 }
             }
             /*if(dbHelper.getOriginalImageByUri(originalImageUrl.toString()) != null){

@@ -179,8 +179,6 @@ class UploadImageFragment : Fragment() {
         Log.d("Response", "Response = Success!")
         Log.d("Response", "After api: $response")
 
-        //dbHelper?.putOriginalImage(DBOriginalImage(null, Uri.parse(response), Calendar.getInstance().time.toString()))
-
         val fetchBingRunnable = FetchImagesRunnable(this,"bing", response)
         val fetchGoogleRunnable = FetchImagesRunnable(this,"google", response)
         val fetchTineyeRunnable = FetchImagesRunnable(this,"tineye", response)
@@ -201,13 +199,6 @@ class UploadImageFragment : Fragment() {
             Log.d("Response", "Get successful")
             Log.d("r_debug", "onSuccessfulGet: Return images from $returnEngine")
             Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
-
-            /*val originalImageID = dbHelper?.getOriginalImageByUri(url)?.id
-            val dbResultImages = originalImageID?.let { Globals.convertResultImagesToDBModel(images, it) }
-
-            if (dbResultImages != null) {
-                dbHelper?.putResultImages(dbResultImages)
-            }*/
 
             startSearchActivity(SearchActivity(), images, url)
         }

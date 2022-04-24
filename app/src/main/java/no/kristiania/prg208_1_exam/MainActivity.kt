@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             else {
+                // TODO: Remove toast!
                 Toast.makeText(applicationContext, "Unable to open gallery", Toast.LENGTH_SHORT)
                     .show()
             }
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
                     requestCode
                 )
             } else {
+                // TODO: Remove toast!
                 Toast.makeText(applicationContext, "Unable to open camera", Toast.LENGTH_SHORT)
                     .show()
             }
