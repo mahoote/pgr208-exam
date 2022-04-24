@@ -9,7 +9,7 @@ import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.models.ResultImage
 
-class ImageAdapter(private val results : ArrayList<ResultImage>): RecyclerView.Adapter<ImageAdapter.ResultsViewHolder>() {
+class SearchImageAdapter(private val results : ArrayList<ResultImage>): RecyclerView.Adapter<SearchImageAdapter.ResultsViewHolder>() {
 
     private lateinit var mListener: OnItemClickListener
 

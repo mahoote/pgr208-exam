@@ -6,18 +6,21 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
-import no.kristiania.prg208_1_exam.adapters.MainRecyclerAdapter
+import no.kristiania.prg208_1_exam.adapters.SavedCategoryAdapter
+import no.kristiania.prg208_1_exam.adapters.SavedImageAdapter
+import no.kristiania.prg208_1_exam.adapters.SearchImageAdapter
 import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.models.AllSearches
 import no.kristiania.prg208_1_exam.models.DBResultImage
 
 class SavedActivity : AppCompatActivity() {
-    private var mainCategoryRecycler: RecyclerView? = null
-    private var mainRecyclerAdapter: MainRecyclerAdapter? = null
+    private lateinit var mainCategoryRecycler: RecyclerView
+    private lateinit var categoryAdapter: SavedCategoryAdapter
     private lateinit var shimmerFrameLayout: ShimmerFrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,12 +44,6 @@ class SavedActivity : AppCompatActivity() {
 
             Thread {
                 allOriginalImages.forEach { originalImage ->
-//                    val list = o.id?.let { origId -> dbHelper.getListOfResultsAsSearchItemById(origId) }
-//                    o.uri?.let { origUri -> o.id?.let { origId -> SearchItem(origId, origUri, true) } }
-//                        ?.let { list?.add(0, it) }
-//                    list?.let { AllSearches(o.created.toString(), it) }
-//                        ?.let { allSearchesList.add(it) }
-
                     val dbResultImages =
                         originalImage.id?.let { origId -> dbHelper.getListOfResultsById(origId) }
                     val originalDbResultImage =
@@ -72,16 +69,15 @@ class SavedActivity : AppCompatActivity() {
             val frameLayout = findViewById<FrameLayout>(container)
             Globals.showEmptyView(frameLayout, container, fragmentManager)
         }
-
     }
 
     private fun setMainRecycler(allSearchesList: List<AllSearches>) {
         mainCategoryRecycler = findViewById(R.id.main_recycler)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
-        mainCategoryRecycler?.layoutManager = layoutManager
-        mainRecyclerAdapter =
-            MainRecyclerAdapter(this, allSearchesList)
-        mainCategoryRecycler?.adapter = mainRecyclerAdapter
+        mainCategoryRecycler.layoutManager = layoutManager
+        categoryAdapter =
+            SavedCategoryAdapter(this, allSearchesList)
+        mainCategoryRecycler.adapter = categoryAdapter
     }
 
     override fun onBackPressed() {
@@ -92,6 +88,6 @@ class SavedActivity : AppCompatActivity() {
     private fun stopLoadingScreen() {
         shimmerFrameLayout.stopShimmer()
         shimmerFrameLayout.visibility = View.GONE
-        mainCategoryRecycler?.visibility = View.VISIBLE
+        mainCategoryRecycler.visibility = View.VISIBLE
     }
 }

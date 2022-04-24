@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import no.kristiania.prg208_1_exam.Globals.loadImage
-import no.kristiania.prg208_1_exam.adapters.ImageAdapter
+import no.kristiania.prg208_1_exam.adapters.SearchImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.ResultImage
@@ -23,7 +23,7 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var fragmentManager: FragmentManager
-    private lateinit var adapter: ImageAdapter
+    private lateinit var adapter: SearchImageAdapter
     private lateinit var results: ArrayList<ResultImage>
     private var originalImageUrl: String? = null
 
@@ -71,7 +71,7 @@ class SearchActivity : AppCompatActivity() {
 
         if(::adapter.isInitialized) {
             val chosenImageFragment = ChosenImageFragment()
-            adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
+            adapter.setOnItemClickListener(object : SearchImageAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int) {
                     replaceFragment(chosenImageFragment, position, originalImageUrl)
                 }
@@ -79,8 +79,8 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun setRecyclerView(results: ArrayList<ResultImage>): ImageAdapter {
-        val adapter = ImageAdapter(results)
+    private fun setRecyclerView(results: ArrayList<ResultImage>): SearchImageAdapter {
+        val adapter = SearchImageAdapter(results)
         recyclerView = findViewById(R.id.s_results_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = GridLayoutManager(this, 2)

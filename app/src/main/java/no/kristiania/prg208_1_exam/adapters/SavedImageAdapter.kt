@@ -10,24 +10,33 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.*
 
-import com.facebook.shimmer.ShimmerFrameLayout
 import com.squareup.picasso.Callback
 import no.kristiania.prg208_1_exam.models.DBResultImage
 import java.lang.Exception
 
 
-class CategoryItemRecyclerAdapter(
+class SavedImageAdapter(
     private val context: Context,
     private val categoryItemList: List<DBResultImage>
 ) :
-    RecyclerView.Adapter<CategoryItemRecyclerAdapter.CategoryItemViewHolder>() {
+    RecyclerView.Adapter<SavedImageAdapter.CategoryItemViewHolder>() {
+
+    private lateinit var mListener: OnItemClickListener
+
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        mListener = listener
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryItemViewHolder {
 
         return CategoryItemViewHolder(
             LayoutInflater.from(
                 context
-            ).inflate(R.layout.category_row_items, parent, false)
+            ).inflate(R.layout.category_row_items, parent, false), mListener
         )
     }
 
@@ -51,7 +60,14 @@ class CategoryItemRecyclerAdapter(
         return categoryItemList.size
     }
 
-    class CategoryItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class CategoryItemViewHolder(itemView: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemView) {
+
+        init {
+            itemView.setOnClickListener {
+                listener.onItemClick(adapterPosition)
+            }
+        }
+
         var itemImage: ImageView = itemView.findViewById(R.id.item_image)
 
     }

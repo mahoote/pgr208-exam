@@ -11,17 +11,29 @@ import no.kristiania.prg208_1_exam.models.AllSearches
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.models.DBResultImage
 
-class MainRecyclerAdapter(
+class SavedCategoryAdapter(
     private val context: Context,
     private val allSearchesList: List<AllSearches>,
 ) :
-    RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>() {
+    RecyclerView.Adapter<SavedCategoryAdapter.MainViewHolder>() {
+
+    private lateinit var mListener: OnItemClickListener
+    var adapters: ArrayList<SavedImageAdapter> = arrayListOf()
+
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        mListener = listener
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
         return MainViewHolder(
             LayoutInflater.from(
                 context
-            ).inflate(R.layout.main_recycler_row_item, parent, false)
+            ).inflate(R.layout.main_recycler_row_item, parent, false),
+            mListener
         )
     }
 
@@ -34,19 +46,28 @@ class MainRecyclerAdapter(
         return allSearchesList.size
     }
 
-    class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var categoryTitle: TextView = itemView.findViewById(R.id.row_title)
-        var itemRecycler: RecyclerView = itemView.findViewById(R.id.item_recycler)
-
-    }
-
     private fun setRecycler(
         recyclerView: RecyclerView,
         categoryItemList: List<DBResultImage>
     ) {
-        val itemRecyclerAdapter = CategoryItemRecyclerAdapter(context, categoryItemList)
+        val adapter = SavedImageAdapter(context, categoryItemList)
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-        recyclerView.adapter = itemRecyclerAdapter
+        recyclerView.adapter = adapter
+
+        adapters.add(adapter)
+    }
+
+
+    class MainViewHolder(itemView: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemView) {
+
+        init {
+            itemView.setOnClickListener {
+                listener.onItemClick(adapterPosition)
+            }
+        }
+        var categoryTitle: TextView = itemView.findViewById(R.id.row_title)
+
+        var itemRecycler: RecyclerView = itemView.findViewById(R.id.item_recycler)
     }
 
 }
