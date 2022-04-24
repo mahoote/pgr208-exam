@@ -27,7 +27,9 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Exception
 import android.annotation.SuppressLint
+import android.widget.FrameLayout
 import androidx.core.content.ContentProviderCompat.requireContext
+import no.kristiania.prg208_1_exam.fragments.NoSavedResultsFragment
 
 
 object Globals : AppCompatActivity() {
@@ -245,6 +247,14 @@ object Globals : AppCompatActivity() {
         val metrics = context.resources.displayMetrics
         val fpixels = metrics.density * this
         return (fpixels + 0.5f).toInt()
+    }
+
+    fun showEmptyView(frameLayout: FrameLayout, fragmentContainer: Int, fragmentManager: FragmentManager) {
+        frameLayout.visibility = View.VISIBLE
+
+        fragmentManager.beginTransaction()
+            .add(fragmentContainer, NoSavedResultsFragment(), "content-fragment")
+            .commit()
     }
 
 }

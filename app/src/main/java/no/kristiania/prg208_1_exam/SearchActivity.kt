@@ -3,6 +3,7 @@ package no.kristiania.prg208_1_exam
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -58,9 +59,13 @@ class SearchActivity : AppCompatActivity() {
                         latestCache = cachedImage
                     }
                 }
-
                 adapter = setRecyclerView(latestCache!!.value.images as ArrayList<ResultImage>)
                 setOriginalImage(latestCache!!.value.imageUri.toString())
+            }
+            else {
+                val container: Int = R.id.se_content_fragment_container
+                val frameLayout = findViewById<FrameLayout>(container)
+                Globals.showEmptyView(frameLayout, container, fragmentManager)
             }
         }
 

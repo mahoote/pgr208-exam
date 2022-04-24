@@ -114,7 +114,7 @@ class ChosenImageFragment : Fragment() {
             }*/
 
 
-            Toast.makeText(requireContext(), "Save", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(requireContext(), "Save", Toast.LENGTH_SHORT).show()
         }
         v.findViewById<ImageButton>(R.id.cif_web_btn).setOnClickListener {
             // TODO: Take to website.

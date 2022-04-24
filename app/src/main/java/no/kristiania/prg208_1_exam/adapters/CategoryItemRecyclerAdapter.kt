@@ -45,7 +45,7 @@ class CategoryItemRecyclerAdapter(
 
         Log.d("i_debug", "onBindViewHolder: Loading image")
 
-        Picasso.get().load(searchItem.imageUri).into(holder.itemImage, object : Callback.EmptyCallback() {
+        Picasso.get().load(searchItem.imageUri).placeholder(R.drawable.result_image_placeholder).into(holder.itemImage, object : Callback.EmptyCallback() {
             override fun onSuccess() {
                 Log.d("i_debug", "onSuccess: Image loaded!")
             }
