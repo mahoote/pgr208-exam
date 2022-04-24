@@ -1,5 +1,6 @@
 package no.kristiania.prg208_1_exam.fragments
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import androidx.core.content.ContextCompat
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.Globals
 import no.kristiania.prg208_1_exam.Globals.toDp
+import no.kristiania.prg208_1_exam.Globals.toUrl
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
@@ -37,13 +39,13 @@ class ChosenImageFragment : Fragment() {
         }
 
         val resultImage = arguments?.getSerializable("resultImage") as ResultImage
-        val dbHelper: DataBaseHelper = DataBaseHelper(context)
+        val dbHelper = DataBaseHelper(context)
 
         val imageView = v.findViewById<ImageView>(R.id.cif_chosen_img)
         val nameView = v.findViewById<TextView>(R.id.cif_img_name_txt)
         val descView = v.findViewById<TextView>(R.id.cif_img_desc_view)
 
-        Picasso.get().load(resultImage.image_link).into(imageView)
+        Picasso.get().load(resultImage.image_link).placeholder(R.drawable.result_image_placeholder).into(imageView)
 
         imageView.post {
             sizeCheck(imageView)
@@ -54,74 +56,85 @@ class ChosenImageFragment : Fragment() {
 
         val bookmarkBtn = v.findViewById<ImageButton>(R.id.cif_bookmark_btn)
 
-        if(dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link)) != null) {
-            bookmarkBtn.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bookmark_solid))
-        }
+        val dbResultImage = dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link))
+
+        // Set checked bookmark icon.
+        setCorrectBookmarkIcon(dbResultImage, bookmarkBtn)
 
         bookmarkBtn.setOnClickListener {
-            // TODO: Save image to DB if not checked, remove from DB if checked
-            if(dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link)) == null) {
-                val originalImage = originalImageExists(dbHelper, originalImageUrl)
-
-                val resultImages = arrayListOf<ResultImage?>()
-                resultImages.add(resultImage)
-
-                val dbResultImages = convertFormat(originalImage, resultImages)
-
-                if (!dbResultImages.isNullOrEmpty()) {
-                    dbHelper.putResultImages(dbResultImages)
-                    bookmarkBtn.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bookmark_solid))
-                }
-            } else {
-                val selectedImage = dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link))
-                val origId = selectedImage?.originalImgID
-
-                dbHelper.deleteResultImageByUri(resultImage.image_link.toString())
-                bookmarkBtn.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bookmark_stroke))
-
-                if (origId != null) {
-                    val results = dbHelper.getListOfResultsById(origId)
-                    if(results.isNullOrEmpty()) {
-                        dbHelper.deleteOriginalAndResults(origId)
-                    }
-                }
-            }
-            /*if(dbHelper.getOriginalImageByUri(originalImageUrl.toString()) != null){
-
-                val originalImage = dbHelper.getOriginalImageByUri(originalImageUrl.toString())
-
-                // if original exists with no results, then delete
-                if(originalImage?.id?.let { it1 -> dbHelper.getListOfResultsById(it1).size } == 0){
-                    dbHelper.deleteOriginalAndResults(originalImage.id)
-                }
-
-                if (dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link)) != null) {
-                    // if orig exists, and res img exists then delete
-                    resultImage.image_link?.let { it1 -> dbHelper.deleteResultImageByUri(it1) }
-                } else {
-                    var resultImages = arrayListOf<ResultImage?>(resultImage)
-                    val correctFormat = originalImage?.id?.let { it1 ->
-                        Globals.convertResultImagesToDBModel(resultImages,
-                            it1
-                        )
-                    }
-                    correctFormat?.let { it1 -> dbHelper.putResultImages(it1) }
-                }
-            } else {
-                // orig does not exist, put in db
-                val status = dbHelper.putOriginalImage(DBOriginalImage(null, originalImageUrl, Calendar.getInstance().time.toString()))
-                Log.d("db", "SAVING RESULT IMAGE, STATUS = " + status)
-            }*/
-
-
-//            Toast.makeText(requireContext(), "Save", Toast.LENGTH_SHORT).show()
+            bookmarkBtnClicked(dbResultImage, dbHelper, originalImageUrl, resultImage, bookmarkBtn)
         }
         v.findViewById<ImageButton>(R.id.cif_web_btn).setOnClickListener {
-            // TODO: Take to website.
-            Toast.makeText(requireContext(), "To website", Toast.LENGTH_SHORT).show()
+            webBtnClicked(resultImage)
         }
 
         return v
+    }
+
+    private fun setCorrectBookmarkIcon(
+        dbResultImage: DBResultImage?,
+        bookmarkBtn: ImageButton
+    ) {
+        if (dbResultImage != null) {
+            bookmarkBtn.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_bookmark_solid
+                )
+            )
+        }
+    }
+
+    private fun webBtnClicked(resultImage: ResultImage) {
+        resultImage.store_link?.let { it1 -> toUrl(requireContext(), it1) } ?: run {
+            Toast.makeText(requireContext(), "Unable to get URL", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun bookmarkBtnClicked(
+        dbResultImage: DBResultImage?,
+        dbHelper: DataBaseHelper,
+        originalImageUrl: Uri?,
+        resultImage: ResultImage,
+        bookmarkBtn: ImageButton
+    ) {
+        if (dbResultImage == null) {
+            val originalImage = originalImageExists(dbHelper, originalImageUrl)
+
+            val resultImages = arrayListOf<ResultImage?>()
+            resultImages.add(resultImage)
+
+            val dbResultImages = convertFormat(originalImage, resultImages)
+
+            if (!dbResultImages.isNullOrEmpty()) {
+                dbHelper.putResultImages(dbResultImages)
+                bookmarkBtn.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.ic_bookmark_solid
+                    )
+                )
+            }
+        } else {
+            val selectedImage =
+                dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link))
+            val origId = selectedImage?.originalImgID
+
+            dbHelper.deleteResultImageByUri(resultImage.image_link.toString())
+            bookmarkBtn.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_bookmark_stroke
+                )
+            )
+
+            if (origId != null) {
+                val results = dbHelper.getListOfResultsById(origId)
+                if (results.isNullOrEmpty()) {
+                    dbHelper.deleteOriginalAndResults(origId)
+                }
+            }
+        }
     }
 
     private fun convertFormat(

@@ -257,4 +257,9 @@ object Globals : AppCompatActivity() {
             .commit()
     }
 
+    fun toUrl(context: Context, uriString: String) {
+        val uri = Uri.parse(uriString)
+        context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+    }
+
 }
