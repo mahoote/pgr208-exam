@@ -15,16 +15,23 @@ import no.kristiania.prg208_1_exam.models.SearchItem
 import android.content.pm.ResolveInfo
 
 import android.content.pm.PackageManager
-
-
+import android.icu.number.NumberFormatter.with
+import com.facebook.shimmer.ShimmerFrameLayout
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Callback.EmptyCallback
+import java.lang.Exception
 
 
 class CategoryItemRecyclerAdapter(
     private val context: Context,
-    private val categoryItemList: List<SearchItem>
+    private val categoryItemList: List<SearchItem>,
+    private val shimmerFrameLayout: ShimmerFrameLayout,
+    private val mainCategoryRecycler: RecyclerView?
 ) :
     RecyclerView.Adapter<CategoryItemRecyclerAdapter.CategoryItemViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryItemViewHolder {
+
         return CategoryItemViewHolder(
             LayoutInflater.from(
                 context
@@ -34,7 +41,19 @@ class CategoryItemRecyclerAdapter(
 
     override fun onBindViewHolder(holder: CategoryItemViewHolder, position: Int) {
         val searchItem = categoryItemList[position]
-        Picasso.get().load(searchItem.imageUri).into(holder.itemImage)
+//        Picasso.get().load(searchItem.imageUri).into(holder.itemImage)
+
+        Log.d("i_debug", "onBindViewHolder: Loading image")
+
+        Picasso.get().load(searchItem.imageUri).into(holder.itemImage, object : Callback.EmptyCallback() {
+            override fun onSuccess() {
+                Log.d("i_debug", "onSuccess: Image loaded!")
+            }
+
+            override fun onError(e: Exception?) {
+                Log.e("i_debug", "onError: Something went wrong")
+            }
+        })
     }
 
     override fun getItemCount(): Int {

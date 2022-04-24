@@ -7,13 +7,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import no.kristiania.prg208_1_exam.models.AllSearches
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.models.SearchItem
 
 class MainRecyclerAdapter(
     private val context: Context,
-    private val allSearchesList: List<AllSearches>
+    private val allSearchesList: List<AllSearches>,
+    private val shimmerFrameLayout: ShimmerFrameLayout,
+    private val mainCategoryRecycler: RecyclerView?
 ) :
     RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>() {
 
@@ -44,7 +47,7 @@ class MainRecyclerAdapter(
         recyclerView: RecyclerView,
         categoryItemList: List<SearchItem>
     ) {
-        val itemRecyclerAdapter = CategoryItemRecyclerAdapter(context, categoryItemList)
+        val itemRecyclerAdapter = CategoryItemRecyclerAdapter(context, categoryItemList, shimmerFrameLayout, mainCategoryRecycler)
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = itemRecyclerAdapter
     }

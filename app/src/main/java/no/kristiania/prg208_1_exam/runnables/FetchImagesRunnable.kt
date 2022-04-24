@@ -1,6 +1,8 @@
 package no.kristiania.prg208_1_exam.runnables
 
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import no.kristiania.prg208_1_exam.fragments.UploadImageFragment
@@ -15,8 +17,12 @@ class FetchImagesRunnable(private val fragment: UploadImageFragment, private val
     }
 
     fun onSuccessfulGet(images: ArrayList<ResultImage?>, engine: String, url: String) {
-        if(images.size > 0) {
-            fragment.onSuccessfulGet(images, engine, url)
+        val mainLooper = Looper.getMainLooper()
+
+        Handler(mainLooper).post {
+            if(images.size > 0) {
+                fragment.onSuccessfulGet(images, engine, url)
+            }
         }
     }
 
