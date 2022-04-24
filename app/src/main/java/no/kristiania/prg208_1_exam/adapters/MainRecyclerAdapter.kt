@@ -7,16 +7,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.shimmer.ShimmerFrameLayout
 import no.kristiania.prg208_1_exam.models.AllSearches
 import no.kristiania.prg208_1_exam.R
-import no.kristiania.prg208_1_exam.models.SearchItem
+import no.kristiania.prg208_1_exam.models.DBResultImage
 
 class MainRecyclerAdapter(
     private val context: Context,
     private val allSearchesList: List<AllSearches>,
-    private val shimmerFrameLayout: ShimmerFrameLayout,
-    private val mainCategoryRecycler: RecyclerView?
 ) :
     RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>() {
 
@@ -30,7 +27,7 @@ class MainRecyclerAdapter(
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         holder.categoryTitle.text = allSearchesList[position].searchTitle
-        setSearchItemRecycler(holder.itemRecycler, allSearchesList[position].searchItemList)
+        setRecycler(holder.itemRecycler, allSearchesList[position].searchItemList)
     }
 
     override fun getItemCount(): Int {
@@ -43,11 +40,11 @@ class MainRecyclerAdapter(
 
     }
 
-    private fun setSearchItemRecycler(
+    private fun setRecycler(
         recyclerView: RecyclerView,
-        categoryItemList: List<SearchItem>
+        categoryItemList: List<DBResultImage>
     ) {
-        val itemRecyclerAdapter = CategoryItemRecyclerAdapter(context, categoryItemList, shimmerFrameLayout, mainCategoryRecycler)
+        val itemRecyclerAdapter = CategoryItemRecyclerAdapter(context, categoryItemList)
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = itemRecyclerAdapter
     }

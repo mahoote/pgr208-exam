@@ -9,7 +9,6 @@ import android.net.Uri
 import android.util.Log
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
-import no.kristiania.prg208_1_exam.models.SearchItem
 
 class DataBaseHelper(
     context: Context?,
@@ -269,46 +268,6 @@ class DataBaseHelper(
                         imageLink,
                         currentDate,
                         originalImageID
-                    )
-                )
-            }
-        } else {
-            // TODO: Error handling: there is no data.
-        }
-        return resultList
-    }
-
-    fun getListOfResultsAsSearchItemById(originalImageId: Int): ArrayList<SearchItem> {
-        val query = "SELECT * FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = $originalImageId"
-        val db = this.readableDatabase
-
-        val resultList: ArrayList<SearchItem> = arrayListOf()
-
-        var cursor: Cursor? = null
-
-        if (db != null) {
-            cursor = db.rawQuery(query, null)
-        }
-
-        if (cursor?.count != 0) {
-
-            while (cursor?.moveToNext() == true) {
-                val id = cursor.getInt(0)
-                val storeLink = cursor.getString(1)
-                val name = cursor.getString(2)
-                val domain = cursor.getString(3)
-                val identifier = cursor.getString(4)
-                val trackingID = cursor.getString(5)
-                val thumbnailLink = cursor.getString(6)
-                val description = cursor.getString(7)
-                val imageLink = cursor.getString(8)
-                val currentDate = cursor.getString(9)
-                val originalImageID = cursor.getInt(10)
-                resultList.add(
-                    SearchItem(
-                        id,
-                        Uri.parse(imageLink),
-                        false
                     )
                 )
             }

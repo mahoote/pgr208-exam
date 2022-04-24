@@ -1,32 +1,24 @@
 package no.kristiania.prg208_1_exam.adapters
 
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.net.toFile
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.*
-import no.kristiania.prg208_1_exam.models.SearchItem
-import android.content.pm.ResolveInfo
 
-import android.content.pm.PackageManager
-import android.icu.number.NumberFormatter.with
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.squareup.picasso.Callback
-import com.squareup.picasso.Callback.EmptyCallback
+import no.kristiania.prg208_1_exam.models.DBResultImage
 import java.lang.Exception
 
 
 class CategoryItemRecyclerAdapter(
     private val context: Context,
-    private val categoryItemList: List<SearchItem>,
-    private val shimmerFrameLayout: ShimmerFrameLayout,
-    private val mainCategoryRecycler: RecyclerView?
+    private val categoryItemList: List<DBResultImage>
 ) :
     RecyclerView.Adapter<CategoryItemRecyclerAdapter.CategoryItemViewHolder>() {
 
@@ -40,12 +32,11 @@ class CategoryItemRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: CategoryItemViewHolder, position: Int) {
-        val searchItem = categoryItemList[position]
-//        Picasso.get().load(searchItem.imageUri).into(holder.itemImage)
+        val resultImage = categoryItemList[position]
 
         Log.d("i_debug", "onBindViewHolder: Loading image")
 
-        Picasso.get().load(searchItem.imageUri).placeholder(R.drawable.result_image_placeholder).into(holder.itemImage, object : Callback.EmptyCallback() {
+        Picasso.get().load(resultImage.imageLink).placeholder(R.drawable.result_image_placeholder).into(holder.itemImage, object : Callback.EmptyCallback() {
             override fun onSuccess() {
                 Log.d("i_debug", "onSuccess: Image loaded!")
             }

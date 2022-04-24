@@ -13,7 +13,7 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import no.kristiania.prg208_1_exam.adapters.MainRecyclerAdapter
 import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.models.AllSearches
-import no.kristiania.prg208_1_exam.models.SearchItem
+import no.kristiania.prg208_1_exam.models.DBResultImage
 
 class SavedActivity : AppCompatActivity() {
     private var mainCategoryRecycler: RecyclerView? = null
@@ -35,17 +35,29 @@ class SavedActivity : AppCompatActivity() {
         shimmerFrameLayout.startShimmer()
 
 
-        if(allOriginalImages.size > 0) {
+        if (allOriginalImages.size > 0) {
 
             val mainLooper = Looper.getMainLooper()
 
             Thread {
-                allOriginalImages.forEach { o ->
-                    val list = o.id?.let { dbHelper.getListOfResultsAsSearchItemById(it) }
-                    o.uri?.let { o.id?.let { it1 -> SearchItem(it1, it, true) } }
-                        ?.let { list?.add(0, it) }
-                    list?.let { AllSearches(o.created.toString(), it) }
-                        ?.let { allSearchesList.add(it) }
+                allOriginalImages.forEach { originalImage ->
+//                    val list = o.id?.let { origId -> dbHelper.getListOfResultsAsSearchItemById(origId) }
+//                    o.uri?.let { origUri -> o.id?.let { origId -> SearchItem(origId, origUri, true) } }
+//                        ?.let { list?.add(0, it) }
+//                    list?.let { AllSearches(o.created.toString(), it) }
+//                        ?.let { allSearchesList.add(it) }
+
+                    val dbResultImages =
+                        originalImage.id?.let { origId -> dbHelper.getListOfResultsById(origId) }
+                    val originalDbResultImage =
+                        originalImage.id?.let {
+                            DBResultImage(null, null, null,
+                                null, null,null,
+                                null, null, originalImage.uri.toString(), null, it
+                            )}
+
+                    originalDbResultImage?.let { dbResultImages?.add(0, it) }
+                    dbResultImages?.let { allSearchesList.add(AllSearches(originalImage.created.toString(), it)) }
                 }
                 setMainRecycler(allSearchesList)
 
@@ -67,7 +79,8 @@ class SavedActivity : AppCompatActivity() {
         mainCategoryRecycler = findViewById(R.id.main_recycler)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         mainCategoryRecycler?.layoutManager = layoutManager
-        mainRecyclerAdapter = MainRecyclerAdapter(this, allSearchesList, shimmerFrameLayout, mainCategoryRecycler)
+        mainRecyclerAdapter =
+            MainRecyclerAdapter(this, allSearchesList)
         mainCategoryRecycler?.adapter = mainRecyclerAdapter
     }
 
