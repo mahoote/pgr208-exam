@@ -21,22 +21,12 @@ class SavedImageAdapter(
 ) :
     RecyclerView.Adapter<SavedImageAdapter.CategoryItemViewHolder>() {
 
-    private lateinit var mListener: OnItemClickListener
-
-    interface OnItemClickListener {
-        fun onItemClick(position: Int)
-    }
-
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        mListener = listener
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryItemViewHolder {
 
         return CategoryItemViewHolder(
             LayoutInflater.from(
                 context
-            ).inflate(R.layout.category_row_items, parent, false), mListener
+            ).inflate(R.layout.category_row_items, parent, false)
         )
     }
 
@@ -60,13 +50,7 @@ class SavedImageAdapter(
         return categoryItemList.size
     }
 
-    class CategoryItemViewHolder(itemView: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemView) {
-
-        init {
-            itemView.setOnClickListener {
-                listener.onItemClick(adapterPosition)
-            }
-        }
+    class CategoryItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         var itemImage: ImageView = itemView.findViewById(R.id.item_image)
 

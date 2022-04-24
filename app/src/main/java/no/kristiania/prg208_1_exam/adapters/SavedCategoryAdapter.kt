@@ -17,23 +17,11 @@ class SavedCategoryAdapter(
 ) :
     RecyclerView.Adapter<SavedCategoryAdapter.MainViewHolder>() {
 
-    private lateinit var mListener: OnItemClickListener
-    var adapters: ArrayList<SavedImageAdapter> = arrayListOf()
-
-    interface OnItemClickListener {
-        fun onItemClick(position: Int)
-    }
-
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        mListener = listener
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
         return MainViewHolder(
             LayoutInflater.from(
                 context
-            ).inflate(R.layout.main_recycler_row_item, parent, false),
-            mListener
+            ).inflate(R.layout.main_recycler_row_item, parent, false)
         )
     }
 
@@ -53,18 +41,11 @@ class SavedCategoryAdapter(
         val adapter = SavedImageAdapter(context, categoryItemList)
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
-
-        adapters.add(adapter)
     }
 
 
-    class MainViewHolder(itemView: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemView) {
+    class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        init {
-            itemView.setOnClickListener {
-                listener.onItemClick(adapterPosition)
-            }
-        }
         var categoryTitle: TextView = itemView.findViewById(R.id.row_title)
 
         var itemRecycler: RecyclerView = itemView.findViewById(R.id.item_recycler)
