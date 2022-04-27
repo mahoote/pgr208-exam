@@ -25,7 +25,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var fragmentManager: FragmentManager
     private lateinit var adapter: SearchImageAdapter
     private lateinit var results: ArrayList<ResultImage>
-    private var originalImageUrl: String? = null
+    private lateinit var uriString: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,14 +39,13 @@ class SearchActivity : AppCompatActivity() {
         val bundle: Bundle? = intent.extras
 
         if(bundle != null) {
-            val chosenImageUri = bundle!!.getString("chosenImageUri")
+            uriString = bundle.getString("uploadedUri")!!
             results = bundle.getSerializable("results") as ArrayList<ResultImage>
-            originalImageUrl = bundle.getString("originalImageUrl")
 
             Log.d("m_debug", "$results")
 
             adapter = setRecyclerView(results)
-            setOriginalImage(chosenImageUri)
+            setOriginalImage(uriString)
         } else {
 
             var latestCache: Map.Entry<String, CachedImages>? = null
@@ -73,7 +72,7 @@ class SearchActivity : AppCompatActivity() {
             val chosenImageFragment = ChosenImageFragment()
             adapter.setOnItemClickListener(object : SearchImageAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int) {
-                    replaceFragment(chosenImageFragment, position, originalImageUrl)
+                    replaceFragment(chosenImageFragment, position, uriString)
                 }
             })
         }
@@ -97,14 +96,12 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun replaceFragment(fragment: Fragment, position: Int, originalImageUrl: String?) {
+    private fun replaceFragment(fragment: Fragment, position: Int, uriString: String) {
         if(::results.isInitialized) {
             val bundle = Bundle()
             bundle.putSerializable("resultImage", results[position])
 
-            if(originalImageUrl != null) {
-                bundle.putString("originalImageUrl", originalImageUrl)
-            }
+            bundle.putString("uriString", uriString)
 
             fragment.arguments = bundle
 

@@ -192,7 +192,7 @@ class UploadImageFragment : Fragment() {
         tineyeThread.start()
     }
 
-    fun onSuccessfulGet(images: ArrayList<ResultImage?>, returnEngine: String, url: String) {
+    fun onSuccessfulGet(images: ArrayList<ResultImage?>, returnEngine: String) {
         Log.d("r_debug", "onSuccessfulGet: Wait for thread: $waitForThread")
         if(waitForThread) {
             waitForThread = false
@@ -200,7 +200,7 @@ class UploadImageFragment : Fragment() {
             Log.d("r_debug", "onSuccessfulGet: Return images from $returnEngine")
             Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
 
-            startSearchActivity(SearchActivity(), images, url)
+            startSearchActivity(SearchActivity(), images)
         }
 
     }
@@ -209,21 +209,17 @@ class UploadImageFragment : Fragment() {
         Log.d("Response", "Get cached images")
         cachedImages?.created = Calendar.getInstance().time
         val results = cachedImages?.images
-        startSearchActivity(SearchActivity(), results, null)
+        startSearchActivity(SearchActivity(), results)
     }
 
-    private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?, url: String?){
+    private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?){
         val activityClassName = activity::class.java.name
         val currentActivity = Globals.getCurrentActivity(context)
 
         if(!currentActivity.equals(activityClassName)) {
             val bundle = Bundle()
-            bundle.putString("chosenImageUri", imageUri.toString())
+            bundle.putString("uploadedUri", imageUri.toString())
             bundle.putSerializable("results", results)
-
-            if(url != null){
-                bundle.putString("originalImageUrl", url)
-            }
 
             val intent = Intent(this.requireContext(), activity::class.java)
             intent.putExtras(bundle)

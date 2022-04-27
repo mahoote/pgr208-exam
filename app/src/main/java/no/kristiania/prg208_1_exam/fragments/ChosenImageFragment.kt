@@ -1,6 +1,5 @@
 package no.kristiania.prg208_1_exam.fragments
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -31,7 +30,7 @@ class ChosenImageFragment : Fragment() {
         // Inflate the layout for this fragment
         val v =  inflater.inflate(R.layout.fragment_chosen_image, container, false)
 
-        val originalImageUrl: Uri? = Uri.parse(arguments?.getString("originalImageUrl"))
+        val origImgUri: Uri? = Uri.parse(arguments?.getString("uriString"))
 
         v.findViewById<ImageButton>(R.id.cif_close_btn).setOnClickListener {
             Log.i("debug", "Close")
@@ -62,7 +61,7 @@ class ChosenImageFragment : Fragment() {
         setCorrectBookmarkIcon(dbResultImage, bookmarkBtn)
 
         bookmarkBtn.setOnClickListener {
-            bookmarkBtnClicked(dbResultImage, dbHelper, originalImageUrl, resultImage, bookmarkBtn)
+            bookmarkBtnClicked(dbResultImage, dbHelper, origImgUri, resultImage, bookmarkBtn)
         }
         v.findViewById<ImageButton>(R.id.cif_web_btn).setOnClickListener {
             webBtnClicked(resultImage)
@@ -94,12 +93,12 @@ class ChosenImageFragment : Fragment() {
     private fun bookmarkBtnClicked(
         dbResultImage: DBResultImage?,
         dbHelper: DataBaseHelper,
-        originalImageUrl: Uri?,
+        origImgUri: Uri?,
         resultImage: ResultImage,
         bookmarkBtn: ImageButton
     ) {
         if (dbResultImage == null) {
-            val originalImage = originalImageExists(dbHelper, originalImageUrl)
+            val originalImage = originalImageExists(dbHelper, origImgUri)
 
             val resultImages = arrayListOf<ResultImage?>()
             resultImages.add(resultImage)

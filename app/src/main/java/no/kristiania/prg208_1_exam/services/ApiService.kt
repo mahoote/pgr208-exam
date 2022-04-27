@@ -64,7 +64,7 @@ class ApiService {
                     Log.d("r_debug", "onSuccessfulPost: Thread $searchEngine used $runnableUseTime milliseconds")
                     Log.d("m_debug", "onResponse: $images")
 
-                    runnable.onSuccessfulGet(images, searchEngine, url)
+                    runnable.onSuccessfulGet(images, searchEngine)
                 }
 
                 override fun onError(anError: ANError) {
