@@ -31,19 +31,23 @@ class SavedImageAdapter(
     }
 
     override fun onBindViewHolder(holder: CategoryItemViewHolder, position: Int) {
-        val resultImage = categoryItemList[position]
+        val dbResultImage = categoryItemList[position]
 
         Log.d("i_debug", "onBindViewHolder: Loading image")
 
-        Picasso.get().load(resultImage.imageLink).placeholder(R.drawable.result_image_placeholder).into(holder.itemImage, object : Callback.EmptyCallback() {
-            override fun onSuccess() {
-                Log.d("i_debug", "onSuccess: Image loaded!")
-            }
+        val byteArray = dbResultImage.imageBlob?.let { Globals.byteArrayToBitmap(it) }
 
-            override fun onError(e: Exception?) {
-                Log.e("i_debug", "onError: Something went wrong")
-            }
-        })
+        holder.itemImage.setImageBitmap(byteArray)
+
+//        Picasso.get().load(dbResultImage.imageLink).placeholder(R.drawable.result_image_placeholder).into(holder.itemImage, object : Callback.EmptyCallback() {
+//            override fun onSuccess() {
+//                Log.d("i_debug", "onSuccess: Image loaded!")
+//            }
+//
+//            override fun onError(e: Exception?) {
+//                Log.e("i_debug", "onError: Something went wrong")
+//            }
+//        })
     }
 
     override fun getItemCount(): Int {

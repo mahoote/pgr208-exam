@@ -27,9 +27,9 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Exception
 import android.annotation.SuppressLint
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.widget.FrameLayout
-import androidx.core.content.ContentProviderCompat.requireContext
 import no.kristiania.prg208_1_exam.fragments.NoSavedResultsFragment
 
 
@@ -44,19 +44,10 @@ object Globals : AppCompatActivity() {
     fun loadImage(
         uriString: String,
         target: ImageView?,
-        statusTxt: TextView
+        statusTxt: TextView,
+        callback: Callback
     ) {
-        Picasso.get().load(uriString).into(target, object : Callback {
-            override fun onSuccess() {
-                statusTxt.visibility = View.INVISIBLE
-            }
-
-            override fun onError(e: Exception?) {
-                statusTxt.text = resources.getString(R.string.error_message_01)
-                Log.e("Error", "Picasso load image: ${e?.printStackTrace()}")
-                e?.printStackTrace()
-            }
-        })
+        Picasso.get().load(uriString).placeholder(R.drawable.result_image_placeholder).into(target, callback)
     }
 
     fun setHeaderFragment(fragmentManager: FragmentManager) {
@@ -191,26 +182,46 @@ object Globals : AppCompatActivity() {
         return removeFileFormat(fullFileName)
     }
 
-    fun convertResultImagesToDBModel(resultImages: ArrayList<ResultImage?>, originalImageId: Int) : ArrayList<DBResultImage> {
-        val dbResultImages = arrayListOf<DBResultImage>()
+    fun convertResultImageToDBModel(
+        originalImageId: Int,
+        resultImage: DBResultImage,
+        byteArray: ByteArray
+    ): DBResultImage {
 
-        resultImages.forEach { resImg ->
-            val dbResultImage = DBResultImage(
-                null,
-                resImg?.store_link,
-                resImg?.name,
-                resImg?.domain,
-                resImg?.tracking_id,
-                resImg?.thumbnail_link,
-                resImg?.thumbnail_link,
-                resImg?.description,
-                resImg?.image_link,
-                resImg?.current_date,
-                originalImageId
-            )
-            dbResultImages.add(dbResultImage)
-        }
-        return dbResultImages
+        return DBResultImage(
+            null,
+            resultImage.storeLink,
+            resultImage.name,
+            resultImage.domain,
+            resultImage.identifier,
+            resultImage.trackingID,
+            resultImage.thumbnailLink,
+            resultImage.description,
+            resultImage.imageLink,
+            byteArray,
+            resultImage.currentDate,
+            originalImageId
+        )
+    }
+
+    fun convertResultImageToDBModelNoOriginal(
+        resultImage: ResultImage,
+    ): DBResultImage {
+
+        return DBResultImage(
+            null,
+            resultImage.store_link,
+            resultImage.name,
+            resultImage.domain,
+            resultImage.identifier,
+            resultImage.tracking_id,
+            resultImage.thumbnail_link,
+            resultImage.description,
+            resultImage.image_link,
+            byteArrayOf(),
+            resultImage.current_date,
+            null
+        )
     }
 
     fun getFileNameFromPath(path: String): String {
@@ -269,6 +280,17 @@ object Globals : AppCompatActivity() {
 
     fun picassoLoad(src: String, imageView: ImageView) {
         Picasso.get().load(src).placeholder(R.drawable.result_image_placeholder).into(imageView)
+    }
+
+    fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+        return stream.toByteArray()
+    }
+
+
+    fun byteArrayToBitmap(byteArray: ByteArray): Bitmap? {
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
 
 }

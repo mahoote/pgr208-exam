@@ -1,9 +1,12 @@
 package no.kristiania.prg208_1_exam.models
 
-import android.net.Uri
 
-data class DBOriginalImage(
+class DBOriginalImage(
     val id: Int?,
-    val uri: Uri?,
+    val byteArray: ByteArray?,
     val created: String?
-)
+) {
+    override fun toString(): String {
+        return "DBOriginalImage(id=$id, byteArray=${byteArray?.contentToString()}, created=$created)"
+    }
+}

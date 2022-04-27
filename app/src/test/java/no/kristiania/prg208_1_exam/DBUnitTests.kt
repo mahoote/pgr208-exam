@@ -1,9 +1,9 @@
+/*
 package no.kristiania.prg208_1_exam
 
 
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
-import no.kristiania.prg208_1_exam.model.db.DataBaseRepository
 import no.kristiania.prg208_1_exam.model.service.DatabaseService
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
@@ -100,7 +100,7 @@ class DBUnitTests {
         resultImages.add(resImg2)
         resultImages.add(resImg3)
 
-        val code = dbService.putResultImages(resultImages)
+        val code = dbService.putResultImage(resultImages)
 
         assertEquals(true, code)
     }
@@ -152,7 +152,7 @@ class DBUnitTests {
         resultImages.add(resImg2)
         resultImages.add(resImg3)
 
-        dbService.putResultImages(resultImages)
+        dbService.putResultImage(resultImages)
 
         val dbResultImages = dbService.getAllResultImages()
 
@@ -180,7 +180,7 @@ class DBUnitTests {
         val img1 = DBOriginalImage(null, Uri.parse(imageUri), "now")
         dbService.putOriginalImage(img1)
 
-        val returnedImage = dbService.getOriginalImageByUri(imageUri)
+        val returnedImage = dbService.getOriginalImageById(imageUri)
 
         assertEquals(imageUri, returnedImage?.uri.toString())
     }
@@ -232,7 +232,7 @@ class DBUnitTests {
         resultImages.add(resImg2)
         resultImages.add(resImg3)
 
-        dbService.putResultImages(resultImages)
+        dbService.putResultImage(resultImages)
 
         val list = dbService.getListOfResultsById(1)
 
@@ -286,7 +286,7 @@ class DBUnitTests {
         resultImages.add(resImg2)
         resultImages.add(resImg3)
 
-        dbService.putResultImages(resultImages)
+        dbService.putResultImage(resultImages)
 
         val list = dbService.getListOfResultsAsSearchItemById(1)
 
@@ -313,8 +313,8 @@ class DBUnitTests {
 
         resultImages.add(resImg1)
 
-        dbService.putResultImages(resultImages)
-        val dbResultImage = dbService.getResultImageByImageLink("imageLink1")
+        dbService.putResultImage(resultImages)
+        val dbResultImage = dbService.getResultImageById("imageLink1")
         assertEquals("imageLink1", dbResultImage?.imageLink)
     }
 
@@ -338,8 +338,8 @@ class DBUnitTests {
 
         resultImages.add(resImg1)
 
-        dbService.putResultImages(resultImages)
-        dbService.deleteResultImageByImageLink("imageLink1")
+        dbService.putResultImage(resultImages)
+        dbService.deleteResultImageById("imageLink1")
     }
 
     @Test
@@ -362,7 +362,7 @@ class DBUnitTests {
 
         resultImages.add(resImg1)
 
-        dbService.putResultImages(resultImages)
+        dbService.putResultImage(resultImages)
 
         val imageUri = "testuri1"
         val img1 = DBOriginalImage(1, Uri.parse(imageUri), "now")
@@ -373,4 +373,4 @@ class DBUnitTests {
         assertEquals(0, dbService.getAllResultImages().size)
         assertEquals(0, dbService.getAllOriginalImages().size)
     }
-}
+}*/

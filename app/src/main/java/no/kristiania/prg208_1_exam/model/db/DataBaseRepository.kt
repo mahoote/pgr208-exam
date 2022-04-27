@@ -5,11 +5,9 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.net.Uri
 import android.util.Log
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
-import java.net.URL
 
 class DataBaseRepository(
     context: Context,
@@ -18,7 +16,7 @@ class DataBaseRepository(
     companion object {
         const val TABLE_ORIGINAL_IMAGE = "ORIGINAL_IMAGE"
         const val COLUMN_PK_ORIGINAL_ID = "ID"
-        const val COLUMN_IMAGE_URI = "IMAGE_URL"
+        const val COLUMN_ORIG_IMAGE_BLOB = "IMAGE_BLOB"
         const val COLUMN_CREATED = "CREATED"
 
         const val TABLE_RESULT_IMAGE = "RESULT_IMAGE"
@@ -31,7 +29,8 @@ class DataBaseRepository(
         const val COLUMN_TRACKING_ID = "TRACKING_ID"
         const val COLUMN_THUMBNAIL_LINK = "THUMBNAIL_LINK"
         const val COLUMN_DESCRIPTION = "DESCRIPTION"
-        const val COLUMN_IMAGE_LINK = "IMAGE_LINK"
+        const val COLUMN_RES_IMAGE_LINK = "IMAGE_LINK"
+        const val COLUMN_RES_IMAGE_BLOB = "IMAGE_BLOB"
         const val COLUMN_CURRENT_DATE = "CURR_DATE"
     }
 
@@ -41,7 +40,7 @@ class DataBaseRepository(
         val createSearchImageTable =
             "CREATE TABLE $TABLE_ORIGINAL_IMAGE " +
                     "($COLUMN_PK_ORIGINAL_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "$COLUMN_IMAGE_URI TEXT, " +
+                    "$COLUMN_ORIG_IMAGE_BLOB BLOB, " +
                     "$COLUMN_CREATED TEXT)"
 
         val createResultImageTable =
@@ -54,7 +53,8 @@ class DataBaseRepository(
                     "$COLUMN_TRACKING_ID TEXT, " +
                     "$COLUMN_THUMBNAIL_LINK TEXT, " +
                     "$COLUMN_DESCRIPTION TEXT, " +
-                    "$COLUMN_IMAGE_LINK TEXT, " +
+                    "$COLUMN_RES_IMAGE_LINK TEXT, " +
+                    "$COLUMN_RES_IMAGE_BLOB BLOB, " +
                     "$COLUMN_CURRENT_DATE TEXT, " +
                     "$COLUMN_FK_ORIGINAL_IMG_ID INTEGER, " +
                     "FOREIGN KEY ($COLUMN_FK_ORIGINAL_IMG_ID) REFERENCES $TABLE_ORIGINAL_IMAGE ($COLUMN_PK_ORIGINAL_ID))"
@@ -72,48 +72,72 @@ class DataBaseRepository(
         this.writableDatabase?.execSQL("VACUUM")
     }
 
-    fun putOriginalImage(dbOriginalImage: DBOriginalImage): Boolean {
+    fun putOriginalImage(dbOriginalImage: DBOriginalImage): Long {
         val db: SQLiteDatabase = this.writableDatabase
         val originalImageCV = ContentValues()
 
-        originalImageCV.put(COLUMN_IMAGE_URI, dbOriginalImage.uri.toString())
+        if(dbOriginalImage.id != null) {
+            originalImageCV.put(COLUMN_PK_ORIGINAL_ID, dbOriginalImage.id)
+        }
+
+        originalImageCV.put(COLUMN_ORIG_IMAGE_BLOB, dbOriginalImage.byteArray)
         originalImageCV.put(COLUMN_CREATED, dbOriginalImage.created)
 
-        val origImgInsertStatus = db.insert(TABLE_ORIGINAL_IMAGE, null, originalImageCV)
+        val origImgId = db.insert(TABLE_ORIGINAL_IMAGE, null, originalImageCV)
 
-        if (origImgInsertStatus < 0) {
-            db.close()
-            return false
-        }
+        Log.d("db_debug", "putOriginalImage: put status: $origImgId")
+
         db.close()
-        return true
+        return origImgId
     }
 
-    fun putResultImages(dbResultImages: ArrayList<DBResultImage>): Boolean {
+    fun putResultImage(dbResultImage: DBResultImage): Long {
         val resultImageCV = ContentValues()
         val db = this.writableDatabase
 
-        dbResultImages.forEach { img ->
-            resultImageCV.put(COLUMN_STORE_LINK, img.storeLink)
-            resultImageCV.put(COLUMN_NAME, img.name)
-            resultImageCV.put(COLUMN_DOMAIN, img.domain)
-            resultImageCV.put(COLUMN_IDENTIFIER, img.identifier)
-            resultImageCV.put(COLUMN_TRACKING_ID, img.trackingID)
-            resultImageCV.put(COLUMN_THUMBNAIL_LINK, img.thumbnailLink)
-            resultImageCV.put(COLUMN_DESCRIPTION, img.description)
-            resultImageCV.put(COLUMN_IMAGE_LINK, img.imageLink)
-            resultImageCV.put(COLUMN_CURRENT_DATE, img.currentDate)
-            resultImageCV.put(COLUMN_FK_ORIGINAL_IMG_ID, img.originalImgID)
+        resultImageCV.put(COLUMN_STORE_LINK, dbResultImage.storeLink)
+        resultImageCV.put(COLUMN_NAME, dbResultImage.name)
+        resultImageCV.put(COLUMN_DOMAIN, dbResultImage.domain)
+        resultImageCV.put(COLUMN_IDENTIFIER, dbResultImage.identifier)
+        resultImageCV.put(COLUMN_TRACKING_ID, dbResultImage.trackingID)
+        resultImageCV.put(COLUMN_THUMBNAIL_LINK, dbResultImage.thumbnailLink)
+        resultImageCV.put(COLUMN_DESCRIPTION, dbResultImage.description)
+        resultImageCV.put(COLUMN_RES_IMAGE_LINK, dbResultImage.imageLink)
+        resultImageCV.put(COLUMN_RES_IMAGE_BLOB, dbResultImage.imageBlob)
+        resultImageCV.put(COLUMN_CURRENT_DATE, dbResultImage.currentDate)
+        resultImageCV.put(COLUMN_FK_ORIGINAL_IMG_ID, dbResultImage.originalImgID)
 
-            val resultInsertStatus = db.insert(TABLE_RESULT_IMAGE, null, resultImageCV)
+        val dbResultId = db.insert(TABLE_RESULT_IMAGE, null, resultImageCV)
 
-            if (resultInsertStatus < 0) {
-                db.close()
-                return false
-            }
-        }
         db.close()
-        return true
+        return dbResultId
+    }
+
+    fun getOriginalImageById(id: Int): DBOriginalImage? {
+        val query = "SELECT * FROM $TABLE_ORIGINAL_IMAGE WHERE $COLUMN_PK_ORIGINAL_ID = '${id}'"
+        val db = this.readableDatabase
+
+        var cursor: Cursor? = null
+
+        if (db != null) {
+            cursor = db.rawQuery(query, null)
+        }
+
+        if (cursor?.count != 0) {
+
+            cursor?.moveToFirst()
+            val id = cursor?.getInt(0)
+            val byteArray = cursor?.getBlob(1)
+            val created = cursor?.getString(2)
+
+            return DBOriginalImage(id, byteArray, created)
+        }
+
+        db.close()
+        cursor.close()
+
+        return null
+
     }
 
     fun getAllOriginalImages(): ArrayList<DBOriginalImage> {
@@ -130,9 +154,9 @@ class DataBaseRepository(
         if (cursor?.count != 0) {
             while (cursor?.moveToNext() == true) {
                 val id = cursor.getInt(0)
-                val uri = cursor.getString(1)
+                val byteArray = cursor.getBlob(1)
                 val created = cursor.getString(2)
-                resultList.add(DBOriginalImage(id, Uri.parse(uri), created))
+                resultList.add(DBOriginalImage(id, byteArray, created))
             }
         }
         db.close()
@@ -149,7 +173,6 @@ class DataBaseRepository(
 
         if (db != null) {
             cursor = db.rawQuery(query, null)
-            cursor.close()
         }
 
         if (cursor?.count != 0) {
@@ -162,9 +185,10 @@ class DataBaseRepository(
                 val trackingID = cursor.getString(5)
                 val thumbnailLink = cursor.getString(6)
                 val description = cursor.getString(7)
-                val imageLink = cursor.getString(8)
-                val currentDate = cursor.getString(9)
-                val originalImageID = cursor.getInt(10)
+                val imageLink = cursor?.getString(8)
+                val imageBlob = cursor?.getBlob(9)
+                val currentDate = cursor?.getString(10)
+                val originalImageID = cursor?.getInt(11)
                 resultList.add(
                     DBResultImage(
                         id,
@@ -176,6 +200,7 @@ class DataBaseRepository(
                         thumbnailLink,
                         description,
                         imageLink,
+                        imageBlob,
                         currentDate,
                         originalImageID
                     )
@@ -183,6 +208,7 @@ class DataBaseRepository(
             }
         }
 
+        cursor?.close()
         db.close()
         return resultList
     }
@@ -209,9 +235,10 @@ class DataBaseRepository(
                 val trackingID = cursor.getString(5)
                 val thumbnailLink = cursor.getString(6)
                 val description = cursor.getString(7)
-                val imageLink = cursor.getString(8)
-                val currentDate = cursor.getString(9)
-                val originalImageID = cursor.getInt(10)
+                val imageLink = cursor?.getString(8)
+                val imageBlob = cursor?.getBlob(9)
+                val currentDate = cursor?.getString(10)
+                val originalImageID = cursor?.getInt(11)
                 resultList.add(
                     DBResultImage(
                         id,
@@ -223,6 +250,7 @@ class DataBaseRepository(
                         thumbnailLink,
                         description,
                         imageLink,
+                        imageBlob,
                         currentDate,
                         originalImageID
                     )
@@ -230,13 +258,14 @@ class DataBaseRepository(
             }
         }
         cursor?.close()
+        db.close()
         return resultList
     }
 
-    fun getResultImageByImageLink(imageLink: String) : DBResultImage? {
+    fun getResultImageById(id: Int) : DBResultImage? {
         val db = this.readableDatabase
 
-        val query = "SELECT * FROM RESULT_IMAGE WHERE IMAGE_LINK = '${imageLink}'"
+        val query = "SELECT * FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_PK_RESULT_ID = '${id}'"
         var cursor: Cursor? = null
         var dbResultImage: DBResultImage? = null
 
@@ -244,21 +273,25 @@ class DataBaseRepository(
             cursor = db.rawQuery(query, null)
         }
 
+        Log.d("db_debug", "getResultImageByByteArray: cursor count: ${cursor?.count}")
+        
         if (cursor?.count != 0) {
 
-            while (cursor?.moveToNext() == true) {
-                val id = cursor.getInt(0)
-                val storeLink = cursor.getString(1)
-                val name = cursor.getString(2)
-                val domain = cursor.getString(3)
-                val identifier = cursor.getString(4)
-                val trackingID = cursor.getString(5)
-                val thumbnailLink = cursor.getString(6)
-                val description = cursor.getString(7)
-                val imageLink = cursor.getString(8)
-                val currentDate = cursor.getString(9)
-                val originalImageID = cursor.getInt(10)
+            cursor?.moveToFirst()
+            val id = cursor?.getInt(0)
+            val storeLink = cursor?.getString(1)
+            val name = cursor?.getString(2)
+            val domain = cursor?.getString(3)
+            val identifier = cursor?.getString(4)
+            val trackingID = cursor?.getString(5)
+            val thumbnailLink = cursor?.getString(6)
+            val description = cursor?.getString(7)
+            val imageLink = cursor?.getString(8)
+            val imageBlob = cursor?.getBlob(9)
+            val currentDate = cursor?.getString(10)
+            val originalImageID = cursor?.getInt(11)
 
+            originalImageID?.let {
                 dbResultImage = DBResultImage(
                     id,
                     storeLink,
@@ -269,20 +302,25 @@ class DataBaseRepository(
                     thumbnailLink,
                     description,
                     imageLink,
+                    imageBlob,
                     currentDate,
                     originalImageID
                 )
-
             }
+
+            Log.d("db_debug", "getResultImageByByteArray: dbResultImage: $dbResultImage")
+
         }
         cursor?.close()
+        db.close()
         return dbResultImage
     }
 
-    fun deleteResultImageByImageLink(imageLink: String){
+    fun deleteResultImageById(id: Int){
         val db = this.writableDatabase
-        val query = "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_IMAGE_LINK = '${imageLink}'"
+        val query = "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_PK_RESULT_ID = '${id}'"
         db.execSQL(query)
+        db.close()
     }
 
     fun deleteOriginalAndResults(originalImgId: Int){
@@ -292,5 +330,6 @@ class DataBaseRepository(
 
         db.execSQL(firstQuery)
         db.execSQL(secondQuery)
+        db.close()
     }
 }

@@ -1,7 +1,6 @@
 package no.kristiania.prg208_1_exam.fragments
 
-import android.graphics.drawable.BitmapDrawable
-import android.net.Uri
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,27 +9,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
-import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.Globals
-import no.kristiania.prg208_1_exam.Globals.picassoLoad
 import no.kristiania.prg208_1_exam.Globals.toDp
 import no.kristiania.prg208_1_exam.Globals.toUrl
 import no.kristiania.prg208_1_exam.R
-import no.kristiania.prg208_1_exam.model.db.DataBaseRepository
 import no.kristiania.prg208_1_exam.model.service.DatabaseService
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
-import no.kristiania.prg208_1_exam.models.ResultImage
 import java.util.*
-import kotlin.collections.ArrayList
 
 class ChosenImageFragment : Fragment() {
 
     var TAG = "bitmap_debug"
 
     private lateinit var imageView: ImageView
-    private lateinit var resultImage: ResultImage
+    private lateinit var chosenBitmapImage: Bitmap
+    private lateinit var origBitmapImage: Bitmap
+    private lateinit var chosenDbResultImage: DBResultImage
     private lateinit var dbService: DatabaseService
+    private var origDBImageId: Long = 0
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,27 +37,40 @@ class ChosenImageFragment : Fragment() {
         val v =  inflater.inflate(R.layout.fragment_chosen_image, container, false)
 
         dbService = DatabaseService(requireContext())
-        resultImage = arguments?.getSerializable("resultImage") as ResultImage
         imageView = v.findViewById(R.id.cif_chosen_img)
 
-        val origImgUri: Uri? = Uri.parse(arguments?.getString("uriString"))
+        val argsDbResultImage: DBResultImage? = arguments?.getParcelable("dbResultImage")
+        val argsChosenBitmap: Bitmap? = arguments?.getParcelable("chosenBitmapImage")
+        val argsOrigBitmap: Bitmap? = arguments?.getParcelable("originalBitmapImage")
+        val argsOrigDBImageId: Long? = arguments?.getLong("origDBImageId")
+
         val bookmarkBtn = v.findViewById<ImageButton>(R.id.cif_bookmark_btn)
         val nameView = v.findViewById<TextView>(R.id.cif_img_name_txt)
         val descView = v.findViewById<TextView>(R.id.cif_img_desc_view)
 
-        picassoLoad(resultImage.image_link.toString(), imageView)
-        nameView.text = resultImage.name
-        descView.text = resultImage.description
+        argsDbResultImage?.let {
+            chosenDbResultImage = it
+        }
+        argsChosenBitmap?.let {
+            chosenBitmapImage = it
+        }
+        argsOrigBitmap?.let {
+            origBitmapImage = it
+        }
+        argsOrigDBImageId?.let {
+            origDBImageId = it
+        }
+
+        imageView.setImageBitmap(chosenBitmapImage)
+
+        nameView.text = chosenDbResultImage.name
+        descView.text = chosenDbResultImage.description
 
         imageView.post {
             sizeCheck(imageView)
-
-            // TODO: Save resultBitmap to db instead of link.
-            val resultBitmap = Globals.drawableToBitmap(imageView.drawable as BitmapDrawable)
-            Log.d(TAG, "onCreateView: resultBitmap: $resultBitmap")
         }
 
-        setCorrectBookmarkIcon(bookmarkBtn)
+        chosenDbResultImage.id?.let { setCorrectBookmarkIcon(bookmarkBtn, it) }
 
         // Close onclick
         v.findViewById<ImageButton>(R.id.cif_close_btn).setOnClickListener {
@@ -68,18 +79,18 @@ class ChosenImageFragment : Fragment() {
         }
         // Bookmark onclick
         bookmarkBtn.setOnClickListener {
-            bookmarkBtnClicked(origImgUri, resultImage, bookmarkBtn)
+            bookmarkBtnClicked(chosenDbResultImage, bookmarkBtn)
         }
         // Web onclick
         v.findViewById<ImageButton>(R.id.cif_web_btn).setOnClickListener {
-            webBtnClicked(resultImage)
+            webBtnClicked(chosenDbResultImage)
         }
 
         return v
     }
 
-    private fun setCorrectBookmarkIcon(bookmarkBtn: ImageButton) {
-        val dbResultImage = resultImage.image_link?.let { dbService.getResultImageByImageLink(it) }
+    private fun setCorrectBookmarkIcon(bookmarkBtn: ImageButton, id: Int) {
+        val dbResultImage = dbService.getResultImageById(id)
         dbResultImage?.let {
             bookmarkBtn.setImageDrawable(
                 ContextCompat.getDrawable(
@@ -90,38 +101,39 @@ class ChosenImageFragment : Fragment() {
         }
     }
 
-    private fun webBtnClicked(resultImage: ResultImage) {
+    private fun webBtnClicked(dbResultImage: DBResultImage) {
         // TODO: Refer to elvis
-        resultImage.store_link?.let { it1 -> toUrl(requireContext(), it1) } ?: run {
+        dbResultImage.storeLink?.let { link -> toUrl(requireContext(), link) } ?: run {
             Toast.makeText(requireContext(), "Unable to get URL", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun bookmarkBtnClicked(origImgUri: Uri?, resultImage: ResultImage, bookmarkBtn: ImageButton) {
-        val dbResultImage = resultImage.image_link?.let { dbService.getResultImageByImageLink(it) }
 
-        if (dbResultImage == null) {
-            val originalImage = originalImageExists(dbService, origImgUri)
+    private fun bookmarkBtnClicked(dbResultImage: DBResultImage, bookmarkBtn: ImageButton) {
+        TAG = "db_debug"
 
-            val resultImages = arrayListOf<ResultImage?>()
-            resultImages.add(resultImage)
+        val chosenByteArray = Globals.bitmapToByteArray(chosenBitmapImage)
 
-            val dbResultImages = convertFormat(originalImage, resultImages)
+        if (dbResultImage.id?.let { dbService.getResultImageById(it) } == null) {
+            val originalImage = originalImageExists(dbService, origBitmapImage)
 
-            if (!dbResultImages.isNullOrEmpty()) {
-                dbService.putResultImages(dbResultImages)
+            val childDbResultImage = convertFormat(originalImage, dbResultImage, chosenByteArray)
+
+            if (childDbResultImage != null) {
+                val resultId = dbService.putResultImage(childDbResultImage)
                 bookmarkBtn.setImageDrawable(
                     ContextCompat.getDrawable(
                         requireContext(),
                         R.drawable.ic_bookmark_solid
                     )
                 )
+                chosenDbResultImage = dbService.getResultImageById(resultId.toInt())!!
             }
         } else {
-            val selectedImage = dbService.getResultImageByImageLink(resultImage.image_link)
-            val origId = selectedImage?.originalImgID
+            val chosenDbResult = dbService.getResultImageById(dbResultImage.id)
+            val origId = chosenDbResult?.originalImgID
 
-            dbService.deleteResultImageByImageLink(resultImage.image_link.toString())
+            dbService.deleteResultImageById(dbResultImage.id)
             bookmarkBtn.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
@@ -138,23 +150,25 @@ class ChosenImageFragment : Fragment() {
         }
     }
 
-    private fun convertFormat(originalImage: DBOriginalImage?, resultImages: ArrayList<ResultImage?>): ArrayList<DBResultImage>? {
-        return originalImage?.id?.let { ogi ->
-            Globals.convertResultImagesToDBModel(resultImages, ogi)
+    private fun convertFormat(originalImage: DBOriginalImage?, dbResultImage: DBResultImage, byteArray: ByteArray): DBResultImage? {
+        return originalImage?.id?.let { id ->
+            Globals.convertResultImageToDBModel(id, dbResultImage, byteArray)
         }
     }
 
-    private fun originalImageExists(dbService: DatabaseService, origImgUri: Uri?): DBOriginalImage? {
-        if (dbService.getOriginalImageByUri(origImgUri.toString()) == null) {
+    private fun originalImageExists(dbService: DatabaseService, bitmapImage: Bitmap): DBOriginalImage? {
+        val byteArray = Globals.bitmapToByteArray(bitmapImage)
+
+        if (dbService.getOriginalImageById(origDBImageId.toInt()) == null) {
             dbService.putOriginalImage(
                 DBOriginalImage(
-                    null, origImgUri,
+                    origDBImageId.toInt(), byteArray,
                     Calendar.getInstance().time.toString()
                 )
             )
         }
 
-        return dbService.getOriginalImageByUri(origImgUri.toString())
+        return dbService.getOriginalImageById(origDBImageId.toInt())
     }
 
     private fun sizeCheck(imageView: ImageView) {

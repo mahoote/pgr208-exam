@@ -1,11 +1,11 @@
 package no.kristiania.prg208_1_exam.model.service
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import no.kristiania.prg208_1_exam.model.db.DataBaseRepository
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
+import java.util.*
 import kotlin.collections.ArrayList
 
 class DatabaseService(context: Context) {
@@ -16,24 +16,22 @@ class DatabaseService(context: Context) {
         dbRepo.clear()
     }
 
-    fun getResultImageByImageLink(imageLink: String): DBResultImage? {
-        val result = dbRepo.getResultImageByImageLink(imageLink)
-
-        Log.d("bitmap_debug", "getResultImageByImageLink: result: $result")
-
+    fun getResultImageById(id: Int): DBResultImage? {
+        val result = dbRepo.getResultImageById(id)
         close()
         return result
     }
 
-    fun putResultImages(dbResultImages: ArrayList<DBResultImage>) : Boolean {
+    fun putResultImage(dbResultImage: DBResultImage) : Long {
         // TODO: Check if bitmap exists.
-        val result = dbRepo.putResultImages(dbResultImages)
+        val resultId = dbRepo.putResultImage(dbResultImage)
+        Log.d("db_debug", "putResultImage: Result put? $resultId")
         close()
-        return result
+        return resultId
     }
 
-    fun deleteResultImageByImageLink(imageLink: String) {
-        dbRepo.deleteResultImageByImageLink(imageLink)
+    fun deleteResultImageById(id: Int) {
+        dbRepo.deleteResultImageById(id)
         close()
     }
 
@@ -48,24 +46,12 @@ class DatabaseService(context: Context) {
         close()
     }
 
-    fun getOriginalImageByUri(imageUri: String): DBOriginalImage? {
-        val originals = dbRepo.getAllOriginalImages()
-        close()
-        var dbOriginalImage: DBOriginalImage? = null
-        for (o in originals) {
-            if(o.uri == Uri.parse(imageUri)) {
-                dbOriginalImage = o
-            }
-        }
-        if(dbOriginalImage != null) {
-            return dbOriginalImage
-        }
-        // TODO: No image found.
-        Log.d("db", "returning" + dbOriginalImage.toString())
-        return dbOriginalImage
+    fun getOriginalImageById(id: Int): DBOriginalImage? {
+
+        return dbRepo.getOriginalImageById(id)
     }
 
-    fun putOriginalImage(dbOriginalImage: DBOriginalImage) : Boolean {
+    fun putOriginalImage(dbOriginalImage: DBOriginalImage) : Long {
         val result = dbRepo.putOriginalImage(dbOriginalImage)
         close()
         return result
@@ -91,5 +77,29 @@ class DatabaseService(context: Context) {
         val result = dbRepo.getListOfResultsById(id)
         close()
         return result
+    }
+
+    private fun origArrayEquals(
+        inputArray: ArrayList<DBOriginalImage>,
+        byteArray: ByteArray
+    ): DBOriginalImage? {
+        inputArray.forEach { origImage ->
+            if (Arrays.equals(origImage.byteArray, byteArray)) {
+                return origImage
+            }
+        }
+        return null
+    }
+
+    private fun resultArrayEquals(
+        inputArray: ArrayList<DBResultImage>,
+        byteArray: ByteArray
+    ): DBResultImage? {
+        inputArray.forEach { resultImage ->
+            if (Arrays.equals(resultImage.imageBlob, byteArray)) {
+                return resultImage
+            }
+        }
+        return null
     }
 }

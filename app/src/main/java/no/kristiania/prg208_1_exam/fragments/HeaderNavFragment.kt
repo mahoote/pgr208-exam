@@ -11,16 +11,24 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import no.kristiania.prg208_1_exam.*
+import no.kristiania.prg208_1_exam.model.service.DatabaseService
 
 class HeaderNavFragment : Fragment() {
 
     private lateinit var v: View
+    private lateinit var dbService: DatabaseService
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         v = inflater.inflate(R.layout.fragment_nav_header, container, false)
+
+        dbService = DatabaseService(requireContext())
+
+        val originalDBImages = dbService.getAllOriginalImages()
+
 
         highlightCurrentActivity()
         headerButtonsOnClick()

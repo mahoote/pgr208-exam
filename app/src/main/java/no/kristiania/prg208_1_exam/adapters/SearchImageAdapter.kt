@@ -7,11 +7,13 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.R
+import no.kristiania.prg208_1_exam.models.DBResultImage
 import no.kristiania.prg208_1_exam.models.ResultImage
 
-class SearchImageAdapter(private val results : ArrayList<ResultImage>): RecyclerView.Adapter<SearchImageAdapter.ResultsViewHolder>() {
+class SearchImageAdapter(private val results : ArrayList<DBResultImage>): RecyclerView.Adapter<SearchImageAdapter.ResultsViewHolder>() {
 
     private lateinit var mListener: OnItemClickListener
+    private var viewHolder: ArrayList<ResultsViewHolder> = arrayListOf()
 
     interface OnItemClickListener {
         fun onItemClick(position: Int)
@@ -29,11 +31,16 @@ class SearchImageAdapter(private val results : ArrayList<ResultImage>): Recycler
     override fun onBindViewHolder(holder: ResultsViewHolder, position: Int) {
         val currentItem = results[position]
 
-        Picasso.get().load(currentItem.image_link).into(holder.img)
+        Picasso.get().load(currentItem.imageLink).into(holder.img)
+        viewHolder.add(holder)
     }
 
     override fun getItemCount(): Int {
         return results.size
+    }
+
+    fun getHolders(): ArrayList<ResultsViewHolder> {
+        return viewHolder
     }
 
     class ResultsViewHolder(itemView: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemView){
