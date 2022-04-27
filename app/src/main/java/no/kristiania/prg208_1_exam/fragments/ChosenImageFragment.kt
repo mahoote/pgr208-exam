@@ -1,6 +1,5 @@
 package no.kristiania.prg208_1_exam.fragments
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +14,8 @@ import no.kristiania.prg208_1_exam.Globals
 import no.kristiania.prg208_1_exam.Globals.toDp
 import no.kristiania.prg208_1_exam.Globals.toUrl
 import no.kristiania.prg208_1_exam.R
-import no.kristiania.prg208_1_exam.db.DataBaseHelper
+import no.kristiania.prg208_1_exam.model.db.DataBaseRepository
+import no.kristiania.prg208_1_exam.model.service.DatabaseService
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
 import no.kristiania.prg208_1_exam.models.ResultImage
@@ -39,7 +39,7 @@ class ChosenImageFragment : Fragment() {
         }
 
         val resultImage = arguments?.getSerializable("resultImage") as ResultImage
-        val dbHelper = DataBaseHelper(context)
+        val dbService = DatabaseService(requireContext())
 
         val imageView = v.findViewById<ImageView>(R.id.cif_chosen_img)
         val nameView = v.findViewById<TextView>(R.id.cif_img_name_txt)
@@ -56,13 +56,13 @@ class ChosenImageFragment : Fragment() {
 
         val bookmarkBtn = v.findViewById<ImageButton>(R.id.cif_bookmark_btn)
 
-        val dbResultImage = dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link))
+        val dbResultImage = resultImage.image_link?.let { dbService.getResultImageByImageLink(it) }
 
         // Set checked bookmark icon.
         setCorrectBookmarkIcon(dbResultImage, bookmarkBtn)
 
         bookmarkBtn.setOnClickListener {
-            bookmarkBtnClicked(dbResultImage, dbHelper, originalImageUrl, resultImage, bookmarkBtn)
+            bookmarkBtnClicked(dbResultImage, dbService, originalImageUrl, resultImage, bookmarkBtn)
         }
         v.findViewById<ImageButton>(R.id.cif_web_btn).setOnClickListener {
             webBtnClicked(resultImage)
@@ -93,13 +93,13 @@ class ChosenImageFragment : Fragment() {
 
     private fun bookmarkBtnClicked(
         dbResultImage: DBResultImage?,
-        dbHelper: DataBaseHelper,
+        dbService: DatabaseService,
         originalImageUrl: Uri?,
         resultImage: ResultImage,
         bookmarkBtn: ImageButton
     ) {
         if (dbResultImage == null) {
-            val originalImage = originalImageExists(dbHelper, originalImageUrl)
+            val originalImage = originalImageExists(dbService, originalImageUrl)
 
             val resultImages = arrayListOf<ResultImage?>()
             resultImages.add(resultImage)
@@ -107,7 +107,7 @@ class ChosenImageFragment : Fragment() {
             val dbResultImages = convertFormat(originalImage, resultImages)
 
             if (!dbResultImages.isNullOrEmpty()) {
-                dbHelper.putResultImages(dbResultImages)
+                dbService.putResultImages(dbResultImages)
                 bookmarkBtn.setImageDrawable(
                     ContextCompat.getDrawable(
                         requireContext(),
@@ -117,10 +117,10 @@ class ChosenImageFragment : Fragment() {
             }
         } else {
             val selectedImage =
-                dbHelper.getResultImageByImageLink(Uri.parse(resultImage.image_link))
+                resultImage.image_link?.let { dbService.getResultImageByImageLink(it) }
             val origId = selectedImage?.originalImgID
 
-            dbHelper.deleteResultImageByUri(resultImage.image_link.toString())
+            dbService.deleteResultImageByImageLink(resultImage.image_link.toString())
             bookmarkBtn.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
@@ -129,9 +129,9 @@ class ChosenImageFragment : Fragment() {
             )
 
             if (origId != null) {
-                val results = dbHelper.getListOfResultsById(origId)
+                val results = dbService.getListOfResultsById(origId)
                 if (results.isNullOrEmpty()) {
-                    dbHelper.deleteOriginalAndResults(origId)
+                    dbService.deleteOriginalAndResults(origId)
                 }
             }
         }
@@ -147,11 +147,11 @@ class ChosenImageFragment : Fragment() {
     }
 
     private fun originalImageExists(
-        dbHelper: DataBaseHelper,
+        dbService: DatabaseService,
         originalImageUrl: Uri?
     ): DBOriginalImage? {
-        if (dbHelper.getOriginalImageByUri(originalImageUrl.toString()) == null) {
-            dbHelper.putOriginalImage(
+        if (dbService.getOriginalImageByUri(originalImageUrl.toString()) == null) {
+            dbService.putOriginalImage(
                 DBOriginalImage(
                     null, originalImageUrl,
                     Calendar.getInstance().time.toString()
@@ -159,7 +159,7 @@ class ChosenImageFragment : Fragment() {
             )
         }
 
-        return dbHelper.getOriginalImageByUri(originalImageUrl.toString())
+        return dbService.getOriginalImageByUri(originalImageUrl.toString())
     }
 
     private fun sizeCheck(imageView: ImageView) {

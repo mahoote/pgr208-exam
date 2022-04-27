@@ -6,15 +6,12 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import no.kristiania.prg208_1_exam.adapters.SavedCategoryAdapter
-import no.kristiania.prg208_1_exam.adapters.SavedImageAdapter
-import no.kristiania.prg208_1_exam.adapters.SearchImageAdapter
-import no.kristiania.prg208_1_exam.db.DataBaseHelper
+import no.kristiania.prg208_1_exam.model.db.DataBaseRepository
 import no.kristiania.prg208_1_exam.models.AllSearches
 import no.kristiania.prg208_1_exam.models.DBResultImage
 
@@ -30,7 +27,7 @@ class SavedActivity : AppCompatActivity() {
         Globals.setHeaderFragment(supportFragmentManager)
         overridePendingTransition(0, 0)
 
-        val dbHelper = DataBaseHelper(applicationContext)
+        val dbHelper = DataBaseRepository(applicationContext)
         val allOriginalImages = dbHelper.getAllOriginalImages()
         val allSearchesList: MutableList<AllSearches> = ArrayList()
 

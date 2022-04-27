@@ -1,4 +1,4 @@
-package no.kristiania.prg208_1_exam.db
+package no.kristiania.prg208_1_exam.model.db
 
 import android.content.ContentValues
 import android.content.Context
@@ -9,9 +9,10 @@ import android.net.Uri
 import android.util.Log
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
+import java.net.URL
 
-class DataBaseHelper(
-    context: Context?,
+class DataBaseRepository(
+    context: Context,
 ) : SQLiteOpenHelper(context, "prg208.db", null, 1) {
 
     companion object {
@@ -67,6 +68,9 @@ class DataBaseHelper(
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_RESULT_IMAGE")
     }
 
+    fun clear() {
+        this.writableDatabase?.execSQL("VACUUM")
+    }
 
     fun putOriginalImage(dbOriginalImage: DBOriginalImage): Boolean {
         val db: SQLiteDatabase = this.writableDatabase
@@ -77,12 +81,11 @@ class DataBaseHelper(
 
         val origImgInsertStatus = db.insert(TABLE_ORIGINAL_IMAGE, null, originalImageCV)
 
-        // TODO: Error handling
         if (origImgInsertStatus < 0) {
-            closeDB(db)
+            db.close()
             return false
         }
-        closeDB(db)
+        db.close()
         return true
     }
 
@@ -103,15 +106,13 @@ class DataBaseHelper(
             resultImageCV.put(COLUMN_FK_ORIGINAL_IMG_ID, img.originalImgID)
 
             val resultInsertStatus = db.insert(TABLE_RESULT_IMAGE, null, resultImageCV)
-            Log.d("db", "truing to save" + resultImageCV.toString())
-            Log.d("db", "put status result img : " + resultInsertStatus)
-            // TODO: Error handling
+
             if (resultInsertStatus < 0) {
-                closeDB(db)
+                db.close()
                 return false
             }
         }
-        closeDB(db)
+        db.close()
         return true
     }
 
@@ -120,23 +121,22 @@ class DataBaseHelper(
         val db = this.readableDatabase
 
         val resultList: ArrayList<DBOriginalImage> = arrayListOf()
-
         var cursor: Cursor? = null
+
         if (db != null) {
             cursor = db.rawQuery(query, null)
+            cursor.close()
         }
 
         if (cursor?.count != 0) {
-            // there is data
             while (cursor?.moveToNext() == true) {
                 val id = cursor.getInt(0)
                 val uri = cursor.getString(1)
                 val created = cursor.getString(2)
                 resultList.add(DBOriginalImage(id, Uri.parse(uri), created))
             }
-        } else {
-            // TODO: Error handling: there is no data.
         }
+        db.close()
         return resultList
     }
 
@@ -145,14 +145,14 @@ class DataBaseHelper(
         val db = this.readableDatabase
 
         val resultList: ArrayList<DBResultImage> = arrayListOf()
-
         var cursor: Cursor? = null
+
         if (db != null) {
             cursor = db.rawQuery(query, null)
+            cursor.close()
         }
 
         if (cursor?.count != 0) {
-            // there is data
             while (cursor?.moveToNext() == true) {
                 val id = cursor.getInt(0)
                 val storeLink = cursor.getString(1)
@@ -181,64 +181,22 @@ class DataBaseHelper(
                     )
                 )
             }
-        } else {
-            // TODO: Error handling: there is no data.
         }
-        return resultList
-    }
 
-    private fun closeDB(db: SQLiteDatabase){
         db.close()
-    }
-
-    fun clear() {
-        this.writableDatabase?.execSQL("VACUUM")
-    }
-
-    fun getOriginalImageByUri(imageUri: String): DBOriginalImage? {
-        val originals = getAllOriginalImages()
-        var dbOriginalImage: DBOriginalImage? = null
-        Log.d("db", "input uri :" + imageUri)
-
-        for (o in originals) {
-            Log.d("db", "correct uri :" + o.uri)
-            if(o.uri == Uri.parse(imageUri)) {
-                dbOriginalImage = o
-            }
-        }
-        if(dbOriginalImage != null) {
-            return dbOriginalImage
-        }
-        // TODO: No image found.
-        return dbOriginalImage
-    }
-
-    fun getOriginalImageById(id: Int): DBOriginalImage? {
-        val originals = getAllOriginalImages()
-        var dbOriginalImage: DBOriginalImage? = null
-
-        for (o in originals) {
-            if(o.id == id) {
-                dbOriginalImage = o
-            }
-        }
-        if(dbOriginalImage != null) {
-            return dbOriginalImage
-        }
-        // TODO: No image found.
-        return dbOriginalImage
+        return resultList
     }
 
     fun getListOfResultsById(originalImageId: Int): ArrayList<DBResultImage> {
-        val query = "SELECT * FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = $originalImageId"
+        val query = "SELECT * FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = '${originalImageId}'"
         val db = this.readableDatabase
 
         val resultList: ArrayList<DBResultImage> = arrayListOf()
-
         var cursor: Cursor? = null
 
         if (db != null) {
             cursor = db.rawQuery(query, null)
+            cursor.close()
         }
 
         if (cursor?.count != 0) {
@@ -271,24 +229,21 @@ class DataBaseHelper(
                     )
                 )
             }
-        } else {
-            // TODO: Error handling: there is no data.
         }
+
         return resultList
     }
 
-    fun getResultImageByImageLink(imageLink: Uri) : DBResultImage? {
-        val uriString = imageLink.toString()
+    fun getResultImageByImageLink(imageLink: String) : DBResultImage? {
         val db = this.readableDatabase
 
-        val query = "SELECT * FROM RESULT_IMAGE WHERE IMAGE_LINK = '${uriString}'"
-
+        val query = "SELECT * FROM RESULT_IMAGE WHERE IMAGE_LINK = '${imageLink}'"
         var cursor: Cursor? = null
-
         var dbResultImage: DBResultImage? = null
 
         if (db != null) {
             cursor = db.rawQuery(query, null)
+            cursor.close()
         }
 
         if (cursor?.count != 0) {
@@ -321,15 +276,14 @@ class DataBaseHelper(
                 )
 
             }
-        } else {
-            // TODO: Error handling: there is no data.
         }
+
         return dbResultImage
     }
 
-    fun deleteResultImageByUri(uri: String){
+    fun deleteResultImageByImageLink(imageLink: String){
         val db = this.writableDatabase
-        val query = "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_IMAGE_LINK = '${uri}'"
+        val query = "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_IMAGE_LINK = '${imageLink}'"
         db.execSQL(query)
     }
 

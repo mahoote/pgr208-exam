@@ -24,9 +24,8 @@ import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
 import no.kristiania.prg208_1_exam.Globals
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.SearchActivity
-import no.kristiania.prg208_1_exam.db.DataBaseHelper
+import no.kristiania.prg208_1_exam.model.db.DataBaseRepository
 import no.kristiania.prg208_1_exam.models.CachedImages
-import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import no.kristiania.prg208_1_exam.runnables.FetchImagesRunnable
@@ -41,7 +40,7 @@ class UploadImageFragment : Fragment() {
 
     private lateinit var imageUri: Uri
     private lateinit var imageFilePath: String
-    private var dbHelper: DataBaseHelper? = null
+    private var dbRepository: DataBaseRepository? = null
     private lateinit var loadingDialog: LoadingDialog
     private var waitForThread: Boolean = true
 
@@ -131,7 +130,7 @@ class UploadImageFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        dbHelper = DataBaseHelper(context)
+        dbRepository = DataBaseRepository(context)
     }
 
     private fun printRealPath(uri: Uri, TAG: String = "m_debug") {
