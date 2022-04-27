@@ -147,18 +147,18 @@ class ChosenImageFragment : Fragment() {
 
     private fun originalImageExists(
         dbHelper: DataBaseHelper,
-        originalImageUrl: Uri?
+        origImgUri: Uri?
     ): DBOriginalImage? {
-        if (dbHelper.getOriginalImageByUri(originalImageUrl.toString()) == null) {
+        if (dbHelper.getOriginalImageByUri(origImgUri.toString()) == null) {
             dbHelper.putOriginalImage(
                 DBOriginalImage(
-                    null, originalImageUrl,
+                    null, origImgUri,
                     Calendar.getInstance().time.toString()
                 )
             )
         }
 
-        return dbHelper.getOriginalImageByUri(originalImageUrl.toString())
+        return dbHelper.getOriginalImageByUri(origImgUri.toString())
     }
 
     private fun sizeCheck(imageView: ImageView) {
