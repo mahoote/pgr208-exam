@@ -16,12 +16,12 @@ class FetchImagesRunnable(private val fragment: UploadImageFragment, private val
         ApiService().getImages(this, fragment, searchEngine, response)
     }
 
-    fun onSuccessfulGet(images: ArrayList<ResultImage?>, engine: String, url: String) {
+    fun onSuccessfulGet(images: ArrayList<ResultImage?>, engine: String) {
         val mainLooper = Looper.getMainLooper()
 
         Handler(mainLooper).post {
             if(images.size > 0) {
-                fragment.onSuccessfulGet(images, engine, url)
+                fragment.onSuccessfulGet(images, engine)
             }
         }
     }

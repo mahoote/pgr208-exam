@@ -1,5 +1,6 @@
 package no.kristiania.prg208_1_exam.fragments
 
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +25,10 @@ import kotlin.collections.ArrayList
 
 class ChosenImageFragment : Fragment() {
 
+    var TAG = "bitmap_debug"
+
+    private lateinit var imageView: ImageView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -31,7 +36,7 @@ class ChosenImageFragment : Fragment() {
         // Inflate the layout for this fragment
         val v =  inflater.inflate(R.layout.fragment_chosen_image, container, false)
 
-        val originalImageUrl: Uri? = Uri.parse(arguments?.getString("originalImageUrl"))
+        val origImgUri: Uri? = Uri.parse(arguments?.getString("uriString"))
 
         v.findViewById<ImageButton>(R.id.cif_close_btn).setOnClickListener {
             Log.i("debug", "Close")
@@ -41,7 +46,7 @@ class ChosenImageFragment : Fragment() {
         val resultImage = arguments?.getSerializable("resultImage") as ResultImage
         val dbService = DatabaseService(requireContext())
 
-        val imageView = v.findViewById<ImageView>(R.id.cif_chosen_img)
+        imageView = v.findViewById(R.id.cif_chosen_img)
         val nameView = v.findViewById<TextView>(R.id.cif_img_name_txt)
         val descView = v.findViewById<TextView>(R.id.cif_img_desc_view)
 
@@ -49,6 +54,10 @@ class ChosenImageFragment : Fragment() {
 
         imageView.post {
             sizeCheck(imageView)
+
+            // TODO: Save resultBitmap to db instead of link.
+            val resultBitmap = Globals.drawableToBitmap(imageView.drawable as BitmapDrawable)
+            Log.d(TAG, "onCreateView: resultBitmap: $resultBitmap")
         }
 
         nameView.text = resultImage.name
@@ -62,7 +71,7 @@ class ChosenImageFragment : Fragment() {
         setCorrectBookmarkIcon(dbResultImage, bookmarkBtn)
 
         bookmarkBtn.setOnClickListener {
-            bookmarkBtnClicked(dbResultImage, dbService, originalImageUrl, resultImage, bookmarkBtn)
+            bookmarkBtnClicked(dbResultImage, dbService, origImgUri, resultImage, bookmarkBtn)
         }
         v.findViewById<ImageButton>(R.id.cif_web_btn).setOnClickListener {
             webBtnClicked(resultImage)
@@ -93,13 +102,13 @@ class ChosenImageFragment : Fragment() {
 
     private fun bookmarkBtnClicked(
         dbResultImage: DBResultImage?,
+        origImgUri: Uri?,
         dbService: DatabaseService,
-        originalImageUrl: Uri?,
         resultImage: ResultImage,
         bookmarkBtn: ImageButton
     ) {
         if (dbResultImage == null) {
-            val originalImage = originalImageExists(dbService, originalImageUrl)
+            val originalImage = originalImageExists(dbService, origImgUri)
 
             val resultImages = arrayListOf<ResultImage?>()
             resultImages.add(resultImage)
@@ -148,18 +157,18 @@ class ChosenImageFragment : Fragment() {
 
     private fun originalImageExists(
         dbService: DatabaseService,
-        originalImageUrl: Uri?
+        origImgUri: Uri?
     ): DBOriginalImage? {
-        if (dbService.getOriginalImageByUri(originalImageUrl.toString()) == null) {
+        if (dbService.getOriginalImageByUri(origImgUri.toString()) == null) {
             dbService.putOriginalImage(
                 DBOriginalImage(
-                    null, originalImageUrl,
+                    null, origImgUri,
                     Calendar.getInstance().time.toString()
                 )
             )
         }
 
-        return dbService.getOriginalImageByUri(originalImageUrl.toString())
+        return dbService.getOriginalImageByUri(origImgUri.toString())
     }
 
     private fun sizeCheck(imageView: ImageView) {

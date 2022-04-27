@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Exception
 import android.annotation.SuppressLint
+import android.graphics.drawable.BitmapDrawable
 import android.widget.FrameLayout
 import androidx.core.content.ContentProviderCompat.requireContext
 import no.kristiania.prg208_1_exam.fragments.NoSavedResultsFragment
@@ -260,6 +261,10 @@ object Globals : AppCompatActivity() {
     fun toUrl(context: Context, uriString: String) {
         val uri = Uri.parse(uriString)
         context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+    }
+
+    fun drawableToBitmap(drawable: BitmapDrawable): Bitmap {
+        return drawable.bitmap
     }
 
 }
