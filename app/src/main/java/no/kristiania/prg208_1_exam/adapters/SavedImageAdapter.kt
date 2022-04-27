@@ -1,20 +1,28 @@
 package no.kristiania.prg208_1_exam.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import no.kristiania.prg208_1_exam.models.CategoryItem
-import no.kristiania.prg208_1_exam.R
+import com.squareup.picasso.Picasso
+import no.kristiania.prg208_1_exam.*
 
-class CategoryItemRecyclerAdapter(
+import com.squareup.picasso.Callback
+import no.kristiania.prg208_1_exam.models.DBResultImage
+import java.lang.Exception
+
+
+class SavedImageAdapter(
     private val context: Context,
-    private val categoryItemList: List<CategoryItem>
+    private val categoryItemList: List<DBResultImage>
 ) :
-    RecyclerView.Adapter<CategoryItemRecyclerAdapter.CategoryItemViewHolder>() {
+    RecyclerView.Adapter<SavedImageAdapter.CategoryItemViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryItemViewHolder {
+
         return CategoryItemViewHolder(
             LayoutInflater.from(
                 context
@@ -23,7 +31,19 @@ class CategoryItemRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: CategoryItemViewHolder, position: Int) {
-        holder.itemImage.setImageResource(categoryItemList[position].imageUrl)
+        val resultImage = categoryItemList[position]
+
+        Log.d("i_debug", "onBindViewHolder: Loading image")
+
+        Picasso.get().load(resultImage.imageLink).placeholder(R.drawable.result_image_placeholder).into(holder.itemImage, object : Callback.EmptyCallback() {
+            override fun onSuccess() {
+                Log.d("i_debug", "onSuccess: Image loaded!")
+            }
+
+            override fun onError(e: Exception?) {
+                Log.e("i_debug", "onError: Something went wrong")
+            }
+        })
     }
 
     override fun getItemCount(): Int {
@@ -31,6 +51,7 @@ class CategoryItemRecyclerAdapter(
     }
 
     class CategoryItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         var itemImage: ImageView = itemView.findViewById(R.id.item_image)
 
     }

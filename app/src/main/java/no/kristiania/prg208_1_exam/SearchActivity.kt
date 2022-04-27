@@ -1,10 +1,11 @@
 package no.kristiania.prg208_1_exam
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -12,7 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import no.kristiania.prg208_1_exam.Globals.loadImage
-import no.kristiania.prg208_1_exam.adapters.ImageAdapter
+import no.kristiania.prg208_1_exam.adapters.SearchImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.ResultImage
@@ -22,7 +23,9 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var fragmentManager: FragmentManager
-    private lateinit var adapter: ImageAdapter
+    private lateinit var adapter: SearchImageAdapter
+    private lateinit var results: ArrayList<ResultImage>
+    private var originalImageUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +40,12 @@ class SearchActivity : AppCompatActivity() {
 
         if(bundle != null) {
             val chosenImageUri = bundle!!.getString("chosenImageUri")
-            val results = bundle.getSerializable("results")
+            results = bundle.getSerializable("results") as ArrayList<ResultImage>
+            originalImageUrl = bundle.getString("originalImageUrl")
 
             Log.d("m_debug", "$results")
 
-            adapter = setRecyclerView(results as ArrayList<ResultImage>)
+            adapter = setRecyclerView(results)
             setOriginalImage(chosenImageUri)
         } else {
 
@@ -55,25 +59,28 @@ class SearchActivity : AppCompatActivity() {
                         latestCache = cachedImage
                     }
                 }
-
                 adapter = setRecyclerView(latestCache!!.value.images as ArrayList<ResultImage>)
                 setOriginalImage(latestCache!!.value.imageUri.toString())
+            }
+            else {
+                val container: Int = R.id.se_content_fragment_container
+                val frameLayout = findViewById<FrameLayout>(container)
+                Globals.showEmptyView(frameLayout, container, fragmentManager)
             }
         }
 
         if(::adapter.isInitialized) {
             val chosenImageFragment = ChosenImageFragment()
-            adapter.setOnItemClickListener(object : ImageAdapter.OnItemClickListener {
+            adapter.setOnItemClickListener(object : SearchImageAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int) {
-                    Toast.makeText(applicationContext, "Button $position pressed", Toast.LENGTH_SHORT).show()
-                    switchFragment(chosenImageFragment)
+                    replaceFragment(chosenImageFragment, position, originalImageUrl)
                 }
             })
         }
     }
 
-    private fun setRecyclerView(results: ArrayList<ResultImage>): ImageAdapter {
-        val adapter = ImageAdapter(results)
+    private fun setRecyclerView(results: ArrayList<ResultImage>): SearchImageAdapter {
+        val adapter = SearchImageAdapter(results)
         recyclerView = findViewById(R.id.s_results_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
@@ -90,8 +97,24 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun switchFragment(fragment: Fragment) {
-        fragmentManager.beginTransaction()
-            .replace(R.id.se_content_layout, fragment, "content_fragment").commit()
+    private fun replaceFragment(fragment: Fragment, position: Int, originalImageUrl: String?) {
+        if(::results.isInitialized) {
+            val bundle = Bundle()
+            bundle.putSerializable("resultImage", results[position])
+
+            if(originalImageUrl != null) {
+                bundle.putString("originalImageUrl", originalImageUrl)
+            }
+
+            fragment.arguments = bundle
+
+            fragmentManager.beginTransaction()
+                .replace(R.id.se_content_layout, fragment, "content_fragment").commit()
+        }
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 }

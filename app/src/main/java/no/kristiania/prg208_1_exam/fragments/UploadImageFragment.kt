@@ -1,6 +1,7 @@
 package no.kristiania.prg208_1_exam.fragments
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -11,19 +12,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.SwitchCompat
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.jacksonandroidnetworking.JacksonParserFactory
 import com.theartofdev.edmodo.cropper.CropImageView
 import no.kristiania.prg208_1_exam.*
 import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
+import no.kristiania.prg208_1_exam.Globals
+import no.kristiania.prg208_1_exam.R
+import no.kristiania.prg208_1_exam.SearchActivity
+import no.kristiania.prg208_1_exam.db.DataBaseHelper
 import no.kristiania.prg208_1_exam.models.CachedImages
+import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
+import no.kristiania.prg208_1_exam.runnables.FetchImagesRunnable
 import no.kristiania.prg208_1_exam.services.ApiService
 import java.io.File
 import java.util.*
@@ -35,7 +41,13 @@ class UploadImageFragment : Fragment() {
 
     private lateinit var imageUri: Uri
     private lateinit var imageFilePath: String
+    private var dbHelper: DataBaseHelper? = null
     private lateinit var loadingDialog: LoadingDialog
+    private var waitForThread: Boolean = true
+
+    private lateinit var googleThread: Thread
+    private lateinit var bingThread: Thread
+    private lateinit var tineyeThread: Thread
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,16 +75,12 @@ class UploadImageFragment : Fragment() {
         loadingDialog = LoadingDialog(requireActivity())
 
         // Upload btn.
-        v.findViewById<AppCompatImageButton>(R.id.uf_upload_search_btn).setOnClickListener{
-
-            loadingDialog.startLoadingDialog()
-
+        v.findViewById<ImageButton>(R.id.uf_upload_search_btn).setOnClickListener{
             if(uploadImage.isShowCropOverlay) {
                 val cropped: Bitmap = uploadImage.croppedImage
                 val fileName = Globals.getFileNameFromUri(requireContext(), imageUri)
                 imageUri = context?.let { context -> Globals.bitmapToUri(context, cropped, "${fileName}_crop") }!!
             }
-
             retrieveImagesFromSrc()
         }
 
@@ -121,12 +129,19 @@ class UploadImageFragment : Fragment() {
         return v
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        dbHelper = DataBaseHelper(context)
+    }
+
     private fun printRealPath(uri: Uri, TAG: String = "m_debug") {
         val path = Globals.getPathFromURI(requireActivity(), uri)
         Log.d(TAG, "printRealPath: $path")
     }
 
     private fun retrieveImagesFromSrc() {
+        waitForThread = true
+        loadingDialog.startLoadingDialog()
         imageFilePath = Globals.getPathFromURI(requireActivity(), imageUri).toString()
 
         if (Globals.cachedImages[imageFilePath] != null) {
@@ -151,34 +166,53 @@ class UploadImageFragment : Fragment() {
 
     fun onErrorResponse(anError: ANError) {
         Log.e("Response", "An error occurred: ${Log.getStackTraceString(anError)}")
-        anError.printStackTrace()
 
-        val errorStatusTxt = requireActivity().findViewById<TextView>(R.id.uf_error_status_txt)
-        errorStatusTxt.visibility = VISIBLE
-        loadingDialog.dismissDialog()
+        if(waitForThread) {
+            waitForThread = false
+            val errorStatusTxt = requireActivity().findViewById<TextView>(R.id.uf_error_status_txt)
+            errorStatusTxt.visibility = VISIBLE
+            loadingDialog.endLoadingDialog()
+        }
     }
 
     fun onSuccessfulPost(response: String) {
         Log.d("Response", "Response = Success!")
         Log.d("Response", "After api: $response")
 
-        ApiService().getImages(this, "bing", response)
+        val fetchBingRunnable = FetchImagesRunnable(this,"bing", response)
+        val fetchGoogleRunnable = FetchImagesRunnable(this,"google", response)
+        val fetchTineyeRunnable = FetchImagesRunnable(this,"tineye", response)
+
+        googleThread = Thread(fetchGoogleRunnable)
+        bingThread = Thread(fetchBingRunnable)
+        tineyeThread = Thread(fetchTineyeRunnable)
+
+        googleThread.start()
+        bingThread.start()
+        tineyeThread.start()
     }
 
-    fun onSuccessfulGet(images: ArrayList<ResultImage?>){
-        Log.d("Response", "Get successful")
-        Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
-        startSearchActivity(SearchActivity(), images)
+    fun onSuccessfulGet(images: ArrayList<ResultImage?>, returnEngine: String, url: String) {
+        Log.d("r_debug", "onSuccessfulGet: Wait for thread: $waitForThread")
+        if(waitForThread) {
+            waitForThread = false
+            Log.d("Response", "Get successful")
+            Log.d("r_debug", "onSuccessfulGet: Return images from $returnEngine")
+            Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
+
+            startSearchActivity(SearchActivity(), images, url)
+        }
+
     }
 
     private fun getCachedImages(cachedImages: CachedImages?) {
         Log.d("Response", "Get cached images")
         cachedImages?.created = Calendar.getInstance().time
         val results = cachedImages?.images
-        startSearchActivity(SearchActivity(), results)
+        startSearchActivity(SearchActivity(), results, null)
     }
 
-    private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?){
+    private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?, url: String?){
         val activityClassName = activity::class.java.name
         val currentActivity = Globals.getCurrentActivity(context)
 
@@ -187,11 +221,15 @@ class UploadImageFragment : Fragment() {
             bundle.putString("chosenImageUri", imageUri.toString())
             bundle.putSerializable("results", results)
 
+            if(url != null){
+                bundle.putString("originalImageUrl", url)
+            }
+
             val intent = Intent(this.requireContext(), activity::class.java)
             intent.putExtras(bundle)
             startActivity(intent)
             Log.d("m_debug", "Starting activity!")
-            loadingDialog.dismissDialog()
+            loadingDialog.endLoadingDialog()
         }
     }
 }

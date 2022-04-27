@@ -1,16 +1,27 @@
 package no.kristiania.prg208_1_exam
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import no.kristiania.prg208_1_exam.adapters.MainRecyclerAdapter
-import no.kristiania.prg208_1_exam.models.AllCategory
-import no.kristiania.prg208_1_exam.models.CategoryItem
+import com.facebook.shimmer.ShimmerFrameLayout
+import no.kristiania.prg208_1_exam.adapters.SavedCategoryAdapter
+import no.kristiania.prg208_1_exam.adapters.SavedImageAdapter
+import no.kristiania.prg208_1_exam.adapters.SearchImageAdapter
+import no.kristiania.prg208_1_exam.db.DataBaseHelper
+import no.kristiania.prg208_1_exam.models.AllSearches
+import no.kristiania.prg208_1_exam.models.DBResultImage
 
 class SavedActivity : AppCompatActivity() {
-    private var mainCategoryRecycler: RecyclerView? = null
-    private var mainRecyclerAdapter: MainRecyclerAdapter? = null
+    private lateinit var mainCategoryRecycler: RecyclerView
+    private lateinit var categoryAdapter: SavedCategoryAdapter
+    private lateinit var shimmerFrameLayout: ShimmerFrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,69 +30,64 @@ class SavedActivity : AppCompatActivity() {
         Globals.setHeaderFragment(supportFragmentManager)
         overridePendingTransition(0, 0)
 
+        val dbHelper = DataBaseHelper(applicationContext)
+        val allOriginalImages = dbHelper.getAllOriginalImages()
+        val allSearchesList: MutableList<AllSearches> = ArrayList()
 
-        val categoryItemList: MutableList<CategoryItem> = ArrayList()
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList.add(CategoryItem(1, R.drawable.ic_launcher_background))
+        shimmerFrameLayout = findViewById(R.id.sa_shimmer_layout)
+        shimmerFrameLayout.startShimmer()
 
 
-        // added in second category
-        val categoryItemList2: MutableList<CategoryItem> = ArrayList()
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList2.add(CategoryItem(1, R.drawable.ic_launcher_background))
+        if (allOriginalImages.size > 0) {
 
+            val mainLooper = Looper.getMainLooper()
 
-        // added in 3rd category
-        val categoryItemList3: MutableList<CategoryItem> = ArrayList()
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList3.add(CategoryItem(1, R.drawable.ic_launcher_background))
+            Thread {
+                allOriginalImages.forEach { originalImage ->
+                    val dbResultImages =
+                        originalImage.id?.let { origId -> dbHelper.getListOfResultsById(origId) }
+                    val originalDbResultImage =
+                        originalImage.id?.let {
+                            DBResultImage(null, null, null,
+                                null, null,null,
+                                null, null, originalImage.uri.toString(), null, it
+                            )}
 
+                    originalDbResultImage?.let { dbResultImages?.add(0, it) }
+                    dbResultImages?.let { allSearchesList.add(AllSearches(originalImage.created.toString(), it)) }
+                }
+                setMainRecycler(allSearchesList)
 
-        // added in 4th category
-        val categoryItemList4: MutableList<CategoryItem> = ArrayList()
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList4.add(CategoryItem(1, R.drawable.ic_launcher_background))
+                Handler(mainLooper).post {
+                    stopLoadingScreen()
+                }
+            }.start()
 
-
-        // added in 5th category
-        val categoryItemList5: MutableList<CategoryItem> = ArrayList()
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-        categoryItemList5.add(CategoryItem(1, R.drawable.ic_launcher_background))
-
-        val allCategoryList: MutableList<AllCategory> = ArrayList()
-        allCategoryList.add(AllCategory("Hollywood", categoryItemList))
-        allCategoryList.add(AllCategory("Best of Oscars", categoryItemList2))
-        allCategoryList.add(AllCategory("Movies Dubbed in Hindi", categoryItemList3))
-        allCategoryList.add(AllCategory("Category 4th", categoryItemList4))
-        allCategoryList.add(AllCategory("Category 5th", categoryItemList5))
-        setMainRecycler(allCategoryList)
+        } else {
+            val fragmentManager = supportFragmentManager
+            val container: Int = R.id.sa_content_fragment_container
+            val frameLayout = findViewById<FrameLayout>(container)
+            Globals.showEmptyView(frameLayout, container, fragmentManager)
+        }
     }
 
-    private fun setMainRecycler(allCategoryList: List<AllCategory>) {
+    private fun setMainRecycler(allSearchesList: List<AllSearches>) {
         mainCategoryRecycler = findViewById(R.id.main_recycler)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
-        mainCategoryRecycler?.layoutManager = layoutManager
-        mainRecyclerAdapter = MainRecyclerAdapter(this, allCategoryList)
-        mainCategoryRecycler?.adapter = mainRecyclerAdapter
+        mainCategoryRecycler.layoutManager = layoutManager
+        categoryAdapter =
+            SavedCategoryAdapter(this, allSearchesList)
+        mainCategoryRecycler.adapter = categoryAdapter
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun stopLoadingScreen() {
+        shimmerFrameLayout.stopShimmer()
+        shimmerFrameLayout.visibility = View.GONE
+        mainCategoryRecycler.visibility = View.VISIBLE
     }
 }

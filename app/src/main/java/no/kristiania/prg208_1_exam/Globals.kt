@@ -21,10 +21,15 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.fragments.HeaderNavFragment
+import no.kristiania.prg208_1_exam.models.DBResultImage
+import no.kristiania.prg208_1_exam.models.ResultImage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Exception
 import android.annotation.SuppressLint
+import android.widget.FrameLayout
+import androidx.core.content.ContentProviderCompat.requireContext
+import no.kristiania.prg208_1_exam.fragments.NoSavedResultsFragment
 
 
 object Globals : AppCompatActivity() {
@@ -175,14 +180,36 @@ object Globals : AppCompatActivity() {
         val fileName = getFileNameFromUri(context, origUri)
 
         Log.d("m_debug", "uriToJPEG: fileName: $fileName")
-        
+
         val imageBitmap = uriToBitmap(context, origUri.toString())
         return bitmapToUri(context, imageBitmap, fileName)
     }
 
     fun getFileNameFromUri(context: Context, origUri: Uri): String {
-        val fullFileName = getFileName(context, origUri)
+        val fullFileName = getFileNameWithFormatFromUri(context, origUri)
         return removeFileFormat(fullFileName)
+    }
+
+    fun convertResultImagesToDBModel(resultImages: ArrayList<ResultImage?>, originalImageId: Int) : ArrayList<DBResultImage> {
+        val dbResultImages = arrayListOf<DBResultImage>()
+
+        resultImages.forEach { resimg ->
+            val dbResultImage = DBResultImage(
+                null,
+                resimg?.store_link,
+                resimg?.name,
+                resimg?.domain,
+                resimg?.tracking_id,
+                resimg?.thumbnail_link,
+                resimg?.thumbnail_link,
+                resimg?.description,
+                resimg?.image_link,
+                resimg?.current_date,
+                originalImageId
+            )
+            dbResultImages.add(dbResultImage)
+        }
+        return dbResultImages
     }
 
     fun getFileNameFromPath(path: String): String {
@@ -200,7 +227,7 @@ object Globals : AppCompatActivity() {
     }
 
     @SuppressLint("Range")
-    private fun getFileName(context: Context, uri: Uri): String {
+    private fun getFileNameWithFormatFromUri(context: Context, uri: Uri): String {
 
         if (uri.scheme == "content") {
             val cursor = context.contentResolver.query(uri, null, null, null, null)
@@ -214,6 +241,25 @@ object Globals : AppCompatActivity() {
         }
 
         return uri.path?.lastIndexOf('/')?.plus(1)?.let { uri.path?.substring(it) }.toString()
+    }
+
+    fun Float.toDp(context: Context): Int {
+        val metrics = context.resources.displayMetrics
+        val fpixels = metrics.density * this
+        return (fpixels + 0.5f).toInt()
+    }
+
+    fun showEmptyView(frameLayout: FrameLayout, fragmentContainer: Int, fragmentManager: FragmentManager) {
+        frameLayout.visibility = View.VISIBLE
+
+        fragmentManager.beginTransaction()
+            .add(fragmentContainer, NoSavedResultsFragment(), "content-fragment")
+            .commit()
+    }
+
+    fun toUrl(context: Context, uriString: String) {
+        val uri = Uri.parse(uriString)
+        context.startActivity(Intent(Intent.ACTION_VIEW, uri))
     }
 
 }

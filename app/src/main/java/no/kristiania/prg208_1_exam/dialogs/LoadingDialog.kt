@@ -19,7 +19,7 @@ class LoadingDialog(private val activity: Activity) {
         dialog.show()
     }
 
-    fun dismissDialog() {
+    fun endLoadingDialog() {
         dialog.dismiss()
     }
 
