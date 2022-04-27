@@ -194,18 +194,18 @@ object Globals : AppCompatActivity() {
     fun convertResultImagesToDBModel(resultImages: ArrayList<ResultImage?>, originalImageId: Int) : ArrayList<DBResultImage> {
         val dbResultImages = arrayListOf<DBResultImage>()
 
-        resultImages.forEach { resimg ->
+        resultImages.forEach { resImg ->
             val dbResultImage = DBResultImage(
                 null,
-                resimg?.store_link,
-                resimg?.name,
-                resimg?.domain,
-                resimg?.tracking_id,
-                resimg?.thumbnail_link,
-                resimg?.thumbnail_link,
-                resimg?.description,
-                resimg?.image_link,
-                resimg?.current_date,
+                resImg?.store_link,
+                resImg?.name,
+                resImg?.domain,
+                resImg?.tracking_id,
+                resImg?.thumbnail_link,
+                resImg?.thumbnail_link,
+                resImg?.description,
+                resImg?.image_link,
+                resImg?.current_date,
                 originalImageId
             )
             dbResultImages.add(dbResultImage)
@@ -265,6 +265,10 @@ object Globals : AppCompatActivity() {
 
     fun drawableToBitmap(drawable: BitmapDrawable): Bitmap {
         return drawable.bitmap
+    }
+
+    fun picassoLoad(src: String, imageView: ImageView) {
+        Picasso.get().load(src).placeholder(R.drawable.result_image_placeholder).into(imageView)
     }
 
 }

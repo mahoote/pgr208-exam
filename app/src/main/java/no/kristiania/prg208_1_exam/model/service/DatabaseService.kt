@@ -17,33 +17,40 @@ class DatabaseService(context: Context) {
     }
 
     fun getResultImageByImageLink(imageLink: String): DBResultImage? {
-        dbRepo.close()
-        return dbRepo.getResultImageByImageLink(imageLink)
+        val result = dbRepo.getResultImageByImageLink(imageLink)
+
+        Log.d("bitmap_debug", "getResultImageByImageLink: result: $result")
+
+        close()
+        return result
     }
 
     fun putResultImages(dbResultImages: ArrayList<DBResultImage>) : Boolean {
         // TODO: Check if bitmap exists.
-        dbRepo.close()
-        return dbRepo.putResultImages(dbResultImages)
+        val result = dbRepo.putResultImages(dbResultImages)
+        close()
+        return result
     }
 
     fun deleteResultImageByImageLink(imageLink: String) {
-        dbRepo.close()
         dbRepo.deleteResultImageByImageLink(imageLink)
+        close()
     }
 
     fun getListOfResultsById(id: Int): ArrayList<DBResultImage> {
-        dbRepo.close()
-        return dbRepo.getListOfResultsById(id)
+        val result = dbRepo.getListOfResultsById(id)
+        close()
+        return result
     }
 
     fun deleteOriginalAndResults(id: Int) {
-        dbRepo.close()
         dbRepo.deleteOriginalAndResults(id)
+        close()
     }
 
     fun getOriginalImageByUri(imageUri: String): DBOriginalImage? {
         val originals = dbRepo.getAllOriginalImages()
+        close()
         var dbOriginalImage: DBOriginalImage? = null
         for (o in originals) {
             if(o.uri == Uri.parse(imageUri)) {
@@ -59,8 +66,9 @@ class DatabaseService(context: Context) {
     }
 
     fun putOriginalImage(dbOriginalImage: DBOriginalImage) : Boolean {
-        dbRepo.close()
-        return dbRepo.putOriginalImage(dbOriginalImage)
+        val result = dbRepo.putOriginalImage(dbOriginalImage)
+        close()
+        return result
     }
 
     fun close() {
@@ -68,14 +76,20 @@ class DatabaseService(context: Context) {
     }
 
     fun getAllResultImages(): ArrayList<DBResultImage> {
-        return dbRepo.getAllResultImages()
+        val result = dbRepo.getAllResultImages()
+        close()
+        return result
     }
 
     fun getAllOriginalImages(): ArrayList<DBOriginalImage> {
-        return dbRepo.getAllOriginalImages()
+        val result = dbRepo.getAllOriginalImages()
+        close()
+        return result
     }
 
     fun getListOfResultsAsSearchItemById(id: Int): ArrayList<DBResultImage> {
-        return dbRepo.getListOfResultsById(id)
+        val result = dbRepo.getListOfResultsById(id)
+        close()
+        return result
     }
 }

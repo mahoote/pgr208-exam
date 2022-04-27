@@ -12,6 +12,7 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.Globals
+import no.kristiania.prg208_1_exam.Globals.picassoLoad
 import no.kristiania.prg208_1_exam.Globals.toDp
 import no.kristiania.prg208_1_exam.Globals.toUrl
 import no.kristiania.prg208_1_exam.R
@@ -28,29 +29,27 @@ class ChosenImageFragment : Fragment() {
     var TAG = "bitmap_debug"
 
     private lateinit var imageView: ImageView
+    private lateinit var resultImage: ResultImage
+    private lateinit var dbService: DatabaseService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val v =  inflater.inflate(R.layout.fragment_chosen_image, container, false)
 
-        val origImgUri: Uri? = Uri.parse(arguments?.getString("uriString"))
-
-        v.findViewById<ImageButton>(R.id.cif_close_btn).setOnClickListener {
-            Log.i("debug", "Close")
-            parentFragmentManager.beginTransaction().remove(this).commit()
-        }
-
-        val resultImage = arguments?.getSerializable("resultImage") as ResultImage
-        val dbService = DatabaseService(requireContext())
-
+        dbService = DatabaseService(requireContext())
+        resultImage = arguments?.getSerializable("resultImage") as ResultImage
         imageView = v.findViewById(R.id.cif_chosen_img)
+
+        val origImgUri: Uri? = Uri.parse(arguments?.getString("uriString"))
+        val bookmarkBtn = v.findViewById<ImageButton>(R.id.cif_bookmark_btn)
         val nameView = v.findViewById<TextView>(R.id.cif_img_name_txt)
         val descView = v.findViewById<TextView>(R.id.cif_img_desc_view)
 
-        Picasso.get().load(resultImage.image_link).placeholder(R.drawable.result_image_placeholder).into(imageView)
+        picassoLoad(resultImage.image_link.toString(), imageView)
+        nameView.text = resultImage.name
+        descView.text = resultImage.description
 
         imageView.post {
             sizeCheck(imageView)
@@ -60,19 +59,18 @@ class ChosenImageFragment : Fragment() {
             Log.d(TAG, "onCreateView: resultBitmap: $resultBitmap")
         }
 
-        nameView.text = resultImage.name
-        descView.text = resultImage.description
+        setCorrectBookmarkIcon(bookmarkBtn)
 
-        val bookmarkBtn = v.findViewById<ImageButton>(R.id.cif_bookmark_btn)
-
-        val dbResultImage = resultImage.image_link?.let { dbService.getResultImageByImageLink(it) }
-
-        // Set checked bookmark icon.
-        setCorrectBookmarkIcon(dbResultImage, bookmarkBtn)
-
-        bookmarkBtn.setOnClickListener {
-            bookmarkBtnClicked(dbResultImage, dbService, origImgUri, resultImage, bookmarkBtn)
+        // Close onclick
+        v.findViewById<ImageButton>(R.id.cif_close_btn).setOnClickListener {
+            Log.i("debug", "Close")
+            parentFragmentManager.beginTransaction().remove(this).commit()
         }
+        // Bookmark onclick
+        bookmarkBtn.setOnClickListener {
+            bookmarkBtnClicked(origImgUri, resultImage, bookmarkBtn)
+        }
+        // Web onclick
         v.findViewById<ImageButton>(R.id.cif_web_btn).setOnClickListener {
             webBtnClicked(resultImage)
         }
@@ -80,11 +78,9 @@ class ChosenImageFragment : Fragment() {
         return v
     }
 
-    private fun setCorrectBookmarkIcon(
-        dbResultImage: DBResultImage?,
-        bookmarkBtn: ImageButton
-    ) {
-        if (dbResultImage != null) {
+    private fun setCorrectBookmarkIcon(bookmarkBtn: ImageButton) {
+        val dbResultImage = resultImage.image_link?.let { dbService.getResultImageByImageLink(it) }
+        dbResultImage?.let {
             bookmarkBtn.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
@@ -95,18 +91,15 @@ class ChosenImageFragment : Fragment() {
     }
 
     private fun webBtnClicked(resultImage: ResultImage) {
+        // TODO: Refer to elvis
         resultImage.store_link?.let { it1 -> toUrl(requireContext(), it1) } ?: run {
             Toast.makeText(requireContext(), "Unable to get URL", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun bookmarkBtnClicked(
-        dbResultImage: DBResultImage?,
-        origImgUri: Uri?,
-        dbService: DatabaseService,
-        resultImage: ResultImage,
-        bookmarkBtn: ImageButton
-    ) {
+    private fun bookmarkBtnClicked(origImgUri: Uri?, resultImage: ResultImage, bookmarkBtn: ImageButton) {
+        val dbResultImage = resultImage.image_link?.let { dbService.getResultImageByImageLink(it) }
+
         if (dbResultImage == null) {
             val originalImage = originalImageExists(dbService, origImgUri)
 
@@ -125,8 +118,7 @@ class ChosenImageFragment : Fragment() {
                 )
             }
         } else {
-            val selectedImage =
-                resultImage.image_link?.let { dbService.getResultImageByImageLink(it) }
+            val selectedImage = dbService.getResultImageByImageLink(resultImage.image_link)
             val origId = selectedImage?.originalImgID
 
             dbService.deleteResultImageByImageLink(resultImage.image_link.toString())
@@ -146,19 +138,13 @@ class ChosenImageFragment : Fragment() {
         }
     }
 
-    private fun convertFormat(
-        originalImage: DBOriginalImage?,
-        resultImages: ArrayList<ResultImage?>
-    ): ArrayList<DBResultImage>? {
+    private fun convertFormat(originalImage: DBOriginalImage?, resultImages: ArrayList<ResultImage?>): ArrayList<DBResultImage>? {
         return originalImage?.id?.let { ogi ->
             Globals.convertResultImagesToDBModel(resultImages, ogi)
         }
     }
 
-    private fun originalImageExists(
-        dbService: DatabaseService,
-        origImgUri: Uri?
-    ): DBOriginalImage? {
+    private fun originalImageExists(dbService: DatabaseService, origImgUri: Uri?): DBOriginalImage? {
         if (dbService.getOriginalImageByUri(origImgUri.toString()) == null) {
             dbService.putOriginalImage(
                 DBOriginalImage(
