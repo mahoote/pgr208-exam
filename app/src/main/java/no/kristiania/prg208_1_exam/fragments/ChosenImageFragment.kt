@@ -1,5 +1,6 @@
 package no.kristiania.prg208_1_exam.fragments
 
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +24,10 @@ import kotlin.collections.ArrayList
 
 class ChosenImageFragment : Fragment() {
 
+    var TAG = "bitmap_debug"
+
+    private lateinit var imageView: ImageView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,7 +45,7 @@ class ChosenImageFragment : Fragment() {
         val resultImage = arguments?.getSerializable("resultImage") as ResultImage
         val dbHelper = DataBaseHelper(context)
 
-        val imageView = v.findViewById<ImageView>(R.id.cif_chosen_img)
+        imageView = v.findViewById(R.id.cif_chosen_img)
         val nameView = v.findViewById<TextView>(R.id.cif_img_name_txt)
         val descView = v.findViewById<TextView>(R.id.cif_img_desc_view)
 
@@ -48,6 +53,10 @@ class ChosenImageFragment : Fragment() {
 
         imageView.post {
             sizeCheck(imageView)
+
+            // TODO: Save resultBitmap to db instead of link.
+            val resultBitmap = Globals.drawableToBitmap(imageView.drawable as BitmapDrawable)
+            Log.d(TAG, "onCreateView: resultBitmap: $resultBitmap")
         }
 
         nameView.text = resultImage.name
