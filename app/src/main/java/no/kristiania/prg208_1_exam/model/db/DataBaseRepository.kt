@@ -125,7 +125,6 @@ class DataBaseRepository(
 
         if (db != null) {
             cursor = db.rawQuery(query, null)
-            cursor.close()
         }
 
         if (cursor?.count != 0) {
@@ -137,6 +136,7 @@ class DataBaseRepository(
             }
         }
         db.close()
+        cursor?.close()
         return resultList
     }
 
@@ -196,7 +196,6 @@ class DataBaseRepository(
 
         if (db != null) {
             cursor = db.rawQuery(query, null)
-            cursor.close()
         }
 
         if (cursor?.count != 0) {
@@ -230,7 +229,7 @@ class DataBaseRepository(
                 )
             }
         }
-
+        cursor?.close()
         return resultList
     }
 
@@ -243,7 +242,6 @@ class DataBaseRepository(
 
         if (db != null) {
             cursor = db.rawQuery(query, null)
-            cursor.close()
         }
 
         if (cursor?.count != 0) {
@@ -277,7 +275,7 @@ class DataBaseRepository(
 
             }
         }
-
+        cursor?.close()
         return dbResultImage
     }
 

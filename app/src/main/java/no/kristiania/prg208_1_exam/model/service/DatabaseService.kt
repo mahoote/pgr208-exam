@@ -1,6 +1,8 @@
 package no.kristiania.prg208_1_exam.model.service
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import no.kristiania.prg208_1_exam.model.db.DataBaseRepository
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
@@ -40,17 +42,20 @@ class DatabaseService(context: Context) {
         dbRepo.deleteOriginalAndResults(id)
     }
 
-    fun getOriginalImageByUri(uri: String) : DBOriginalImage? {
-        // TODO: Refactor this to getOriginalImageByBitmap + SELECT STATEMENT?
-        val images = dbRepo.getAllOriginalImages()
-
-        images.forEach {
-            if(it.uri.toString() == uri){
-                return it
+    fun getOriginalImageByUri(imageUri: String): DBOriginalImage? {
+        val originals = dbRepo.getAllOriginalImages()
+        var dbOriginalImage: DBOriginalImage? = null
+        for (o in originals) {
+            if(o.uri == Uri.parse(imageUri)) {
+                dbOriginalImage = o
             }
         }
-        dbRepo.close()
-        return null
+        if(dbOriginalImage != null) {
+            return dbOriginalImage
+        }
+        // TODO: No image found.
+        Log.d("db", "returning" + dbOriginalImage.toString())
+        return dbOriginalImage
     }
 
     fun putOriginalImage(dbOriginalImage: DBOriginalImage) : Boolean {
@@ -73,23 +78,4 @@ class DatabaseService(context: Context) {
     fun getListOfResultsAsSearchItemById(id: Int): ArrayList<DBResultImage> {
         return dbRepo.getListOfResultsById(id)
     }
-
-
-
-
-    /*fun getOriginalImageByUri(imageUri: String): DBOriginalImage? {
-        val originals = dbRepo.getAllOriginalImages()
-        var dbOriginalImage: DBOriginalImage? = null
-        Log.d("db", "input uri :" + imageUri)
-        for (o in originals) {
-            if(o.uri == Uri.parse(imageUri)) {
-                dbOriginalImage = o
-            }
-        }
-        if(dbOriginalImage != null) {
-            return dbOriginalImage
-        }
-        // TODO: No image found.
-        return dbOriginalImage
-    }*/
 }
