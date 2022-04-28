@@ -7,4 +7,12 @@
     <string name="error_message_image_upload">Something went wrong! \nPlease try again or with another image.</string>
     <string name="select_image">Select Image</string>
     <string name="take_photo">Take Photo</string>
+    <string name="original_image">Original Image</string>
+    <string name="results">Results</string>
+    <string name="example_title">Example Title</string>
+    <string name="example_description">Example Description</string>
+    <string name="new_image">New Image</string>
+    <string name="search">Search</string>
+    <string name="saved">Saved</string>
+    <string name="loading">Loading...</string>
 </resources>

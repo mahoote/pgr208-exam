@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="35dp"
                 android:layout_weight="1"
-                android:text="New Image"
+                android:text="@string/new_image"
                 android:textAllCaps="false"
                 android:background="@drawable/nav_gray_btn"
                 android:textColor="@color/white"
@@ -48,7 +48,7 @@
                 android:layout_width="0dp"
                 android:layout_height="35dp"
                 android:layout_weight="1"
-                android:text="Search"
+                android:text="@string/search"
                 android:textAllCaps="false"
                 android:background="@drawable/nav_gray_btn"
                 android:textColor="@color/white"
@@ -59,15 +59,13 @@
                 android:layout_width="0dp"
                 android:layout_height="35dp"
                 android:layout_weight="1"
-                android:text="Saved"
+                android:text="@string/saved"
                 android:textAllCaps="false"
                 android:background="@drawable/nav_gray_btn"
                 android:textColor="@color/white"
                 android:textSize="18sp"/>
 
-
         </LinearLayout>
-
     </LinearLayout>
 
 
