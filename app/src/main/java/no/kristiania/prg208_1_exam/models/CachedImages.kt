@@ -5,6 +5,6 @@ import java.util.*
 
 data class CachedImages(
     var imageUri: Uri,
-    val images: ArrayList<ResultImage?>,
+    val images: ArrayList<DBResultImage?>,
     var created: Date
 )

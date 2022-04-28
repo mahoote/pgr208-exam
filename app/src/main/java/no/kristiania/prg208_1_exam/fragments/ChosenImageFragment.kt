@@ -1,5 +1,6 @@
 package no.kristiania.prg208_1_exam.fragments
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
@@ -13,12 +14,24 @@ import no.kristiania.prg208_1_exam.Globals
 import no.kristiania.prg208_1_exam.Globals.toDp
 import no.kristiania.prg208_1_exam.Globals.toUrl
 import no.kristiania.prg208_1_exam.R
+import no.kristiania.prg208_1_exam.SearchActivity
 import no.kristiania.prg208_1_exam.model.service.DatabaseService
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
 import java.util.*
 
+interface OnDataPass {
+    fun onDataPass(data: Pair<Int, DBResultImage>)
+}
+
 class ChosenImageFragment : Fragment() {
+
+    lateinit var dataPasser: OnDataPass
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        dataPasser = context as OnDataPass
+    }
 
     var TAG = "bitmap_debug"
 
@@ -43,6 +56,7 @@ class ChosenImageFragment : Fragment() {
         val argsChosenBitmap: Bitmap? = arguments?.getParcelable("chosenBitmapImage")
         val argsOrigBitmap: Bitmap? = arguments?.getParcelable("originalBitmapImage")
         val argsOrigDBImageId: Long? = arguments?.getLong("origDBImageId")
+        val argsChosenImagePosition: Int = arguments?.getInt("chosenImagePosition")!!
 
         val bookmarkBtn = v.findViewById<ImageButton>(R.id.cif_bookmark_btn)
         val nameView = v.findViewById<TextView>(R.id.cif_img_name_txt)
@@ -74,7 +88,7 @@ class ChosenImageFragment : Fragment() {
 
         // Close onclick
         v.findViewById<ImageButton>(R.id.cif_close_btn).setOnClickListener {
-            Log.i("debug", "Close")
+            passData(Pair(argsChosenImagePosition, chosenDbResultImage))
             parentFragmentManager.beginTransaction().remove(this).commit()
         }
         // Bookmark onclick
@@ -90,6 +104,8 @@ class ChosenImageFragment : Fragment() {
     }
 
     private fun setCorrectBookmarkIcon(bookmarkBtn: ImageButton, id: Int) {
+        Log.d("bookmark_debug", "setCorrectBookmarkIcon: Set correct bookmark")
+
         val dbResultImage = dbService.getResultImageById(id)
         dbResultImage?.let {
             bookmarkBtn.setImageDrawable(
@@ -184,5 +200,9 @@ class ChosenImageFragment : Fragment() {
             Log.d("p_debug", "sizeCheck: Height is bigger or equal: ${imageView.layoutParams.height}")
         }
         imageView.requestLayout()
+    }
+
+    private fun passData(data: Pair<Int, DBResultImage>) {
+        dataPasser.onDataPass(data)
     }
 }

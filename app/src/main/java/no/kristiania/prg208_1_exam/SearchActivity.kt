@@ -19,7 +19,9 @@ import com.squareup.picasso.Callback
 import no.kristiania.prg208_1_exam.Globals.loadImage
 import no.kristiania.prg208_1_exam.adapters.SearchImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
+import no.kristiania.prg208_1_exam.fragments.OnDataPass
 import no.kristiania.prg208_1_exam.model.service.DatabaseService
+import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
 import no.kristiania.prg208_1_exam.models.ResultImage
@@ -28,12 +30,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity(), OnDataPass {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var fragmentManager: FragmentManager
     private lateinit var adapter: SearchImageAdapter
-    private lateinit var results: ArrayList<DBResultImage>
+    lateinit var results: ArrayList<DBResultImage>
     private lateinit var uriString: String
     private lateinit var origBitmap: Bitmap
     private lateinit var dbService: DatabaseService
@@ -112,24 +114,24 @@ class SearchActivity : AppCompatActivity() {
             val frameLayout = findViewById<FrameLayout>(container)
             Globals.showEmptyView(frameLayout, container, fragmentManager)
 
-//            var latestCache: Map.Entry<String, CachedImages>? = null
-//            if(Globals.cachedImages.isNotEmpty()) {
-//                Globals.cachedImages.forEach { cachedImage ->
-//                    latestCache?.let {
-//                        if(it.value.created < cachedImage.value.created)
-//                            latestCache = cachedImage
-//                    } ?: run {
-//                        latestCache = cachedImage
-//                    }
-//                }
-//                adapter = setRecyclerView(latestCache!!.value.images as ArrayList<ResultImage>)
-//                setOriginalImage(latestCache!!.value.imageUri.toString())
-//            }
-//            else {
-//                val container: Int = R.id.se_content_fragment_container
-//                val frameLayout = findViewById<FrameLayout>(container)
-//                Globals.showEmptyView(frameLayout, container, fragmentManager)
-//            }
+            var latestCache: Map.Entry<String, CachedImages>? = null
+            if(Globals.cachedImages.isNotEmpty()) {
+                Globals.cachedImages.forEach { cachedImage ->
+                    latestCache?.let {
+                        if(it.value.created < cachedImage.value.created)
+                            latestCache = cachedImage
+                    } ?: run {
+                        latestCache = cachedImage
+                    }
+                }
+                adapter = setRecyclerView(latestCache!!.value.images as ArrayList<DBResultImage>)
+                setOriginalImage(latestCache!!.value.imageUri.toString())
+            }
+            else {
+                val container: Int = R.id.se_content_fragment_container
+                val frameLayout = findViewById<FrameLayout>(container)
+                Globals.showEmptyView(frameLayout, container, fragmentManager)
+            }
         }
 
         if(::adapter.isInitialized) {
@@ -183,6 +185,7 @@ class SearchActivity : AppCompatActivity() {
             bundle.putParcelable("chosenBitmapImage", chosenBitmapImage)
             bundle.putParcelable("originalBitmapImage", originalBitmap)
             bundle.putLong("origDBImageId", origDBImageId)
+            bundle.putInt("chosenImagePosition", position)
 
             fragment.arguments = bundle
 
@@ -194,5 +197,9 @@ class SearchActivity : AppCompatActivity() {
     override fun onBackPressed() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+    }
+
+    override fun onDataPass(data: Pair<Int, DBResultImage>) {
+        results[data.first] = data.second
     }
 }

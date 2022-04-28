@@ -143,11 +143,11 @@ class UploadImageFragment : Fragment() {
         loadingDialog.startLoadingDialog()
         imageFilePath = Globals.getPathFromURI(requireActivity(), imageUri).toString()
 
-        if (Globals.cachedImages[imageFilePath] != null) {
-            getCachedImages(Globals.cachedImages[imageFilePath])
-        } else {
+//        if (Globals.cachedImages[imageFilePath] != null) {
+//            getCachedImages(Globals.cachedImages[imageFilePath])
+//        } else {
             uploadImageToServer(imageUri)
-        }
+//        }
     }
 
     private fun initializeAndroidNetworking() {
@@ -197,19 +197,20 @@ class UploadImageFragment : Fragment() {
             waitForThread = false
             Log.d("Response", "Get successful")
             Log.d("r_debug", "onSuccessfulGet: Return images from $returnEngine")
-            Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
+
+//            Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
 
             startSearchActivity(SearchActivity(), images)
         }
 
     }
 
-    private fun getCachedImages(cachedImages: CachedImages?) {
-        Log.d("Response", "Get cached images")
-        cachedImages?.created = Calendar.getInstance().time
-        val results = cachedImages?.images
-        startSearchActivity(SearchActivity(), results)
-    }
+//    private fun getCachedImages(cachedImages: CachedImages?) {
+//        Log.d("Response", "Get cached images")
+//        cachedImages?.created = Calendar.getInstance().time
+//        val results = cachedImages?.images
+//        startSearchActivity(SearchActivity(), results)
+//    }
 
     private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?){
         val activityClassName = activity::class.java.name
