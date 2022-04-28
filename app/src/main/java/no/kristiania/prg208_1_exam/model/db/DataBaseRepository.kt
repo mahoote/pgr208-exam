@@ -68,10 +68,6 @@ class DataBaseRepository(
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_RESULT_IMAGE")
     }
 
-    fun clear() {
-        this.writableDatabase?.execSQL("VACUUM")
-    }
-
     fun putOriginalImage(dbOriginalImage: DBOriginalImage): Long {
         val db: SQLiteDatabase = this.writableDatabase
         val originalImageCV = ContentValues()

@@ -18,7 +18,6 @@ import java.util.*
 class DBServiceUnitTests {
     lateinit var dbService: DatabaseService
 
-
     @Before
     fun setup(){
         dbService = DatabaseService(ApplicationProvider.getApplicationContext())
@@ -28,7 +27,6 @@ class DBServiceUnitTests {
     fun finish(){
         dbService.close()
     }
-
 
     @Test
     fun shouldPutResultImage(){
