@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +22,8 @@ class SavedActivity : AppCompatActivity(), OnDataPass {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: SavedVerticalAdapter
+    private lateinit var fragmentManager: FragmentManager
+    private var allSearchesList: ArrayList<AllSearches> = ArrayList()
 
     // If loading screen is used.
     /*private lateinit var shimmerFrameLayout: ShimmerFrameLayout*/
@@ -29,12 +32,13 @@ class SavedActivity : AppCompatActivity(), OnDataPass {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_saved)
 
+        fragmentManager = supportFragmentManager
+
         Utils.setHeaderFragment(supportFragmentManager)
         overridePendingTransition(0, 0)
 
         val dbService = DatabaseService(this)
         val allOriginalImages = dbService.getAllOriginalImages()
-        val allSearchesList: ArrayList<AllSearches> = ArrayList()
 
         // If loading screen is used.
         /*shimmerFrameLayout = findViewById(R.id.sa_shimmer_layout)
@@ -44,8 +48,8 @@ class SavedActivity : AppCompatActivity(), OnDataPass {
         if (allOriginalImages.size > 0) {
 
             Thread {
-                createAllSearchesList(allOriginalImages, dbService, allSearchesList)
-                initRecyclerView(allSearchesList)
+                createAllSearchesList(allOriginalImages, dbService)
+                initRecyclerView()
 
                 // If loading screen is used.
                 /*Handler(mainLooper).post {
@@ -61,8 +65,10 @@ class SavedActivity : AppCompatActivity(), OnDataPass {
     private fun createAllSearchesList(
         allOriginalImages: ArrayList<DBOriginalImage>,
         dbService: DatabaseService,
-        allSearchesList: ArrayList<AllSearches>
     ) {
+        // Make sure list is empty.
+        allSearchesList = ArrayList()
+
         allOriginalImages.forEach { originalImage ->
             val dbResultImages =
                 originalImage.id?.let { origId -> dbService.getListOfResultsById(origId) }
@@ -94,7 +100,7 @@ class SavedActivity : AppCompatActivity(), OnDataPass {
         Utils.showEmptyView(frameLayout, container, fragmentManager)
     }
 
-    private fun initRecyclerView(allSearchesList: ArrayList<AllSearches>) {
+    private fun initRecyclerView() {
         recyclerView = findViewById(R.id.sa_recycler_view)
 
         recyclerView.apply {
@@ -107,9 +113,16 @@ class SavedActivity : AppCompatActivity(), OnDataPass {
         }
     }
 
+
     override fun onBackPressed() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
+        val contentFragment = fragmentManager.findFragmentByTag("content_fragment")
+
+        if (contentFragment != null) {
+            fragmentManager.beginTransaction().remove(contentFragment).commit()
+        } else {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     // If loading screen is used.
