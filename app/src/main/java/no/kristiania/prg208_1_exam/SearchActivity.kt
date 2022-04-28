@@ -179,6 +179,7 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
     private fun replaceFragment(fragment: Fragment, position: Int, chosenBitmapImage: Bitmap, originalBitmap: Bitmap) {
         if(::results.isInitialized) {
             val bundle = Bundle()
+            // TODO: Parcelable reference: SearchActivity to ChosenImageFragment
             bundle.putParcelable("dbResultImage", results[position])
             bundle.putParcelable("chosenBitmapImage", chosenBitmapImage)
             bundle.putParcelable("originalBitmapImage", originalBitmap)

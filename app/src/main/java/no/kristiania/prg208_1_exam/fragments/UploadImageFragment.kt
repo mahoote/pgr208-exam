@@ -41,10 +41,6 @@ class UploadImageFragment : Fragment() {
     private lateinit var loadingDialog: LoadingDialog
     private var waitForThread: Boolean = true
 
-    private lateinit var googleThread: Thread
-    private lateinit var bingThread: Thread
-    private lateinit var tineyeThread: Thread
-
     private lateinit var loadingDialogTextView: TextView
 
     override fun onCreateView(
@@ -173,8 +169,6 @@ class UploadImageFragment : Fragment() {
         val file = File(uriPath)
         Log.d("m_debug", "uploadImageToServer: file: $file")
         ApiService().postImage(this, file)
-
-        loadingDialogTextView.text = resources.getString(R.string.uploading_api)
     }
 
     fun onErrorResponse(anError: ANError) {
@@ -197,7 +191,7 @@ class UploadImageFragment : Fragment() {
         val fetchText = StringBuilder()
 
         fetchText.append("Fetching images from:\n")
-
+// TODO: Thread reference
         engines.forEach {
             val fetchRunnable = FetchImagesRunnable(this,it, response)
             Thread(fetchRunnable).start()

@@ -34,6 +34,7 @@ class DataBaseRepository(
         const val COLUMN_CURRENT_DATE = "CURRENT_DATE"
     }
 
+
     // TODO: Check injection safety + close resources
 
     override fun onCreate(db: SQLiteDatabase?) {

@@ -108,6 +108,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun replaceFragment(fragment: Fragment, uri: Uri?) {
         val bundle = Bundle()
+        // TODO: Parcelable implementation reference mainactivity to uploadFragment
         bundle.putParcelable("imageUri", uri)
         fragment.arguments = bundle
 
