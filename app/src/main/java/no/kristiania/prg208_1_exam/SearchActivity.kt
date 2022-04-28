@@ -86,6 +86,7 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
                     object :
                         Callback {
                         override fun onSuccess() {
+                            findViewById<TextView>(R.id.s_orig_img_status_txt).visibility = View.INVISIBLE
                             origBitmap = Utils.drawableToBitmap(originalImage.drawable as BitmapDrawable)
                             Log.d("db_debug", "onCreate: set orig image to bitmap: $origBitmap")
 

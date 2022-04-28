@@ -10,7 +10,7 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
@@ -29,6 +29,7 @@ import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import no.kristiania.prg208_1_exam.runnables.FetchImagesRunnable
 import no.kristiania.prg208_1_exam.services.ApiService
+import org.w3c.dom.Text
 import java.io.File
 import kotlin.collections.ArrayList
 
@@ -64,6 +65,8 @@ class UploadImageFragment : Fragment() {
             Log.d(TAG, "onCreateView: Imageuri: $imageUri")
 
             printRealPath(imageUri)
+
+            v.findViewById<TextView>(R.id.uf_upload_img_status_txt).visibility = INVISIBLE
 
             uploadImage.setImageUriAsync(imageUri)
             uploadImage.isShowCropOverlay = false
