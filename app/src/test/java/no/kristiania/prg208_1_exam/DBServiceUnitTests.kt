@@ -2,9 +2,9 @@ package no.kristiania.prg208_1_exam
 
 
 import androidx.test.core.app.ApplicationProvider
-import no.kristiania.prg208_1_exam.model.service.DatabaseService
-import no.kristiania.prg208_1_exam.models.DBOriginalImage
-import no.kristiania.prg208_1_exam.models.DBResultImage
+import no.kristiania.prg208_1_exam.controller.service.DatabaseService
+import no.kristiania.prg208_1_exam.model.models.DBOriginalImage
+import no.kristiania.prg208_1_exam.model.models.DBResultImage
 import org.junit.After
 import org.junit.Test
 import org.junit.Before

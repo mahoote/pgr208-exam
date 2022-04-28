@@ -5,9 +5,8 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
-import no.kristiania.prg208_1_exam.models.DBOriginalImage
-import no.kristiania.prg208_1_exam.models.DBResultImage
+import no.kristiania.prg208_1_exam.model.models.DBOriginalImage
+import no.kristiania.prg208_1_exam.model.models.DBResultImage
 
 class DataBaseRepository(
     context: Context,
