@@ -11,7 +11,6 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import no.kristiania.prg208_1_exam.Globals
 
 object ReadExternalStorage {
 

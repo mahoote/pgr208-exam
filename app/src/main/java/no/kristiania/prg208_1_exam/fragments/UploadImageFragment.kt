@@ -21,17 +21,15 @@ import com.jacksonandroidnetworking.JacksonParserFactory
 import com.theartofdev.edmodo.cropper.CropImageView
 import no.kristiania.prg208_1_exam.*
 import no.kristiania.prg208_1_exam.dialogs.LoadingDialog
-import no.kristiania.prg208_1_exam.Globals
+import no.kristiania.prg208_1_exam.Utils
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.SearchActivity
 import no.kristiania.prg208_1_exam.model.db.DataBaseRepository
-import no.kristiania.prg208_1_exam.models.CachedImages
 import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import no.kristiania.prg208_1_exam.runnables.FetchImagesRunnable
 import no.kristiania.prg208_1_exam.services.ApiService
 import java.io.File
-import java.util.*
 import kotlin.collections.ArrayList
 
 class UploadImageFragment : Fragment() {
@@ -77,8 +75,8 @@ class UploadImageFragment : Fragment() {
         v.findViewById<ImageButton>(R.id.uf_upload_search_btn).setOnClickListener{
             if(uploadImage.isShowCropOverlay) {
                 val cropped: Bitmap = uploadImage.croppedImage
-                val fileName = Globals.getFileNameFromUri(requireContext(), imageUri)
-                imageUri = context?.let { context -> Globals.bitmapToUri(context, cropped, "${fileName}_crop") }!!
+                val fileName = Utils.getFileNameFromUri(requireContext(), imageUri)
+                imageUri = context?.let { context -> Utils.bitmapToUri(context, cropped, "${fileName}_crop") }!!
             }
             retrieveImagesFromSrc()
         }
@@ -86,19 +84,19 @@ class UploadImageFragment : Fragment() {
         // Select new image btn.
         v.findViewById<AppCompatImageButton>(R.id.uf_select_new_btn).setOnClickListener {
             val mainActivity = activity as MainActivity
-            val requestCode = Globals.GALLERY_REQUEST_CODE
+            val requestCode = Utils.GALLERY_REQUEST_CODE
 
             if (ReadExternalStorage.askForStoragePermissions(mainActivity, requestCode)) {
-                mainActivity.startActivityForResult(Globals.openImageGallery(), requestCode)
+                mainActivity.startActivityForResult(Utils.openImageGallery(), requestCode)
             }
         }
         // Take new photo btn.
         v.findViewById<AppCompatImageButton>(R.id.uf_take_photo_btn).setOnClickListener {
             val mainActivity = activity as MainActivity
-            val requestCode = Globals.CAMERA_REQUEST_CODE
+            val requestCode = Utils.CAMERA_REQUEST_CODE
 
             if (ReadExternalStorage.askForStoragePermissions(mainActivity, requestCode)) {
-                mainActivity.startActivityForResult(Globals.openCamera(requireContext()), requestCode)
+                mainActivity.startActivityForResult(Utils.openCamera(requireContext()), requestCode)
             }
         }
 
@@ -134,14 +132,14 @@ class UploadImageFragment : Fragment() {
     }
 
     private fun printRealPath(uri: Uri, TAG: String = "m_debug") {
-        val path = Globals.getPathFromURI(requireActivity(), uri)
+        val path = Utils.getPathFromURI(requireActivity(), uri)
         Log.d(TAG, "printRealPath: $path")
     }
 
     private fun retrieveImagesFromSrc() {
         waitForThread = true
         loadingDialog.startLoadingDialog()
-        imageFilePath = Globals.getPathFromURI(requireActivity(), imageUri).toString()
+        imageFilePath = Utils.getPathFromURI(requireActivity(), imageUri).toString()
 
 //        if (Globals.cachedImages[imageFilePath] != null) {
 //            getCachedImages(Globals.cachedImages[imageFilePath])
@@ -157,7 +155,7 @@ class UploadImageFragment : Fragment() {
 
     private fun uploadImageToServer(uri: Uri) {
         Log.d("m_debug", "uploadImageToServer")
-        val uriPath = Globals.getPathFromURI(requireActivity(), uri).toString()
+        val uriPath = Utils.getPathFromURI(requireActivity(), uri).toString()
         val file = File(uriPath)
         Log.d(TAG, "uploadImageToServer: file: $file")
         ApiService().postImage(this, file)
@@ -214,7 +212,7 @@ class UploadImageFragment : Fragment() {
 
     private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?){
         val activityClassName = activity::class.java.name
-        val currentActivity = Globals.getCurrentActivity(context)
+        val currentActivity = Utils.getCurrentActivity(context)
 
         if(!currentActivity.equals(activityClassName)) {
             val bundle = Bundle()

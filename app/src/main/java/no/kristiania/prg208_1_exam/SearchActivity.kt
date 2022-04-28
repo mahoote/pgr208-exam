@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Callback
-import no.kristiania.prg208_1_exam.Globals.loadImage
+import no.kristiania.prg208_1_exam.Utils.loadImage
 import no.kristiania.prg208_1_exam.adapters.SearchImageAdapter
 import no.kristiania.prg208_1_exam.fragments.ChosenImageFragment
 import no.kristiania.prg208_1_exam.fragments.OnDataPass
@@ -48,7 +48,7 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
 
         fragmentManager = supportFragmentManager
 
-        Globals.setHeaderFragment(fragmentManager)
+        Utils.setHeaderFragment(fragmentManager)
         overridePendingTransition(0, 0)
 
         dbService = DatabaseService(this)
@@ -64,7 +64,7 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
             val resultImages = bundle.getSerializable("results") as ArrayList<ResultImage>
 
             resultImages.forEach { resultImage ->
-                val dbResultImage = Globals.convertResultImageToDBModelNoOriginal(resultImage)
+                val dbResultImage = Utils.convertResultImageToDBModelNoOriginal(resultImage)
                 results.add(dbResultImage)
             }
 
@@ -89,10 +89,10 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
                     object :
                         Callback {
                         override fun onSuccess() {
-                            origBitmap = Globals.drawableToBitmap(originalImage.drawable as BitmapDrawable)
+                            origBitmap = Utils.drawableToBitmap(originalImage.drawable as BitmapDrawable)
                             Log.d("db_debug", "onCreate: set orig image to bitmap: $origBitmap")
 
-                            val byteArray = Globals.bitmapToByteArray(origBitmap)
+                            val byteArray = Utils.bitmapToByteArray(origBitmap)
 
                             origDBImageId = dbService.putOriginalImage(
                                 DBOriginalImage(
@@ -112,11 +112,11 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
 
             val container: Int = R.id.se_content_fragment_container
             val frameLayout = findViewById<FrameLayout>(container)
-            Globals.showEmptyView(frameLayout, container, fragmentManager)
+            Utils.showEmptyView(frameLayout, container, fragmentManager)
 
             var latestCache: Map.Entry<String, CachedImages>? = null
-            if(Globals.cachedImages.isNotEmpty()) {
-                Globals.cachedImages.forEach { cachedImage ->
+            if(Utils.cachedImages.isNotEmpty()) {
+                Utils.cachedImages.forEach { cachedImage ->
                     latestCache?.let {
                         if(it.value.created < cachedImage.value.created)
                             latestCache = cachedImage
@@ -130,7 +130,7 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
             else {
                 val container: Int = R.id.se_content_fragment_container
                 val frameLayout = findViewById<FrameLayout>(container)
-                Globals.showEmptyView(frameLayout, container, fragmentManager)
+                Utils.showEmptyView(frameLayout, container, fragmentManager)
             }
         }
 
@@ -140,7 +140,7 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
                 override fun onItemClick(position: Int) {
 
                     val imageView = adapter.getHolders()[position].img
-                    val chosenBitmapImage = Globals.drawableToBitmap(imageView.drawable as BitmapDrawable)
+                    val chosenBitmapImage = Utils.drawableToBitmap(imageView.drawable as BitmapDrawable)
 
                     replaceFragment(chosenImageFragment, position, chosenBitmapImage, origBitmap)
                 }
@@ -195,8 +195,14 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
     }
 
     override fun onBackPressed() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
+        val contentFragment = fragmentManager.findFragmentByTag("content_fragment")
+
+        if (contentFragment != null) {
+            fragmentManager.beginTransaction().remove(contentFragment).commit()
+        } else {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onDataPass(data: Pair<Int, DBResultImage>) {

@@ -24,7 +24,7 @@ class SavedActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_saved)
 
-        Globals.setHeaderFragment(supportFragmentManager)
+        Utils.setHeaderFragment(supportFragmentManager)
         overridePendingTransition(0, 0)
 
         val dbService = DatabaseService(this)
@@ -64,7 +64,7 @@ class SavedActivity : AppCompatActivity() {
             val fragmentManager = supportFragmentManager
             val container: Int = R.id.sa_content_fragment_container
             val frameLayout = findViewById<FrameLayout>(container)
-            Globals.showEmptyView(frameLayout, container, fragmentManager)
+            Utils.showEmptyView(frameLayout, container, fragmentManager)
         }
     }
 

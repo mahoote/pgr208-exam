@@ -9,12 +9,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
-import no.kristiania.prg208_1_exam.Globals
-import no.kristiania.prg208_1_exam.Globals.toDp
-import no.kristiania.prg208_1_exam.Globals.toUrl
+import no.kristiania.prg208_1_exam.Utils
+import no.kristiania.prg208_1_exam.Utils.toDp
+import no.kristiania.prg208_1_exam.Utils.toUrl
 import no.kristiania.prg208_1_exam.R
-import no.kristiania.prg208_1_exam.SearchActivity
 import no.kristiania.prg208_1_exam.model.service.DatabaseService
 import no.kristiania.prg208_1_exam.models.DBOriginalImage
 import no.kristiania.prg208_1_exam.models.DBResultImage
@@ -41,6 +41,7 @@ class ChosenImageFragment : Fragment() {
     private lateinit var chosenDbResultImage: DBResultImage
     private lateinit var dbService: DatabaseService
     private var origDBImageId: Long = 0
+    private var chosenImagePosition: Int = 0
 
 
     override fun onCreateView(
@@ -56,7 +57,7 @@ class ChosenImageFragment : Fragment() {
         val argsChosenBitmap: Bitmap? = arguments?.getParcelable("chosenBitmapImage")
         val argsOrigBitmap: Bitmap? = arguments?.getParcelable("originalBitmapImage")
         val argsOrigDBImageId: Long? = arguments?.getLong("origDBImageId")
-        val argsChosenImagePosition: Int = arguments?.getInt("chosenImagePosition")!!
+        chosenImagePosition = arguments?.getInt("chosenImagePosition")!!
 
         val bookmarkBtn = v.findViewById<ImageButton>(R.id.cif_bookmark_btn)
         val nameView = v.findViewById<TextView>(R.id.cif_img_name_txt)
@@ -88,8 +89,7 @@ class ChosenImageFragment : Fragment() {
 
         // Close onclick
         v.findViewById<ImageButton>(R.id.cif_close_btn).setOnClickListener {
-            passData(Pair(argsChosenImagePosition, chosenDbResultImage))
-            parentFragmentManager.beginTransaction().remove(this).commit()
+            closeFragment()
         }
         // Bookmark onclick
         bookmarkBtn.setOnClickListener {
@@ -101,6 +101,10 @@ class ChosenImageFragment : Fragment() {
         }
 
         return v
+    }
+
+    private fun closeFragment() {
+        parentFragmentManager.beginTransaction().remove(this).commit()
     }
 
     private fun setCorrectBookmarkIcon(bookmarkBtn: ImageButton, id: Int) {
@@ -128,7 +132,7 @@ class ChosenImageFragment : Fragment() {
     private fun bookmarkBtnClicked(dbResultImage: DBResultImage, bookmarkBtn: ImageButton) {
         TAG = "db_debug"
 
-        val chosenByteArray = Globals.bitmapToByteArray(chosenBitmapImage)
+        val chosenByteArray = Utils.bitmapToByteArray(chosenBitmapImage)
 
         if (dbResultImage.id?.let { dbService.getResultImageById(it) } == null) {
             val originalImage = originalImageExists(dbService, origBitmapImage)
@@ -168,12 +172,12 @@ class ChosenImageFragment : Fragment() {
 
     private fun convertFormat(originalImage: DBOriginalImage?, dbResultImage: DBResultImage, byteArray: ByteArray): DBResultImage? {
         return originalImage?.id?.let { id ->
-            Globals.convertResultImageToDBModel(id, dbResultImage, byteArray)
+            Utils.convertResultImageToDBModel(id, dbResultImage, byteArray)
         }
     }
 
     private fun originalImageExists(dbService: DatabaseService, bitmapImage: Bitmap): DBOriginalImage? {
-        val byteArray = Globals.bitmapToByteArray(bitmapImage)
+        val byteArray = Utils.bitmapToByteArray(bitmapImage)
 
         if (dbService.getOriginalImageById(origDBImageId.toInt()) == null) {
             dbService.putOriginalImage(
@@ -204,5 +208,11 @@ class ChosenImageFragment : Fragment() {
 
     private fun passData(data: Pair<Int, DBResultImage>) {
         dataPasser.onDataPass(data)
+    }
+
+    // TODO: Reference to onDestroy.
+    override fun onDestroy() {
+        passData(Pair(chosenImagePosition, chosenDbResultImage))
+        super.onDestroy()
     }
 }

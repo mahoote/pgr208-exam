@@ -2,7 +2,6 @@ package no.kristiania.prg208_1_exam.fragments
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -63,7 +62,7 @@ class HeaderNavFragment : Fragment() {
 
     private fun startEmptyActivity(activity: Activity){
         val activityClassName = activity::class.java.name
-        val currentActivity = Globals.getCurrentActivity(context)
+        val currentActivity = Utils.getCurrentActivity(context)
 
         if(!currentActivity.equals(activityClassName)) {
             val intent = Intent(requireContext(), activity::class.java)
@@ -72,7 +71,7 @@ class HeaderNavFragment : Fragment() {
     }
 
     private fun highlightCurrentActivity() {
-        val currentActivity = Globals.getCurrentActivity(context)
+        val currentActivity = Utils.getCurrentActivity(context)
         if(currentActivity != null) {
             when {
                 currentActivity.contains("MainActivity") -> {

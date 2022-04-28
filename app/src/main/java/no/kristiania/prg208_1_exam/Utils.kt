@@ -33,7 +33,7 @@ import android.widget.FrameLayout
 import no.kristiania.prg208_1_exam.fragments.NoSavedResultsFragment
 
 
-object Globals : AppCompatActivity() {
+object Utils : AppCompatActivity() {
 
     const val GALLERY_REQUEST_CODE = 100
     const val CAMERA_REQUEST_CODE = 101

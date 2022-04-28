@@ -26,38 +26,48 @@ class MainActivity : AppCompatActivity() {
 
         fragmentManager = supportFragmentManager
 
-        Globals.setHeaderFragment(fragmentManager)
+        Utils.setHeaderFragment(fragmentManager)
         overridePendingTransition(0, 0)
 
+        // Select image onclick
         findViewById<AppCompatButton>(R.id.m_select_image_btn).setOnClickListener {
-            val requestCode = Globals.GALLERY_REQUEST_CODE
-
-            if (ReadExternalStorage.askForStoragePermissions(this, requestCode)) {
-                startActivityForResult(
-                    Globals.openImageGallery(),
-                    requestCode
-                )
-            }
-            else {
-                // TODO: Remove toast!
-//                Toast.makeText(applicationContext, "Unable to open gallery", Toast.LENGTH_SHORT)
-//                    .show()
-            }
+            openGallery()
         }
-
+        // Take photo onclick
         findViewById<AppCompatButton>(R.id.m_take_photo_btn).setOnClickListener {
-            val requestCode = Globals.CAMERA_REQUEST_CODE
+            openCamera()
+        }
+    }
 
-            if (CameraPermission.askForStoragePermissions(this, requestCode)) {
-                startActivityForResult(
-                    Globals.openCamera(this),
-                    requestCode
-                )
-            } else {
-                // TODO: Remove toast!
-//                Toast.makeText(applicationContext, "Unable to open camera", Toast.LENGTH_SHORT)
-//                    .show()
-            }
+    private fun openCamera() {
+        val requestCode = Utils.CAMERA_REQUEST_CODE
+
+        if (CameraPermission.askForStoragePermissions(this, requestCode)) {
+            startActivityForResult(
+                Utils.openCamera(this),
+                requestCode
+            )
+        } else {
+            Toast.makeText(applicationContext, "Give permission to open camera", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    private fun openGallery() {
+        val requestCode = Utils.GALLERY_REQUEST_CODE
+
+        if (ReadExternalStorage.askForStoragePermissions(this, requestCode)) {
+            startActivityForResult(
+                Utils.openImageGallery(),
+                requestCode
+            )
+        } else {
+            Toast.makeText(
+                applicationContext,
+                "Give permission to open gallery",
+                Toast.LENGTH_SHORT
+            )
+                .show()
         }
     }
 
@@ -75,19 +85,19 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                Globals.GALLERY_REQUEST_CODE -> {
-                    val imageUri = data?.data?.let { Globals.uriToJPEG(this, it) }
+                Utils.GALLERY_REQUEST_CODE -> {
+                    val imageUri = data?.data?.let { Utils.uriToJPEG(this, it) }
                     val uploadImageFragment = UploadImageFragment()
                     replaceFragment(uploadImageFragment, imageUri)
                 }
-                Globals.CAMERA_REQUEST_CODE -> {
-                    val currentPhotoPath: String = Globals.currentPhotoPath
+                Utils.CAMERA_REQUEST_CODE -> {
+                    val currentPhotoPath: String = Utils.currentPhotoPath
 
                     Log.d("m_debug", "openCamera: imagepath: $currentPhotoPath")
 
                     val bitmap = BitmapFactory.decodeFile(currentPhotoPath)
-                    val fileName = Globals.getFileNameFromPath(currentPhotoPath)
-                    val imageUri = Globals.bitmapToUri(this, bitmap, fileName)
+                    val fileName = Utils.getFileNameFromPath(currentPhotoPath)
+                    val imageUri = Utils.bitmapToUri(this, bitmap, fileName)
 
                     val uploadImageFragment = UploadImageFragment()
                     replaceFragment(uploadImageFragment, imageUri)

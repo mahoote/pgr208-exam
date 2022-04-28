@@ -7,12 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.*
 
-import com.squareup.picasso.Callback
 import no.kristiania.prg208_1_exam.models.DBResultImage
-import java.lang.Exception
 
 
 class SavedImageAdapter(
@@ -35,7 +32,7 @@ class SavedImageAdapter(
 
         Log.d("i_debug", "onBindViewHolder: Loading image")
 
-        val byteArray = dbResultImage.imageBlob?.let { Globals.byteArrayToBitmap(it) }
+        val byteArray = dbResultImage.imageBlob?.let { Utils.byteArrayToBitmap(it) }
 
         holder.itemImage.setImageBitmap(byteArray)
 
