@@ -31,7 +31,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="80dp"/>
+                android:layout_height="100dp"/>
 
             <ImageView
                 android:id="@+id/cif_chosen_img"
@@ -40,7 +40,8 @@
                 android:layout_gravity="center"
                 android:src="@mipmap/ic_launcher_round"
                 android:adjustViewBounds="true"
-                android:scaleType="fitXY"/>
+                android:scaleType="fitXY"
+                android:layout_marginBottom="10dp"/>
 
             <TextView
                 android:id="@+id/cif_img_name_txt"
