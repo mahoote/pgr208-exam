@@ -53,9 +53,6 @@ class SearchActivity : AppCompatActivity(), OnDataPass {
 
         dbService = DatabaseService(this)
 
-        // TODO: DEBUG!!
-        dbService.clear()
-
         val bundle: Bundle? = intent.extras
 
         if(bundle != null) {

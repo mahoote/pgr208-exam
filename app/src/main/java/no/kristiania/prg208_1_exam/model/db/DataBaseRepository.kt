@@ -85,8 +85,6 @@ class DataBaseRepository(
 
         val origImgId = db.insert(TABLE_ORIGINAL_IMAGE, null, originalImageCV)
 
-        Log.d("db_debug", "putOriginalImage: put status: $origImgId")
-
         db.close()
         return origImgId
     }
@@ -116,7 +114,6 @@ class DataBaseRepository(
     fun getOriginalImageById(id: Int): DBOriginalImage? {
         val query = "SELECT * FROM $TABLE_ORIGINAL_IMAGE WHERE $COLUMN_PK_ORIGINAL_ID = '${id}'"
         val db = this.readableDatabase
-
         var cursor: Cursor? = null
 
         if (db != null) {
@@ -124,7 +121,6 @@ class DataBaseRepository(
         }
 
         if (cursor?.count != 0) {
-
             cursor?.moveToFirst()
             val id = cursor?.getInt(0)
             val byteArray = cursor?.getBlob(1)
@@ -135,15 +131,12 @@ class DataBaseRepository(
 
         db.close()
         cursor.close()
-
         return null
-
     }
 
     fun getAllOriginalImages(): ArrayList<DBOriginalImage> {
         val query = "SELECT * FROM $TABLE_ORIGINAL_IMAGE"
         val db = this.readableDatabase
-
         val resultList: ArrayList<DBOriginalImage> = arrayListOf()
         var cursor: Cursor? = null
 
@@ -159,6 +152,7 @@ class DataBaseRepository(
                 resultList.add(DBOriginalImage(id, byteArray, created))
             }
         }
+
         db.close()
         cursor?.close()
         return resultList
@@ -167,7 +161,6 @@ class DataBaseRepository(
     fun getAllResultImages(): ArrayList<DBResultImage> {
         val query = "SELECT * FROM $TABLE_RESULT_IMAGE"
         val db = this.readableDatabase
-
         val resultList: ArrayList<DBResultImage> = arrayListOf()
         var cursor: Cursor? = null
 
@@ -185,10 +178,10 @@ class DataBaseRepository(
                 val trackingID = cursor.getString(5)
                 val thumbnailLink = cursor.getString(6)
                 val description = cursor.getString(7)
-                val imageLink = cursor?.getString(8)
-                val imageBlob = cursor?.getBlob(9)
-                val currentDate = cursor?.getString(10)
-                val originalImageID = cursor?.getInt(11)
+                val imageLink = cursor.getString(8)
+                val imageBlob = cursor.getBlob(9)
+                val currentDate = cursor.getString(10)
+                val originalImageID = cursor.getInt(11)
                 resultList.add(
                     DBResultImage(
                         id,
@@ -216,7 +209,6 @@ class DataBaseRepository(
     fun getListOfResultsById(originalImageId: Int): ArrayList<DBResultImage> {
         val query = "SELECT * FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = '${originalImageId}'"
         val db = this.readableDatabase
-
         val resultList: ArrayList<DBResultImage> = arrayListOf()
         var cursor: Cursor? = null
 
@@ -235,10 +227,10 @@ class DataBaseRepository(
                 val trackingID = cursor.getString(5)
                 val thumbnailLink = cursor.getString(6)
                 val description = cursor.getString(7)
-                val imageLink = cursor?.getString(8)
-                val imageBlob = cursor?.getBlob(9)
-                val currentDate = cursor?.getString(10)
-                val originalImageID = cursor?.getInt(11)
+                val imageLink = cursor.getString(8)
+                val imageBlob = cursor.getBlob(9)
+                val currentDate = cursor.getString(10)
+                val originalImageID = cursor.getInt(11)
                 resultList.add(
                     DBResultImage(
                         id,
@@ -257,6 +249,7 @@ class DataBaseRepository(
                 )
             }
         }
+
         cursor?.close()
         db.close()
         return resultList
@@ -264,7 +257,6 @@ class DataBaseRepository(
 
     fun getResultImageById(id: Int) : DBResultImage? {
         val db = this.readableDatabase
-
         val query = "SELECT * FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_PK_RESULT_ID = '${id}'"
         var cursor: Cursor? = null
         var dbResultImage: DBResultImage? = null
@@ -273,8 +265,6 @@ class DataBaseRepository(
             cursor = db.rawQuery(query, null)
         }
 
-        Log.d("db_debug", "getResultImageByByteArray: cursor count: ${cursor?.count}")
-        
         if (cursor?.count != 0) {
 
             cursor?.moveToFirst()
@@ -307,10 +297,8 @@ class DataBaseRepository(
                     originalImageID
                 )
             }
-
-            Log.d("db_debug", "getResultImageByByteArray: dbResultImage: $dbResultImage")
-
         }
+
         cursor?.close()
         db.close()
         return dbResultImage
@@ -319,17 +307,24 @@ class DataBaseRepository(
     fun deleteResultImageById(id: Int){
         val db = this.writableDatabase
         val query = "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_PK_RESULT_ID = '${id}'"
+
         db.execSQL(query)
         db.close()
     }
 
-    fun deleteOriginalAndResults(originalImgId: Int){
+    fun deleteResultImagesByOriginalImageId(id: Int){
         val db = this.writableDatabase
-        val firstQuery = "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = '${originalImgId}'"
-        val secondQuery = "DELETE FROM $TABLE_ORIGINAL_IMAGE WHERE $COLUMN_PK_ORIGINAL_ID = '${originalImgId}'"
+        val query = "DELETE FROM $TABLE_RESULT_IMAGE WHERE $COLUMN_FK_ORIGINAL_IMG_ID = '${id}'"
 
-        db.execSQL(firstQuery)
-        db.execSQL(secondQuery)
+        db.execSQL(query)
+        db.close()
+    }
+
+    fun deleteOriginalImageById(id: Int) {
+        val db = this.writableDatabase
+        val query = "DELETE FROM $TABLE_ORIGINAL_IMAGE WHERE $COLUMN_PK_ORIGINAL_ID = '${id}'"
+
+        db.execSQL(query)
         db.close()
     }
 }
