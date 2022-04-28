@@ -14,5 +14,6 @@
     <string name="new_image">New Image</string>
     <string name="search">Search</string>
     <string name="saved">Saved</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
+    <string name="uploading_api">Uploading image…</string>
 </resources>

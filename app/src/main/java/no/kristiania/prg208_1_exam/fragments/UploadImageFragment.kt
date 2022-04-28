@@ -29,8 +29,8 @@ import no.kristiania.prg208_1_exam.models.ResultImage
 import no.kristiania.prg208_1_exam.permissions.ReadExternalStorage
 import no.kristiania.prg208_1_exam.runnables.FetchImagesRunnable
 import no.kristiania.prg208_1_exam.services.ApiService
-import org.w3c.dom.Text
 import java.io.File
+import java.lang.StringBuilder
 import kotlin.collections.ArrayList
 
 class UploadImageFragment : Fragment() {
@@ -44,6 +44,8 @@ class UploadImageFragment : Fragment() {
     private lateinit var googleThread: Thread
     private lateinit var bingThread: Thread
     private lateinit var tineyeThread: Thread
+
+    private lateinit var loadingDialogTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -154,7 +156,7 @@ class UploadImageFragment : Fragment() {
 
     private fun retrieveImagesFromSrc() {
         waitForThread = true
-        loadingDialog.startLoadingDialog()
+        loadingDialogTextView = loadingDialog.startLoadingDialog()
         imageFilePath = Utils.getPathFromURI(requireActivity(), imageUri).toString()
 
         uploadImageToServer(imageUri)
@@ -171,10 +173,12 @@ class UploadImageFragment : Fragment() {
         val file = File(uriPath)
         Log.d("m_debug", "uploadImageToServer: file: $file")
         ApiService().postImage(this, file)
+
+        loadingDialogTextView.text = resources.getString(R.string.uploading_api)
     }
 
     fun onErrorResponse(anError: ANError) {
-        Log.e("Response", "An error occurred: ${Log.getStackTraceString(anError)}")
+        Log.e("API Response", "An error occurred: ${Log.getStackTraceString(anError)}")
 
         if(waitForThread) {
             waitForThread = false
@@ -188,17 +192,20 @@ class UploadImageFragment : Fragment() {
         Log.d("Response", "Response = Success!")
         Log.d("Response", "After api: $response")
 
-        val fetchBingRunnable = FetchImagesRunnable(this,"bing", response)
-        val fetchGoogleRunnable = FetchImagesRunnable(this,"google", response)
-        val fetchTineyeRunnable = FetchImagesRunnable(this,"tineye", response)
+        val engines = arrayListOf("bing", "google", "tineye")
 
-        googleThread = Thread(fetchGoogleRunnable)
-        bingThread = Thread(fetchBingRunnable)
-        tineyeThread = Thread(fetchTineyeRunnable)
+        val fetchText = StringBuilder()
 
-        googleThread.start()
-        bingThread.start()
-        tineyeThread.start()
+        fetchText.append("Fetching images from:\n")
+
+        engines.forEach {
+            val fetchRunnable = FetchImagesRunnable(this,it, response)
+            Thread(fetchRunnable).start()
+
+            fetchText.append("$it. ")
+        }
+
+        loadingDialogTextView.text = fetchText
     }
 
     fun onSuccessfulGet(images: ArrayList<ResultImage?>, returnEngine: String) {

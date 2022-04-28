@@ -3,7 +3,6 @@ package no.kristiania.prg208_1_exam.services
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.Lifecycle
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.ParsedRequestListener
@@ -14,17 +13,26 @@ import no.kristiania.prg208_1_exam.runnables.FetchImagesRunnable
 import java.io.File
 import java.time.Duration
 import java.time.LocalDateTime
-
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
 
 class ApiService {
 
     val path: String = "http://api-edu.gtl.ai/api/v1/imagesearch"
+    private val timeoutSeconds: Long = 60
 
     fun postImage(fragment: UploadImageFragment, file: File) {
+        val okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
+            .connectTimeout(timeoutSeconds, TimeUnit.SECONDS)
+            .readTimeout(timeoutSeconds, TimeUnit.SECONDS)
+            .writeTimeout(timeoutSeconds, TimeUnit.SECONDS)
+            .build()
+
         AndroidNetworking.upload("$path/upload")
             .addMultipartFile("image", file)
             .addMultipartParameter("key", "value")
             .addHeaders("Connection", "close")
+            .setOkHttpClient(okHttpClient)
             .build()
             .setUploadProgressListener { bytesUploaded, totalBytes ->
                 Log.d("Response", "bytes uploaded: $bytesUploaded / total bytes: $totalBytes")
@@ -44,12 +52,19 @@ class ApiService {
     fun getImages(runnable: FetchImagesRunnable, fragment: UploadImageFragment, searchEngine: String, url: String){
         val startThreadTime = LocalDateTime.now()
 
+        val okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
+            .connectTimeout(timeoutSeconds, TimeUnit.SECONDS)
+            .readTimeout(timeoutSeconds, TimeUnit.SECONDS)
+            .writeTimeout(timeoutSeconds, TimeUnit.SECONDS)
+            .build()
+
         Log.d("r_debug", "getImages: GET images from $searchEngine")
 
         AndroidNetworking.get("$path/{searchEngine}")
             .addPathParameter("searchEngine", searchEngine)
             .addQueryParameter("url", url)
             .addHeaders("Accept-Encoding", "identity")
+            .setOkHttpClient(okHttpClient)
             .build()
             .setDownloadProgressListener {bytesDownloaded, totalBytes ->
                 Log.d("Response", "bytes downloaded: $bytesDownloaded / total bytes: $totalBytes")
