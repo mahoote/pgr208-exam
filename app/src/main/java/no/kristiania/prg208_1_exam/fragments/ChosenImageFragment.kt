@@ -2,6 +2,7 @@ package no.kristiania.prg208_1_exam.fragments
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -33,8 +34,6 @@ class ChosenImageFragment : Fragment() {
         dataPasser = context as OnDataPass
     }
 
-    var TAG = "bitmap_debug"
-
     private lateinit var imageView: ImageView
     private lateinit var chosenBitmapImage: Bitmap
     private lateinit var origBitmapImage: Bitmap
@@ -60,6 +59,7 @@ class ChosenImageFragment : Fragment() {
         chosenImagePosition = arguments?.getInt("chosenImagePosition")!!
 
         val bookmarkBtn = v.findViewById<ImageButton>(R.id.cif_bookmark_btn)
+        val webBtn = v.findViewById<ImageButton>(R.id.cif_web_btn)
         val nameView = v.findViewById<TextView>(R.id.cif_img_name_txt)
         val descView = v.findViewById<TextView>(R.id.cif_img_desc_view)
 
@@ -74,6 +74,13 @@ class ChosenImageFragment : Fragment() {
         }
         argsOrigDBImageId?.let {
             origDBImageId = it
+        }
+
+        if(chosenDbResultImage.id == null && chosenDbResultImage.originalImgID != null) {
+            bookmarkBtn.visibility = View.GONE
+        }
+        if(chosenDbResultImage.storeLink == null) {
+            webBtn.visibility = View.GONE
         }
 
         imageView.setImageBitmap(chosenBitmapImage)
@@ -96,7 +103,7 @@ class ChosenImageFragment : Fragment() {
             bookmarkBtnClicked(chosenDbResultImage, bookmarkBtn)
         }
         // Web onclick
-        v.findViewById<ImageButton>(R.id.cif_web_btn).setOnClickListener {
+        webBtn.setOnClickListener {
             webBtnClicked(chosenDbResultImage)
         }
 
@@ -108,8 +115,6 @@ class ChosenImageFragment : Fragment() {
     }
 
     private fun setCorrectBookmarkIcon(bookmarkBtn: ImageButton, id: Int) {
-        Log.d("bookmark_debug", "setCorrectBookmarkIcon: Set correct bookmark")
-
         val dbResultImage = dbService.getResultImageById(id)
         dbResultImage?.let {
             bookmarkBtn.setImageDrawable(
@@ -130,8 +135,6 @@ class ChosenImageFragment : Fragment() {
 
 
     private fun bookmarkBtnClicked(dbResultImage: DBResultImage, bookmarkBtn: ImageButton) {
-        TAG = "db_debug"
-
         val chosenByteArray = Utils.bitmapToByteArray(chosenBitmapImage)
 
         if (dbResultImage.id?.let { dbService.getResultImageById(it) } == null) {
@@ -167,6 +170,8 @@ class ChosenImageFragment : Fragment() {
                     dbService.deleteOriginalAndResults(origId)
                 }
             }
+
+            closeFragment()
         }
     }
 
@@ -198,10 +203,8 @@ class ChosenImageFragment : Fragment() {
 
         if(width > height) {
             imageView.layoutParams.width = maxSize
-            Log.d("p_debug", "sizeCheck: Width is bigger: ${imageView.layoutParams.width}")
         } else {
             imageView.layoutParams.height = maxSize
-            Log.d("p_debug", "sizeCheck: Height is bigger or equal: ${imageView.layoutParams.height}")
         }
         imageView.requestLayout()
     }

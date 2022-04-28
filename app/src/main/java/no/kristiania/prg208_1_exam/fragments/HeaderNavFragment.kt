@@ -26,9 +26,6 @@ class HeaderNavFragment : Fragment() {
 
         dbService = DatabaseService(requireContext())
 
-        val originalDBImages = dbService.getAllOriginalImages()
-
-
         highlightCurrentActivity()
         headerButtonsOnClick()
 

@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import no.kristiania.prg208_1_exam.R
 import no.kristiania.prg208_1_exam.models.DBResultImage
-import no.kristiania.prg208_1_exam.models.ResultImage
 
 class SearchImageAdapter(private val results : ArrayList<DBResultImage>): RecyclerView.Adapter<SearchImageAdapter.ResultsViewHolder>() {
 
@@ -24,7 +23,7 @@ class SearchImageAdapter(private val results : ArrayList<DBResultImage>): Recycl
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultsViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.search_result_item, parent, false)
         return ResultsViewHolder(itemView, mListener)
     }
 
