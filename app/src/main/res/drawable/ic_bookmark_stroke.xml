@@ -7,5 +7,5 @@
         android:fillColor="#00000000"
         android:pathData="M17.4388,37.7812L1.75,47.3309V4.6875C1.75,2.8672 3.1501,1.5 4.7422,1.5H31.6953C33.2874,1.5 34.6875,2.8672 34.6875,4.6875V47.3309L18.9987,37.7812L18.2188,37.3065L17.4388,37.7812Z"
         android:strokeWidth="3"
-        android:strokeColor="#0082FB" />
+        android:strokeColor="@color/app_blue" />
 </vector>

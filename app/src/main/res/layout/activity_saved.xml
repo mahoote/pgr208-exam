@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".SavedActivity">
+    tools:context=".view.SavedActivity"
+    android:id="@+id/sa_content_layout">
 
     <FrameLayout
         android:id="@+id/header_fragment_container"
@@ -16,6 +17,7 @@
         app:layout_constraintRight_toRightOf="parent"
         />
 
+    <!-- Possibility for loading screen, but not in use -->
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/sa_shimmer_layout"
         android:layout_width="0dp"
@@ -23,7 +25,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header_fragment_container">
+        app:layout_constraintTop_toBottomOf="@+id/header_fragment_container"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -41,14 +44,13 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/main_recycler"
+        android:id="@+id/sa_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header_fragment_container"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toBottomOf="@+id/header_fragment_container"/>
 
     <FrameLayout
         android:id="@+id/sa_content_fragment_container"

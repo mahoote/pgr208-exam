@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.ChosenImageFragment">
+    tools:context=".view.fragments.ChosenImageFragment">
 
     <com.revosleap.blurrylayout.BlurryLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="80dp"/>
+                android:layout_height="100dp"/>
 
             <ImageView
                 android:id="@+id/cif_chosen_img"
@@ -40,13 +40,14 @@
                 android:layout_gravity="center"
                 android:src="@mipmap/ic_launcher_round"
                 android:adjustViewBounds="true"
-                android:scaleType="fitXY"/>
+                android:scaleType="fitXY"
+                android:layout_marginBottom="10dp"/>
 
             <TextView
                 android:id="@+id/cif_img_name_txt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Cat with cool glasses"
+                android:text="@string/example_title"
                 android:textSize="22sp"
                 android:textColor="@color/white"
                 android:gravity="center"
@@ -58,7 +59,7 @@
                 android:id="@+id/cif_img_desc_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="This cat is really cool. He (or she) wears glasses that are really cool!"
+                android:text="@string/example_description"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:gravity="center"
