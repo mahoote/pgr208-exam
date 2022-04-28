@@ -34,8 +34,6 @@ import kotlin.collections.ArrayList
 
 class UploadImageFragment : Fragment() {
 
-    val TAG: String = "m_debug"
-
     private lateinit var imageUri: Uri
     private lateinit var imageFilePath: String
     private var dbRepository: DataBaseRepository? = null
@@ -60,11 +58,6 @@ class UploadImageFragment : Fragment() {
 
         origUri?.let {
             imageUri = it
-
-            Log.d(TAG, "onCreateView: Imageuri: $imageUri")
-
-            printRealPath(imageUri)
-
             uploadImage.setImageUriAsync(imageUri)
             uploadImage.isShowCropOverlay = false
         }
@@ -73,57 +66,83 @@ class UploadImageFragment : Fragment() {
 
         // Upload btn.
         v.findViewById<ImageButton>(R.id.uf_upload_search_btn).setOnClickListener{
-            if(uploadImage.isShowCropOverlay) {
-                val cropped: Bitmap = uploadImage.croppedImage
-                val fileName = Utils.getFileNameFromUri(requireContext(), imageUri)
-                imageUri = context?.let { context -> Utils.bitmapToUri(context, cropped, "${fileName}_crop") }!!
-            }
-            retrieveImagesFromSrc()
+            uploadToServer(uploadImage)
         }
 
         // Select new image btn.
         v.findViewById<AppCompatImageButton>(R.id.uf_select_new_btn).setOnClickListener {
-            val mainActivity = activity as MainActivity
-            val requestCode = Utils.GALLERY_REQUEST_CODE
-
-            if (ReadExternalStorage.askForStoragePermissions(mainActivity, requestCode)) {
-                mainActivity.startActivityForResult(Utils.openImageGallery(), requestCode)
-            }
+            selectNewImage()
         }
         // Take new photo btn.
         v.findViewById<AppCompatImageButton>(R.id.uf_take_photo_btn).setOnClickListener {
-            val mainActivity = activity as MainActivity
-            val requestCode = Utils.CAMERA_REQUEST_CODE
-
-            if (ReadExternalStorage.askForStoragePermissions(mainActivity, requestCode)) {
-                mainActivity.startActivityForResult(Utils.openCamera(requireContext()), requestCode)
-            }
+            takeNewPhoto()
         }
-
         // Crop btn.
         val cropBtn = v.findViewById<AppCompatImageButton>(R.id.uf_crop_btn)
-
         cropBtn.setOnClickListener {
-            val isChecked = !uploadImage.isShowCropOverlay
-            uploadImage.isShowCropOverlay = isChecked
-
-            if(!isChecked) {
-                cropBtn.alpha = 1f
-                uploadImage.resetCropRect()
-            } else {
-                cropBtn.alpha = 0.7f
-            }
+            cropOption(uploadImage, cropBtn)
         }
-
         // Rotate switch.
         v.findViewById<AppCompatImageButton>(R.id.uf_rotate_btn).setOnClickListener {
-            val degree = uploadImage.rotation
-            val plusDegree = 90f
-
-            uploadImage.rotation = degree + plusDegree
+            rotate90(uploadImage)
         }
 
         return v
+    }
+
+    private fun uploadToServer(uploadImage: CropImageView) {
+        if (uploadImage.isShowCropOverlay) {
+            val cropped: Bitmap = uploadImage.croppedImage
+            val fileName = Utils.getFileNameFromUri(requireContext(), imageUri)
+            imageUri = context?.let { context ->
+                Utils.bitmapToUri(
+                    context,
+                    cropped,
+                    "${fileName}_crop"
+                )
+            }!!
+        }
+        retrieveImagesFromSrc()
+    }
+
+    private fun cropOption(
+        uploadImage: CropImageView,
+        cropBtn: AppCompatImageButton
+    ) {
+        val isChecked = !uploadImage.isShowCropOverlay
+        uploadImage.isShowCropOverlay = isChecked
+
+        if (!isChecked) {
+            cropBtn.alpha = 1f
+            uploadImage.resetCropRect()
+        } else {
+            cropBtn.alpha = 0.7f
+        }
+    }
+
+    private fun rotate90(uploadImage: CropImageView) {
+        val degree = uploadImage.rotation
+        val plusDegree = 90f
+
+        uploadImage.rotation = degree + plusDegree
+    }
+
+    private fun takeNewPhoto() {
+        val mainActivity = activity as MainActivity
+        val requestCode = Utils.CAMERA_REQUEST_CODE
+
+        if (ReadExternalStorage.askForStoragePermissions(mainActivity, requestCode)) {
+            mainActivity.startActivityForResult(Utils.openCamera(requireContext()), requestCode)
+        }
+    }
+
+    private fun selectNewImage() {
+        val mainActivity = activity as MainActivity
+        val requestCode = Utils.GALLERY_REQUEST_CODE
+
+        if (ReadExternalStorage.askForStoragePermissions(mainActivity, requestCode)) {
+            mainActivity.startActivityForResult(Utils.openImageGallery(), requestCode)
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -131,21 +150,12 @@ class UploadImageFragment : Fragment() {
         dbRepository = DataBaseRepository(context)
     }
 
-    private fun printRealPath(uri: Uri, TAG: String = "m_debug") {
-        val path = Utils.getPathFromURI(requireActivity(), uri)
-        Log.d(TAG, "printRealPath: $path")
-    }
-
     private fun retrieveImagesFromSrc() {
         waitForThread = true
         loadingDialog.startLoadingDialog()
         imageFilePath = Utils.getPathFromURI(requireActivity(), imageUri).toString()
 
-//        if (Globals.cachedImages[imageFilePath] != null) {
-//            getCachedImages(Globals.cachedImages[imageFilePath])
-//        } else {
-            uploadImageToServer(imageUri)
-//        }
+        uploadImageToServer(imageUri)
     }
 
     private fun initializeAndroidNetworking() {
@@ -157,7 +167,7 @@ class UploadImageFragment : Fragment() {
         Log.d("m_debug", "uploadImageToServer")
         val uriPath = Utils.getPathFromURI(requireActivity(), uri).toString()
         val file = File(uriPath)
-        Log.d(TAG, "uploadImageToServer: file: $file")
+        Log.d("m_debug", "uploadImageToServer: file: $file")
         ApiService().postImage(this, file)
     }
 
@@ -196,19 +206,9 @@ class UploadImageFragment : Fragment() {
             Log.d("Response", "Get successful")
             Log.d("r_debug", "onSuccessfulGet: Return images from $returnEngine")
 
-//            Globals.cachedImages[imageFilePath] = CachedImages(imageUri, images, Calendar.getInstance().time)
-
             startSearchActivity(SearchActivity(), images)
         }
-
     }
-
-//    private fun getCachedImages(cachedImages: CachedImages?) {
-//        Log.d("Response", "Get cached images")
-//        cachedImages?.created = Calendar.getInstance().time
-//        val results = cachedImages?.images
-//        startSearchActivity(SearchActivity(), results)
-//    }
 
     private fun startSearchActivity(activity: Activity, results: ArrayList<ResultImage?>?){
         val activityClassName = activity::class.java.name

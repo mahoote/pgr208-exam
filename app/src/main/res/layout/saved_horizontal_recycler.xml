@@ -24,5 +24,7 @@
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/large_blue_btn" />
+
     </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
