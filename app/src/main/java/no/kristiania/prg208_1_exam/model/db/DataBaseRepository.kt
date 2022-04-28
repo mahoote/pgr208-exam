@@ -31,7 +31,7 @@ class DataBaseRepository(
         const val COLUMN_DESCRIPTION = "DESCRIPTION"
         const val COLUMN_RES_IMAGE_LINK = "IMAGE_LINK"
         const val COLUMN_RES_IMAGE_BLOB = "IMAGE_BLOB"
-        const val COLUMN_CURRENT_DATE = "CURR_DATE"
+        const val COLUMN_CURRENT_DATE = "CURRENT_DATE"
     }
 
     // TODO: Check injection safety + close resources
